@@ -13,6 +13,7 @@ import uniTransition from '@dcloudio/uni-ui/lib/uni-transition/uni-transition.vu
 import uniPopup from '@dcloudio/uni-ui/lib/uni-popup/uni-popup.vue';
 import uniFilePicker from '@dcloudio/uni-ui/lib/uni-file-picker/uni-file-picker.vue';
 import uniCountdown from '@dcloudio/uni-ui/lib/uni-countdown/uni-countdown.vue';
+import customTabBar from '@/components/customTabBar.vue';
 
 Vue.config.productionTip = false;
 
@@ -24,6 +25,7 @@ Vue.component('uniTransition', uniTransition);
 Vue.component('uniPopup', uniPopup);
 Vue.component('uniFilePicker', uniFilePicker);
 Vue.component('uniCountdown', uniCountdown);
+Vue.component('customTabBar', customTabBar);
 
 Vue.prototype.$toRouter = toRouter;
 Vue.prototype.$toSwitch = toSwitch;

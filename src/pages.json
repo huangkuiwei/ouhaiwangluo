@@ -548,6 +548,7 @@
   "tabBar": {
     "color": "#1A1A1A",
     "selectedColor": "#1A1A1A",
+    "custom": true,
     "list": [
       {
         "pagePath": "pages/index/index",

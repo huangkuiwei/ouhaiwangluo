@@ -98,6 +98,7 @@
               <text>对话记饮食</text>
             </view>
 
+            <!-- TODO 拍照记饮食 -->
             <view class="option-item" @click="showAddFoodRecodeDialog">
               <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon2.png" />
               <text>拍照记饮食</text>
@@ -190,7 +191,7 @@
     </view>
 
     <view class="weight-cards">
-      <view class="card-item" @click="updateWeight">
+      <view class="card-item" @click="showRecodeWeight">
         <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/bg3.png" />
         <view class="details details1">
           <template v-if="isLogin && userDetailInfo">
@@ -216,7 +217,76 @@
       </view>
     </view>
 
+    <view class="motion" v-if="isVip">
+      <view class="left">
+        <view class="left-title">运动</view>
+
+        <view class="motion-list">
+          <template v-if="!isLogin">
+            <view class="login">登录后查看</view>
+          </template>
+
+          <template v-else-if="motionRecodeList.length">
+            <view class="item" v-for="(item, index) of motionRecodeList" :key="index">
+              <text class="point"></text>
+              <text class="name">{{ item.name }}</text>
+              <text class="quantity">{{ item.quantity }}分钟</text>
+            </view>
+          </template>
+
+          <view v-else class="empty-recode">今日未运动记录</view>
+        </view>
+
+        <view class="add" v-if="isLogin">
+          <view class="total">总消耗{{ motionTotalCalorie }}千卡</view>
+          <view class="add-icon" @click="showAddMotionRecodeDialog">
+            <text>+</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="right">
+        <view class="right-title">今日训练</view>
+
+        <view class="exercises-list">
+          <template v-if="!isLogin">
+            <view class="login">登录后查看</view>
+          </template>
+
+          <template v-else-if="exercisesPlanData.length">
+            <view class="exercises-item" v-for="item of exercisesPlanData" :key="item.id">
+              <view class="detail">
+                <view @click.capture.stop="onCheckboxClick(item)">
+                  <checkbox-group>
+                    <checkbox value="1" :checked="item.is_completed.includes('1')" />
+                  </checkbox-group>
+                </view>
+                <view class="name">{{ item.name }}</view>
+                <view class="calorie">{{ item.calorie }}千卡</view>
+              </view>
+
+              <view class="content">{{ item.content }}</view>
+            </view>
+          </template>
+
+          <view v-else class="empty-recode">未制定运动计划</view>
+        </view>
+
+        <!-- TODO 今日训练是否可以自己添加 -->
+        <!--<view class="add">-->
+        <!--  <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/add-icon.png" />-->
+        <!--</view>-->
+      </view>
+    </view>
+
+    <view class="lock" v-else @click="$toRouter('/pages/vip/vip')">
+      <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/lock-box.png" />
+    </view>
+
     <add-food-recode-dialog ref="addFoodRecodeDialog" @addRecode="addRecode" @addImageRecode="addImageRecode" />
+    <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
+    <update-weight-data-dialog ref="updateWeightDataDialog" @updateSuccess="initData" />
+
     <custom-tab-bar />
   </view>
 </template>
@@ -227,6 +297,8 @@ import * as echarts from '@/uni_modules/lime-echart/static/echarts.min';
 import $http from '@/utils/http';
 import { verifyIsLogin } from '@/utils';
 import AddFoodRecodeDialog from '@/pages/recode/addFoodRecodeDialog.vue';
+import AddMotionRecodeDialog from '@/pages/recode/addMotionRecodeDialog.vue';
+import UpdateWeightDataDialog from '@/components/updateWeightDataDialog.vue';
 
 let chart = null;
 
@@ -234,6 +306,8 @@ export default {
   name: 'indexPage',
 
   components: {
+    UpdateWeightDataDialog,
+    AddMotionRecodeDialog,
     AddFoodRecodeDialog,
   },
 
@@ -339,6 +413,7 @@ export default {
       dailyCalorie: {},
       selectRecodeItem: {},
       motionRecodeList: [],
+      exercisesPlanData: [],
     };
   },
 
@@ -352,7 +427,7 @@ export default {
 
   computed: {
     ...mapState('app', ['userDetailInfo']),
-    ...mapGetters('app', ['isLogin']),
+    ...mapGetters('app', ['isLogin', 'isVip']),
 
     isWeightLoss() {
       if (!this.homeWeightPlanData) {
@@ -372,6 +447,16 @@ export default {
       }
 
       return undefined;
+    },
+
+    motionTotalCalorie() {
+      let total = 0;
+
+      this.motionRecodeList.forEach((item) => {
+        total += item.calorie;
+      });
+
+      return total;
     },
   },
 
@@ -397,6 +482,7 @@ export default {
 
       this.getDailyCalorie();
       this.getDailyFoods();
+      this.getExercises();
       await this.getHomeWeightPlan().catch(() => {});
       await this._getUserDetailInfo().catch(() => {});
 
@@ -410,6 +496,24 @@ export default {
       // chart 图表实例不能存在data里
       chart = await this.$refs.chartRef.init(echarts);
       chart.setOption(this.option);
+    },
+
+    getExercises() {
+      $http
+        .post('api/diet-info/daily-exercises', {
+          date: new Date().format(),
+        })
+        .then((res) => {
+          res.data.forEach((item) => {
+            if (item.is_completed) {
+              item.is_completed = ['1'];
+            } else {
+              item.is_completed = [];
+            }
+          });
+
+          this.exercisesPlanData = res.data;
+        });
     },
 
     /**
@@ -559,6 +663,44 @@ export default {
         });
     },
 
+    onCheckboxClick(item) {
+      console.log(this.exercisesPlanData);
+      if (!item.is_completed.includes('1')) {
+        uni.showModal({
+          title: '温馨提示',
+          content: '您确定完成了此项训练吗？',
+          confirmText: '完成',
+          success: (res) => {
+            if (res.confirm) {
+              item.is_completed = ['1'];
+
+              uni.showLoading({
+                title: '加载中...',
+                mask: true,
+              });
+
+              $http
+                .post('api/diet-info/complete-exercise', {
+                  exercise_item_id: item.id,
+                })
+                .then(() => {
+                  uni.hideLoading();
+
+                  uni.showToast({
+                    title: '操作成功',
+                    icon: 'none',
+                  });
+
+                  this.getExercises();
+                  this.getDailyFoods();
+                  this.getDailyCalorie();
+                });
+            }
+          },
+        });
+      }
+    },
+
     showAddFoodRecodeDialog() {
       if (!this.userDetailInfo) {
         verifyIsLogin();
@@ -566,6 +708,16 @@ export default {
         this.$toRouter('/pages/evaluation/evaluation');
       } else {
         this.$refs.addFoodRecodeDialog.open();
+      }
+    },
+
+    showAddMotionRecodeDialog() {
+      if (!this.userDetailInfo) {
+        verifyIsLogin();
+
+        this.$toRouter('/pages/evaluation/evaluation');
+      } else {
+        this.$refs.addMotionRecodeDialog.open();
       }
     },
 
@@ -591,8 +743,82 @@ export default {
       );
     },
 
-    // TODO 更新体重
-    updateWeight() {},
+    addMotionRecode(event) {
+      this.$refs.addMotionRecodeDialog.close();
+
+      uni.showLoading({
+        title: '加载中...',
+        mask: true,
+      });
+
+      $http
+        .post(
+          'api/diet-info/exercise-analysis',
+          {
+            text: event.text,
+            input_type: event.input_type,
+            type: event.type,
+            date_time: new Date().format(),
+          },
+          {
+            timeout: 90000,
+          },
+        )
+        .then((res) => {
+          if (res.data && !res.data.length) {
+            uni.hideLoading();
+
+            uni.showModal({
+              title: '温馨提示',
+              content: '未检出到运动项目，请重新输入',
+              showCancel: false,
+              success: (res) => {
+                if (res.confirm) {
+                  this.$toBack();
+                }
+              },
+            });
+
+            return;
+          }
+
+          $http
+            .post(
+              'api/diet-info/create-batch',
+              {
+                food_batch: res.data,
+              },
+              {
+                timeout: 90000,
+              },
+            )
+            .then(() => {
+              uni.hideLoading();
+
+              uni.showToast({
+                title: '添加成功',
+                icon: 'none',
+              });
+
+              this.getDailyFoods();
+              this.getDailyCalorie();
+            });
+        });
+    },
+
+    showRecodeWeight() {
+      if (!this.isLogin) {
+        this.$toRouter('/packageLogin/pages/login/login');
+        return;
+      }
+
+      if (!this.userDetailInfo) {
+        this.$toRouter('/pages/evaluation/evaluation');
+        return;
+      }
+
+      this.$refs.updateWeightDataDialog.open();
+    },
 
     /**
      * 跳转创建计划页
@@ -647,7 +873,7 @@ export default {
 
 <style scoped lang="scss">
 .index-page {
-  padding: 0 24rpx;
+  padding: 0 24rpx 200rpx;
 
   .page-title {
   }
@@ -987,7 +1213,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12rpx;
+    margin-bottom: 22rpx;
 
     .card-item {
       width: 340rpx;
@@ -1031,6 +1257,190 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .motion {
+    height: 362rpx;
+    background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/bg5.png') left top/100% 100%
+      no-repeat;
+    display: flex;
+
+    .left {
+      width: 45%;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 12rpx;
+      margin-right: 4%;
+
+      .left-title {
+        flex-shrink: 0;
+        padding: 46rpx 0 52rpx 136rpx;
+        font-weight: 600;
+        font-size: 24rpx;
+        color: #323131;
+      }
+
+      .motion-list {
+        flex-grow: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        padding-left: 32rpx;
+        gap: 12rpx;
+        margin-bottom: 10rpx;
+
+        .item {
+          display: flex;
+          align-items: center;
+
+          text {
+            &.point {
+              width: 21rpx;
+              height: 20rpx;
+              background: #323131;
+              border-radius: 50%;
+              margin-right: 16rpx;
+            }
+
+            &.name,
+            &.quantity {
+              font-size: 20rpx;
+              color: #323131;
+            }
+          }
+        }
+
+        .login,
+        .empty-recode {
+          padding-top: 50rpx;
+        }
+      }
+
+      .add {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 18rpx;
+
+        .total {
+          background: #ffffff;
+          border-radius: 20rpx 20rpx 20rpx 20rpx;
+          font-size: 20rpx;
+          color: #323131;
+          padding: 8rpx 18rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .add-icon {
+          width: 42rpx;
+          height: 42rpx;
+          font-weight: bold;
+          font-size: 40rpx;
+          background: #ffffff;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          text {
+            position: relative;
+            top: -4rpx;
+          }
+        }
+      }
+    }
+
+    .right {
+      width: 51%;
+      display: flex;
+      flex-direction: column;
+
+      .right-title {
+        flex-shrink: 0;
+        padding: 46rpx 0 16rpx 0;
+        font-weight: 600;
+        font-size: 24rpx;
+        color: #323131;
+      }
+
+      .exercises-list {
+        flex-grow: 1;
+        margin-bottom: 10rpx;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6rpx;
+
+        .exercises-item {
+          display: flex;
+          flex-direction: column;
+          gap: 12rpx;
+          position: relative;
+          left: -10rpx;
+
+          .detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: -14rpx;
+
+            checkbox {
+              transform: scale(0.6);
+            }
+
+            .name {
+              font-size: 20rpx;
+              color: #000000;
+              margin-right: 12rpx;
+              position: relative;
+              left: -6rpx;
+            }
+
+            .calorie {
+              font-size: 20rpx;
+              color: #000000;
+            }
+          }
+
+          .content {
+            font-size: 20rpx;
+            color: #6c6c6c;
+            padding-left: 50rpx;
+            line-height: 28rpx;
+          }
+        }
+
+        .login,
+        .empty-recode {
+          padding-top: 86rpx;
+        }
+      }
+
+      .add {
+        flex-shrink: 0;
+        text-align: right;
+
+        image {
+          width: 80rpx;
+        }
+      }
+    }
+
+    .login,
+    .empty-recode {
+      font-size: 20rpx;
+      color: #6c6c6c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .lock {
+    image {
+      width: 100%;
     }
   }
 }

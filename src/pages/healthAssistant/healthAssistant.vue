@@ -77,11 +77,6 @@ export default {
           id: 2,
           text: '中医体质测评',
         },
-        // TODO 暂不支持图片
-        // {
-        //   id: 3,
-        //   text: '舌象诊断',
-        // },
       ],
       chatList: [],
       questionText: '',

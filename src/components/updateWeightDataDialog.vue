@@ -54,7 +54,7 @@ export default {
 
       $http
         .post('api/diet-info/user-weight/update', {
-          weight: Number(this.currentWeight).toFixed(2),
+          weight: Number(this.currentWeight).toFixed(1),
         })
         .then(() => {
           this.$refs.updateWeightDataDialog.close();

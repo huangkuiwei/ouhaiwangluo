@@ -1,130 +1,179 @@
 <template>
   <view class="user-center-page">
     <view class="page-title">
-      <text>个人信息</text>
+      <text>我的信息</text>
 
       <view class="back" @click="$toBack">
-        <uni-icons class="back" color="#1A1A1A" type="left" size="22"></uni-icons>
+        <uni-icons class="back" color="#1A1A1A" type="arrow-left" size="22"></uni-icons>
       </view>
     </view>
 
-    <view class="banner"> </view>
+    <view class="banner"></view>
 
     <view class="userinfo">
-      <view class="box">
-        <view class="item">
+      <view class="box" style="background: #ffffff">
+        <view class="item" @click="$refs.updateGenderDialog.open()">
           <text class="label">性别</text>
 
-          <picker
-            mode="selector"
-            range-key="text"
-            :range="genderList"
-            :value="userDetailInfo.gender"
-            @change="userDetailInfo.gender = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
               <text class="filed">{{ genderList[userDetailInfo.gender].text }}</text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
 
-        <view class="item">
-          <text class="label">出生年份</text>
+        <view class="item" @click="$refs.updateBirthDialog.open()">
+          <text class="label">出生年月</text>
 
-          <picker
-            mode="date"
-            fields="year"
-            :value="userDetailInfo.birth_year"
-            @change="userDetailInfo.birth_year = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
-              <text class="filed">{{ userDetailInfo.birth_year }}年</text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <text class="filed">{{
+                userDetailInfo.birth_year && userDetailInfo.birth_year.replace(/\//g, '-')
+              }}</text>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
 
-        <view class="item">
+        <view class="item" @click="$refs.updateHeightDialog.open()">
           <text class="label">身高</text>
 
-          <picker
-            mode="selector"
-            :range="rulerLineList1"
-            :value="userDetailInfo.height"
-            @change="userDetailInfo.height = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
               <text class="filed">{{ rulerLineList1[userDetailInfo.height] }}厘米</text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
 
-        <view class="item">
+        <view class="item" @click="$refs.updateCurrentWeightDialog.open()">
           <text class="label">当前体重</text>
 
-          <picker
-            mode="selector"
-            :range="rulerLineList2"
-            :value="userDetailInfo.current_weight"
-            @change="userDetailInfo.current_weight = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
               <text class="filed">{{ rulerLineList2[userDetailInfo.current_weight] || currentWeight }}公斤</text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
       </view>
 
-      <view class="box">
-        <view class="item">
+      <view class="box" style="background: #f3f3f3">
+        <view class="item" @click="$refs.updateTargetWeightDialog.open()">
           <text class="label">目标体重</text>
 
-          <picker
-            mode="selector"
-            :range="rulerLineList4"
-            :value="userDetailInfo.target_weight"
-            @change="userDetailInfo.target_weight = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
               <text class="filed">{{ rulerLineList4[userDetailInfo.target_weight] || targetWeight }}公斤</text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
+
+        <!--<view class="item">-->
+        <!--  <text class="label">开始日期</text>-->
+
+        <!--  <view class="picker">-->
+        <!--    <view class="value">-->
+        <!--      <text class="filed">{{-->
+        <!--        userDetailInfo.end_date && userDetailInfo.begin_date.slice(0, 10).replace(/\//g, '-')-->
+        <!--      }}</text>-->
+        <!--      &lt;!&ndash;<uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>&ndash;&gt;-->
+        <!--    </view>-->
+        <!--  </view>-->
+        <!--</view>-->
       </view>
 
-      <view class="box">
-        <view class="item">
-          <text class="label">运动习惯</text>
+      <view class="box" style="background: #e8f480">
+        <view class="item" @click="$refs.updateHabitsDialog.open()">
+          <text class="label">运动量</text>
 
-          <picker
-            mode="selector"
-            :range="exerciseHabits.map((item) => item.text)"
-            :value="userDetailInfo.exercise_habits"
-            @change="userDetailInfo.exercise_habits = $event.detail.value"
-          >
+          <view class="picker">
             <view class="value">
               <text class="filed">
                 {{ exerciseHabits[userDetailInfo.exercise_habits].text }}
               </text>
-              <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+              <uni-icons class="back" color="#323131" type="right" size="16"></uni-icons>
             </view>
-          </picker>
+          </view>
         </view>
       </view>
     </view>
+
+    <update-gender-dialog
+      ref="updateGenderDialog"
+      :genderList="genderList"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-birth-dialog
+      ref="updateBirthDialog"
+      :genderList="genderList"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-height-dialog
+      ref="updateHeightDialog"
+      :list="rulerLineList1"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-current-weight-dialog
+      ref="updateCurrentWeightDialog"
+      :list="rulerLineList2"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-target-weight-dialog
+      ref="updateTargetWeightDialog"
+      :list="rulerLineList4"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-habits-dialog
+      ref="updateHabitsDialog"
+      :list="exerciseHabits"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
+
+    <update-end-date-dialog
+      ref="updateEndDateDialog"
+      :userDetailInfo="userDetailInfo"
+      @submit="Object.assign(userDetailInfo, $event)"
+    />
   </view>
 </template>
 
 <script>
-import $http from '@/utils/http';
 import { mapActions } from 'vuex';
+import $http from '@/utils/http';
+import UpdateGenderDialog from '@/pages/userCenter/updateGenderDialog.vue';
+import UpdateBirthDialog from '@/pages/userCenter/updateBirthDialog.vue';
+import UpdateHeightDialog from '@/pages/userCenter/updateHeightDialog.vue';
+import UpdateCurrentWeightDialog from '@/pages/userCenter/updateCurrentWeightDialog.vue';
+import UpdateTargetWeightDialog from '@/pages/userCenter/updateTargetWeightDialog.vue';
+import UpdateHabitsDialog from '@/pages/userCenter/updateHabitsDialog.vue';
+import UpdateEndDateDialog from '@/pages/userCenter/updateEndDateDialog.vue';
 
 export default {
   name: 'userCenter',
+
+  components: {
+    UpdateEndDateDialog,
+    UpdateHabitsDialog,
+    UpdateTargetWeightDialog,
+    UpdateCurrentWeightDialog,
+    UpdateHeightDialog,
+    UpdateBirthDialog,
+    UpdateGenderDialog,
+  },
 
   data() {
     let rulerLineList1 = [];
@@ -136,10 +185,11 @@ export default {
       rulerLineList1.push(i);
     }
 
-    for (let i = 30; i < 301; i++) {
-      rulerLineList2.push(i);
-      rulerLineList3.push(i);
-      rulerLineList4.push(i);
+    // TODO 体重选择间隔设置
+    for (let i = 0; i < 401; i++) {
+      rulerLineList2.push(Number((i * 0.5).toFixed(1)));
+      rulerLineList3.push(Number((i * 0.5).toFixed(1)));
+      rulerLineList4.push(Number((i * 0.5).toFixed(1)));
     }
 
     return {
@@ -164,31 +214,31 @@ export default {
         {
           id: 0,
           value: 1,
-          text: '几乎不动，长时间久坐',
+          text: '极少运动，日常坐姿为主',
           active: true,
         },
         {
           id: 1,
           value: 2,
-          text: '偶尔活动，每周1-3天',
+          text: '偶尔运动，少量步行与家务为主',
           active: false,
         },
         {
           id: 2,
           value: 3,
-          text: '经常活动，每周3-5天',
+          text: '经常运动，每周3-5天',
           active: false,
         },
         {
           id: 3,
           value: 4,
-          text: '活动频繁，每周6-7天',
+          text: '运动频繁，每周6-7天',
           active: false,
         },
         {
           id: 4,
           value: 5,
-          text: '高强度活动，长时间体力工作',
+          text: '高强度运动，长时间体力工作',
           active: false,
         },
       ],
@@ -210,7 +260,7 @@ export default {
           $http
             .post('api/diet-info/user-info/update', {
               gender: this.genderList[value.gender].value,
-              birth_year: new Date(value.birth_year.toString()).format(),
+              birth_year: new Date(value.birth_year.toString() + '/01').format(),
               height: this.rulerLineList1[value.height],
               initial_weight: this.rulerLineList3[value.initial_weight],
               target_weight: this.rulerLineList4[value.target_weight],
@@ -253,7 +303,7 @@ export default {
   onShareAppMessage() {
     return {
       title: 'AI饮食记录小程序',
-      imageUrl: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/share-img.jpg',
+      imageUrl: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/zhiyingsaoshi/share.jpg',
       path: '/pages/index/index',
     };
   },
@@ -279,7 +329,7 @@ export default {
         }
 
         if (res.data.birth_year) {
-          res.data.birth_year = res.data.birth_year.slice(0, 4);
+          res.data.birth_year = res.data.birth_year.slice(0, 7).replace(/-/g, '/');
         }
 
         if (res.data.begin_date && res.data.end_date) {
@@ -296,8 +346,8 @@ export default {
             currentDate2.getMonth() + 1 > 9 ? currentDate2.getMonth() + 1 : `0${currentDate2.getMonth() + 1}`;
           const date2 = currentDate2.getDate() > 9 ? currentDate2.getDate() : '0' + currentDate2.getDate();
 
-          res.data.begin_date = `${year1}-${month1}-${date1}`;
-          res.data.end_date = `${year2}-${month2}-${date2}`;
+          res.data.begin_date = `${year1}/${month1}/${date1}`;
+          res.data.end_date = `${year2}/${month2}/${date2}`;
         }
 
         if (res.data.height) {
@@ -333,46 +383,63 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  height: 100%;
 }
 </style>
 
 <style scoped lang="scss">
 .user-center-page {
+  // TODO 背景颜色修改
+  background: linear-gradient(180deg, #e8f480 0%, #ffffff 100%);
+  padding: 0 24rpx 200rpx;
+  height: 100%;
+  overflow: auto;
+
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 8rpx;
   }
 
   .userinfo {
-    padding: 20rpx 30rpx 0;
-
     .box {
-      background: #ffffff;
       border-radius: 20rpx;
-      padding: 30rpx 24rpx;
+      padding: 32rpx;
       margin-bottom: 20rpx;
+
+      &:nth-child(1) {
+        .filed {
+          color: #32313180;
+        }
+      }
+
+      &:nth-child(2) {
+        .filed {
+          color: #323131bb;
+        }
+      }
+
+      &:nth-child(3) {
+        .filed {
+          color: #323131;
+        }
+      }
 
       .item {
         display: flex;
         align-items: center;
 
         &:not(:last-child) {
-          padding-bottom: 30rpx;
-          margin-bottom: 30rpx;
-          border-bottom: 1px solid #f6f7fb;
+          padding-bottom: 40rpx;
         }
 
         .label {
-          font-size: 28rpx;
-          color: #1a1a1a;
+          font-size: 24rpx;
+          color: #323131;
         }
 
-        picker {
+        .picker {
           flex-grow: 1;
 
           .value {
@@ -381,8 +448,7 @@ page {
             justify-content: flex-end;
 
             .filed {
-              font-size: 26rpx;
-              color: #666666;
+              font-size: 24rpx;
               margin-right: 10rpx;
             }
           }

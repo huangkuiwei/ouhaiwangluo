@@ -10,8 +10,10 @@
 
     <view class="banner"> </view>
 
+    <view class="no-login" @click="$toSwitch('/pages/index/index')">暂不登录</view>
+
     <view class="container">
-      <view class="title">慧食搭子 记录美好生活</view>
+      <view class="title">OUHI欢迎你的到来</view>
 
       <view class="input-box">
         <view class="phone">
@@ -42,7 +44,7 @@
       <view class="agreement">
         <checkbox-group @change="agree = $event.detail.value">
           <label>
-            <checkbox value="1" :checked="agree.includes('1')" />
+            <checkbox color="#E8F480" value="1" :checked="agree.includes('1')" />
           </label>
         </checkbox-group>
         <view>
@@ -57,7 +59,8 @@
     <view class="kefu">
       <text @click="callPhone">联系客服</text>
       <text class="line">｜</text>
-      <text>客服电话：4009989759</text>
+      <!-- TODO 客服电话 -->
+      <text>客服电话：4000000000</text>
     </view>
   </view>
 </template>
@@ -267,9 +270,10 @@ export default {
       }
     },
 
+    // TODO 客服电话
     callPhone() {
       uni.makePhoneCall({
-        phoneNumber: '4009989759',
+        phoneNumber: '4000000000',
       });
     },
   },
@@ -285,8 +289,7 @@ page {
 <style scoped lang="scss">
 .login-page {
   height: 100%;
-  background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/login/login-bg.png') top left/100% 100%
-    no-repeat;
+  background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/login/bg.png') top left/100% 100% no-repeat;
   padding-bottom: 60rpx;
   display: flex;
   flex-direction: column;
@@ -299,51 +302,71 @@ page {
     padding: calc(var(--page-title-height)) 0 0;
   }
 
+  .no-login {
+    padding: 20rpx 40rpx 0;
+    font-size: 32rpx;
+    color: #313030;
+    text-align: right;
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 40rpx;
+      width: 128rpx;
+      height: 2rpx;
+      background: #313030;
+    }
+  }
+
   .container {
     flex-grow: 1;
-    padding-bottom: 180rpx;
+    padding-bottom: 210rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 
     .title {
-      font-weight: 500;
-      font-size: 38rpx;
-      color: #1a1a1a;
-      margin-bottom: 86rpx;
+      font-weight: 600;
+      font-size: 40rpx;
+      color: #313030;
+      margin-bottom: 134rpx;
     }
 
     .input-box {
-      margin-bottom: 50rpx;
+      margin-bottom: 40rpx;
 
       .phone {
-        width: 590rpx;
-        height: 90rpx;
-        background: #f6f7fb;
-        border-radius: 45rpx;
-        font-size: 28rpx;
+        width: 532rpx;
+        height: 80rpx;
+        background: #f3f3f3;
+        border-radius: 60rpx;
+        font-size: 24rpx;
+        color: #313030;
         margin-bottom: 30rpx;
 
         input {
-          padding: 0 36rpx;
+          padding: 0 32rpx;
           width: 100%;
           height: 100%;
         }
       }
 
       .password {
-        width: 590rpx;
-        height: 90rpx;
-        background: #f6f7fb;
-        border-radius: 45rpx;
-        font-size: 28rpx;
+        width: 532rpx;
+        height: 80rpx;
+        background: #f3f3f3;
+        border-radius: 60rpx;
+        font-size: 24rpx;
+        color: #313030;
         padding-right: 38rpx;
         display: flex;
         align-items: center;
 
         input {
-          padding: 0 36rpx;
+          padding: 0 32rpx;
           flex-grow: 1;
           height: 100%;
         }
@@ -351,28 +374,27 @@ page {
         .line {
           flex-shrink: 0;
           width: 2rpx;
-          height: 50rpx;
-          background: #0abf92;
-          margin-right: 14rpx;
+          height: 48rpx;
+          background: #5a5959;
+          margin-right: 20rpx;
         }
 
         .get-code {
           flex-shrink: 0;
           white-space: nowrap;
           font-size: 24rpx;
-          color: #0abf92;
+          color: #313030aa;
         }
       }
     }
 
     .login {
-      width: 560rpx;
-      height: 90rpx;
-      background: #0abf92;
-      border-radius: 45rpx;
-      font-weight: 500;
-      font-size: 32rpx;
-      color: #ffffff;
+      width: 532rpx;
+      height: 100rpx;
+      background: linear-gradient(86deg, #e8f480 0%, #fcffea 100%);
+      border-radius: 60rpx;
+      font-size: 28rpx;
+      color: #313030;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -394,19 +416,19 @@ page {
       align-items: center;
 
       checkbox {
-        transform: scale(0.6);
+        transform: scale(0.55);
       }
 
       view {
-        font-size: 22rpx;
-        color: #999999;
+        font-size: 20rpx;
+        color: #5a5959;
       }
     }
   }
 
   .kefu {
-    font-size: 22rpx;
-    color: #999999;
+    font-size: 20rpx;
+    color: #5a5959aa;
     align-self: center;
 
     .line {

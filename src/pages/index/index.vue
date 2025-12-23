@@ -13,7 +13,7 @@
       </view>
 
       <view class="status">
-        <text v-if="isLogin" @click="addPlan">
+        <text v-if="isLogin" @click="goWeightManage">
           <template v-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看计划</template>
           <template v-else-if="homeWeightPlanData && homeWeightPlanData.state === 2">创建下阶段计划</template>
           <template v-else>完善个人资料</template>
@@ -834,21 +834,6 @@ export default {
     },
 
     /**
-     * 跳转创建计划页
-     */
-    addPlan() {
-      verifyIsLogin();
-
-      if (!this.userDetailInfo) {
-        this.$toRouter('/pages/evaluation/evaluation');
-        return;
-      }
-
-      // 创建计划
-      this.$toRouter('/pages/addPlan/addPlan');
-    },
-
-    /**
      * 跳转计划管理页
      */
     goWeightManage() {
@@ -865,20 +850,6 @@ export default {
       }
 
       this.$toRouter('/pages/weightManagementPlan/weightManagementPlan');
-    },
-
-    /**
-     * 跳转 AI 搭子聊天界面
-     */
-    jumpAi(item) {
-      // verifyIsLogin();
-
-      if (item.id === 10000) {
-        this.$toRouter('/pages/healthAssistant/healthAssistant', `agent_id=${item.id}&name=${item.name}`);
-        return;
-      }
-
-      this.$toRouter('/pages/aiChat/aiChat', `agent_id=${item.id}&name=${item.name}`);
     },
   },
 };

@@ -1,36 +1,12 @@
 <template>
   <view class="my-page">
-    <view class="page-title">个人中心</view>
+    <view class="page-title">我的</view>
 
-    <view class="banner">
+    <view class="banner"></view>
+
+    <view class="user-info">
       <view class="info">
-        <view class="left">
-          <view class="username" v-if="isLogin">
-            <text class="name">{{ userInfo.uname }}</text>
-
-            <image
-              mode="widthFix"
-              src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/edit-icon.png"
-            />
-
-            <text class="edit" @click="goProfile">编辑资料</text>
-          </view>
-
-          <view class="no-login" v-else @click="$toRouter('/packageLogin/pages/login/login')">
-            <text class="name">登录/注册</text>
-            <text class="tip">点击登录/注册</text>
-          </view>
-
-          <template v-if="isLogin">
-            <view class="time" v-if="isVip">
-              <text>会员到期：{{ userInfo.vip_info.vip_end_time.slice(0, 10) }}</text>
-              <text class="renewal" @click="$toRouter('/pages/renewalManage/renewalManage')">续订管理</text>
-            </view>
-            <view class="time" v-else>普通用户</view>
-          </template>
-        </view>
-
-        <view class="right">
+        <view class="left" @click="goProfile">
           <image
             mode="aspectFill"
             :src="
@@ -38,119 +14,124 @@
             "
           />
         </view>
+
+        <view class="right">
+          <view class="username" v-if="isLogin" @click="goProfile">
+            <text class="name">微信用户</text>
+            <text class="phone">{{ userInfo.uname }}</text>
+          </view>
+
+          <view class="username" v-else>
+            <text class="name" @click="$toRouter('/packageLogin/pages/login/login')">登录/注册</text>
+            <text class="phone">登录/注册</text>
+          </view>
+        </view>
       </view>
 
-      <view class="vip-icon" @click="!isVip && goVip()">
+      <view class="data-card">
+        <!-- TODO 记录饮食次数 -->
+        <view class="data-item">
+          <text>0</text>
+          <text>记录饮食/次</text>
+        </view>
+
+        <!-- TODO 记录运动次数 -->
+        <view class="data-item">
+          <text>0</text>
+          <text>记录运动/天</text>
+        </view>
+      </view>
+
+      <view class="vip-icon" @click="goVip">
+        <!-- TODO vip图片 -->
         <image
           mode="widthFix"
           :src="
             isVip
-              ? 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/my/vip-icon2.png'
-              : 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/vip-icon.png'
+              ? 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg1.png'
+              : 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg1.png'
           "
         />
+
+        <view class="desc" v-if="isVip">
+          <view>你已是尊贵的会员</view>
+          <view>
+            <text>已解锁全部功能</text>
+            <text class="time">有效期至{{ userInfo.vip_info.vip_end_time.slice(0, 10) }}</text>
+          </view>
+        </view>
+
+        <view class="desc" v-else>
+          <view>升级会员</view>
+          <view>解锁专属健身饮食方案等所有功能</view>
+        </view>
       </view>
 
       <view class="data">
-        <view class="item" @click="previewDataPage('/pages/dataStatistics/dataStatistics')">
-          <view class="data-title">数据统计</view>
-          <view class="number">
-            <text>{{ recodeSummary.weekly_caloric_diff || 0 }}</text>
-            <text>千卡</text>
-          </view>
-          <view class="tip">近7天的热量缺口数据</view>
+        <!-- TODO 饮食记录 -->
+        <view class="item">
+          <view class="data-title">饮食记录</view>
+          <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg02.png" />
+        </view>
 
-          <view class="arrow">
-            <uni-icons color="#C0C0C0" type="right" size="14"></uni-icons>
-          </view>
+        <!-- TODO 我的食谱 -->
+        <view class="item">
+          <view class="data-title">我的食谱</view>
+          <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg03.png" />
         </view>
 
         <view class="item" @click="previewDataPage('/pages/weightData/weightData')">
           <view class="data-title">体重数据</view>
-          <view class="number">
-            <text>
-              {{ (isWeightLoss ? recodeSummary.weight_loss || 0 : -recodeSummary.weight_loss || 0).toFixed(2) || 0 }}
-            </text>
-            <text>公斤</text>
-          </view>
-          <view class="tip" v-if="isWeightLoss">累计减重（公斤）</view>
-          <view class="tip" v-else>累计增肌（公斤）</view>
+          <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg04.png" />
+        </view>
 
-          <view class="arrow">
-            <uni-icons color="#C0C0C0" type="right" size="14"></uni-icons>
-          </view>
+        <view class="item" @click="previewDataPage('/pages/dataStatistics/dataStatistics')">
+          <view class="data-title">数据统计</view>
+          <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg05.png" />
         </view>
       </view>
     </view>
 
     <view class="nav-container">
       <view class="nav">
-        <view class="nav-item" @click="goFuliCenter">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon07.png"
-          />
-          <text class="nav-title">福利中心</text>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
+        <view class="nav-item" @click="goUserCenter">
+          <text class="nav-title">我的信息</text>
+          <uni-icons color="#323131" type="right" size="14"></uni-icons>
         </view>
 
-        <view class="nav-item" @click="goUserCenter">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon01.png"
-          />
-          <text class="nav-title">我的数据</text>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
+        <!-- TODO 断食提醒 -->
+        <view class="nav-item">
+          <text class="nav-title">断食提醒</text>
+          <view>
+            <text>09:00</text>
+            <switch :checked="remind" @change="remind = !remind" />
+          </view>
         </view>
 
         <view class="nav-item" @click="previewDataPage('/pages/dataReport/dataReport')">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon02.png"
-          />
           <text class="nav-title">数据报告</text>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
+          <uni-icons color="#323131" type="right" size="14"></uni-icons>
         </view>
+      </view>
+    </view>
 
-        <!--<view class="nav-item" @click="jumpAuthPage('/pages/setReminder/setReminder')">-->
-        <!--  <image-->
-        <!--    mode="widthFix"-->
-        <!--    src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon03.png"-->
-        <!--  />-->
-        <!--  <text class="nav-title">提醒设置</text>-->
-        <!--  <uni-icons color="#999999" type="right" size="14"></uni-icons>-->
-        <!--</view>-->
-
-        <view class="nav-item" @click="showRedemptionDialog">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon04.png"
-          />
-          <text class="nav-title">兑换码</text>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
-        </view>
-
+    <view class="nav-container1">
+      <view class="nav">
         <view class="nav-item" @click="jumpAuthPage('/pages/feedback/feedback')">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon05.png"
-          />
-          <text class="nav-title">意见和反馈</text>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
+          <text class="nav-title">意见反馈</text>
+          <uni-icons color="#323131" type="right" size="14"></uni-icons>
         </view>
 
         <view class="nav-item">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/recode/nav-icon06.png"
-          />
-          <button class="nav-title" @click="openContact">联系客服</button>
-          <uni-icons color="#999999" type="right" size="14"></uni-icons>
+          <button class="nav-title" open-type="contact">联系客服</button>
+          <uni-icons color="#323131" type="right" size="14"></uni-icons>
         </view>
       </view>
     </view>
 
     <redemption-dialog ref="redemptionDialog" @success="success" />
+
+    <custom-tab-bar />
   </view>
 </template>
 
@@ -167,6 +148,7 @@ export default {
     return {
       recodeSummary: {},
       homeWeightPlanData: null,
+      remind: false,
     };
   },
 
@@ -275,6 +257,7 @@ export default {
       this.$toRouter(url);
     },
 
+    // TODO 客服
     openContact() {
       uni.openCustomerServiceChat({
         corpId: 'wwa09afa94a53c191b',
@@ -289,20 +272,9 @@ export default {
       this.$toRouter(url);
     },
 
-    showRedemptionDialog() {
-      verifyIsLogin();
-      this.$refs.redemptionDialog.open();
-    },
-
     goProfile() {
       verifyIsLogin();
       this.$toRouter('/pages/profile/profile');
-    },
-
-    goFuliCenter() {
-      uni.navigateTo({
-        url: `/pages/webview/webview?src=${encodeURIComponent('https://myorder.laketay.com')}`,
-      });
     },
 
     goUserCenter() {
@@ -326,107 +298,134 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  height: 100%;
 }
 </style>
 
 <style scoped lang="scss">
 .my-page {
-  padding-bottom: 60rpx;
+  background: linear-gradient(180deg, #e8f480 0%, #ffffff 100%);
+  padding: 0 24rpx 200rpx;
+  height: 100%;
+  overflow: auto;
 
   .page-title {
   }
 
   .banner {
-    padding: calc(var(--page-title-height) + 43rpx) 30rpx 20rpx;
-    background: linear-gradient(180deg, rgba(204, 255, 238, 0.9) 0%, #f6f7fb 100%);
+    padding: calc(var(--page-title-height)) 0 60rpx;
+  }
+
+  .user-info {
+    margin-bottom: 20rpx;
 
     .info {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 30rpx;
+      margin-bottom: 40rpx;
 
       .left {
-        display: flex;
-        flex-direction: column;
-        gap: 32rpx;
+        margin-right: 20rpx;
 
-        .username {
-          display: flex;
-          align-items: center;
-
-          .name {
-            font-weight: bold;
-            font-size: 32rpx;
-            color: #1a1a1a;
-          }
-
-          image {
-            width: 26rpx;
-            margin: 0 8rpx 0 24rpx;
-          }
-
-          .edit {
-            font-size: 22rpx;
-            color: #555555;
-          }
-        }
-
-        .no-login {
-          display: flex;
-          flex-direction: column;
-          gap: 30rpx;
-
-          .name {
-            font-weight: bold;
-            font-size: 32rpx;
-            color: #1a1a1a;
-          }
-
-          .tip {
-            font-size: 26rpx;
-            color: #1a1a1a;
-          }
-        }
-
-        .time {
-          font-size: 26rpx;
-          color: #1a1a1a;
-          display: flex;
-          align-items: center;
-          gap: 20rpx;
-
-          .renewal {
-            width: 105rpx;
-            height: 35rpx;
-            background: #0abf92;
-            border-radius: 18rpx;
-            font-size: 20rpx;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
+        image {
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 50%;
+          display: block;
         }
       }
 
       .right {
-        image {
-          width: 135rpx;
-          height: 135rpx;
-          border-radius: 50%;
-          display: block;
+        display: flex;
+
+        .username {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 16rpx;
+
+          .name {
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #323131;
+          }
+
+          .phone {
+            font-size: 28rpx;
+            color: #323131;
+          }
+        }
+      }
+    }
+
+    .data-card {
+      background: #ffffff;
+      border-radius: 20rpx;
+      padding: 36rpx 112rpx 20rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20rpx;
+
+      .data-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20rpx;
+
+        text {
+          &:nth-child(1) {
+            font-weight: 600;
+            font-size: 56rpx;
+            color: #323131;
+          }
+
+          &:nth-child(2) {
+            font-size: 24rpx;
+            color: #323131;
+          }
         }
       }
     }
 
     .vip-icon {
       width: 100%;
+      position: relative;
       margin-bottom: 20rpx;
 
       image {
         width: 100%;
+      }
+
+      .desc {
+        position: absolute;
+        left: 40rpx;
+        top: 20rpx;
+        display: flex;
+        flex-direction: column;
+        gap: 24rpx;
+
+        view {
+          &:nth-child(1) {
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #323131;
+          }
+
+          &:nth-child(2) {
+            font-size: 24rpx;
+            color: #323131;
+            display: flex;
+            align-items: center;
+            gap: 34rpx;
+
+            .time {
+              font-size: 20rpx;
+              color: #32313170;
+            }
+          }
+        }
       }
     }
 
@@ -436,83 +435,84 @@ page {
       justify-content: space-between;
 
       .item {
-        width: 335rpx;
-        height: 160rpx;
-        background: #ffffff;
-        border-radius: 25rpx;
-        padding: 20rpx 30rpx;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
         position: relative;
+        width: 160rpx;
+
+        image {
+          width: 100%;
+        }
 
         .data-title {
-          font-size: 28rpx;
-          color: #1a1a1a;
-          font-weight: 500;
-        }
-
-        .number {
-          display: flex;
-          align-items: center;
-
-          text {
-            &:nth-child(1) {
-              font-size: 34rpx;
-              color: #0abf92;
-              margin-right: 6rpx;
-            }
-
-            &:nth-child(2) {
-              font-size: 26rpx;
-              color: #333333;
-            }
-          }
-        }
-
-        .tip {
-          font-size: 22rpx;
-          color: #999999;
-        }
-
-        .arrow {
           position: absolute;
-          top: 26rpx;
-          right: 16rpx;
+          top: 20rpx;
+          left: 0;
+          right: 0;
+          text-align: center;
+          font-size: 24rpx;
+          color: #323131;
         }
       }
     }
   }
 
   .nav-container {
-    padding: 0 30rpx;
+    border-radius: 20rpx;
+    padding: 32rpx;
+    border: 4rpx solid #c6b9ff;
+    background: #ffffff;
+    margin-bottom: 20rpx;
 
     .nav {
-      background: #ffffff;
-      border-radius: 20rpx;
-      padding: 40rpx 30rpx;
       display: flex;
       flex-direction: column;
+      gap: 20rpx;
 
       .nav-item {
         display: flex;
         align-items: center;
 
-        &:not(:last-child) {
-          padding-bottom: 34rpx;
-          margin-bottom: 34rpx;
-          border-bottom: 2rpx solid #f2f2f2;
+        .nav-title {
+          font-size: 24rpx;
+          color: #323131;
+          flex-grow: 1;
         }
 
-        image {
-          width: 60rpx;
-          margin-right: 20rpx;
+        view {
+          display: flex;
+          align-items: center;
+          position: relative;
+          left: 30rpx;
+
+          text {
+            font-size: 24rpx;
+            color: #c6b9ff;
+          }
+
+          switch {
+            transform: scale(0.6);
+          }
         }
+      }
+    }
+  }
+
+  .nav-container1 {
+    border-radius: 20rpx;
+    padding: 32rpx;
+    background: #f3f3f3;
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 20rpx;
+
+      .nav-item {
+        display: flex;
+        align-items: center;
 
         .nav-title {
-          font-weight: 500;
-          font-size: 26rpx;
-          color: #1a1a1a;
+          font-size: 24rpx;
+          color: #323131;
           flex-grow: 1;
         }
 

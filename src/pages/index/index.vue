@@ -121,7 +121,7 @@
           </view>
         </view>
 
-        <view class="calorie-type">
+        <view class="calorie-type" @click="showChangeRatioDialog">
           <view class="calorie-item">
             <view class="name">碳水化合物</view>
 
@@ -286,6 +286,7 @@
     <add-food-recode-dialog ref="addFoodRecodeDialog" @addRecode="addRecode" @addImageRecode="addImageRecode" />
     <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
     <update-weight-data-dialog ref="updateWeightDataDialog" @updateSuccess="initData" />
+    <change-ratio-dialog ref="changeRatioDialog" @success="initData" />
 
     <custom-tab-bar />
   </view>
@@ -299,6 +300,7 @@ import { verifyIsLogin } from '@/utils';
 import AddFoodRecodeDialog from '@/pages/recode/addFoodRecodeDialog.vue';
 import AddMotionRecodeDialog from '@/pages/recode/addMotionRecodeDialog.vue';
 import UpdateWeightDataDialog from '@/components/updateWeightDataDialog.vue';
+import ChangeRatioDialog from '@/pages/recode/changeRatioDialog.vue';
 
 let chart = null;
 
@@ -306,6 +308,7 @@ export default {
   name: 'indexPage',
 
   components: {
+    ChangeRatioDialog,
     UpdateWeightDataDialog,
     AddMotionRecodeDialog,
     AddFoodRecodeDialog,
@@ -698,6 +701,16 @@ export default {
             }
           },
         });
+      }
+    },
+
+    showChangeRatioDialog() {
+      if (!this.userDetailInfo) {
+        verifyIsLogin();
+
+        this.$toRouter('/pages/evaluation/evaluation');
+      } else {
+        this.$refs.changeRatioDialog.open();
       }
     },
 

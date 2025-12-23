@@ -23,28 +23,35 @@
           />
 
           <view class="upload-box">
-            <uni-file-picker
-              :image-styles="{
-                width: 50,
-                height: 50,
-                border: false,
-              }"
-              :value="imageValue"
-              :auto-upload="false"
-              :limit="5"
-              file-mediatype="image"
-              fileMediatype="image"
-              mode="grid"
-              @select="onSelect"
-            >
-              <view class="add">+</view>
-            </uni-file-picker>
+            <view class="upload-box-content">
+              <uni-file-picker
+                :image-styles="{
+                  width: 50,
+                  height: 50,
+                  border: false,
+                }"
+                :value="imageValue"
+                :auto-upload="false"
+                :limit="5"
+                file-mediatype="image"
+                fileMediatype="image"
+                mode="grid"
+                @select="onSelect"
+              >
+                <view class="add">
+                  <image
+                    mode="widthFix"
+                    src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/feedback/add-icon.png"
+                  />
+                </view>
+              </uni-file-picker>
+            </view>
           </view>
         </view>
 
         <view class="feedback-title2">
           <text>联系方式</text>
-          <text>注：手机号/微信/QQ</text>
+          <!--<text>注：手机号/微信/QQ</text>-->
         </view>
 
         <view class="input-box2">
@@ -56,9 +63,9 @@
           />
         </view>
       </view>
-    </view>
 
-    <view class="submit" @click="submit">确认</view>
+      <view class="submit" @click="submit">确认</view>
+    </view>
   </view>
 </template>
 
@@ -153,47 +160,43 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  background: #ffffff;
 }
 </style>
 
 <style scoped lang="scss">
 .feedback-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 6rpx;
   }
 
   .feedback-container {
-    padding: 20rpx 30rpx;
+    padding: 0 46rpx;
 
     .feedback-box {
-      padding: 34rpx 22rpx;
       border-radius: 20rpx;
-      background: #ffffff;
+      margin-bottom: 100rpx;
 
       .feedback-title {
-        font-weight: 500;
-        font-size: 30rpx;
-        color: #1a1a1a;
-        margin-bottom: 30rpx;
+        font-weight: 600;
+        font-size: 32rpx;
+        color: #323131;
+        margin-bottom: 20rpx;
       }
 
       .input-box {
-        background: #f5f6fa;
-        height: 500rpx;
+        background: #f3f3f3;
+        height: 550rpx;
         border-radius: 20rpx;
         padding: 30rpx 20rpx;
         display: flex;
         flex-direction: column;
-        margin-bottom: 50rpx;
+        margin-bottom: 40rpx;
 
         textarea {
-          background: #f5f6fa;
           width: 100%;
           flex-grow: 1;
           font-size: 26rpx;
@@ -202,18 +205,20 @@ page {
 
         .upload-box {
           flex-shrink: 0;
-          height: 50px;
+          display: flex;
+          justify-content: flex-end;
 
-          .add {
-            width: 100%;
-            height: 100%;
-            border-radius: 20rpx;
-            border: 1px dashed #bfbfbf;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50rpx;
-            color: #bfbfbf;
+          .upload-box-content {
+            .add {
+              width: 110rpx;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              image {
+                width: 90%;
+              }
+            }
           }
         }
       }
@@ -226,9 +231,9 @@ page {
 
         text {
           &:nth-child(1) {
-            font-weight: 500;
-            font-size: 30rpx;
-            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 24rpx;
+            color: #313030;
           }
 
           &:nth-child(2) {
@@ -240,32 +245,31 @@ page {
 
       .input-box2 {
         background: #f5f6fa;
-        height: 120rpx;
+        height: 80rpx;
         border-radius: 20rpx;
-        padding: 30rpx 20rpx;
+        padding: 0 32rpx;
         display: flex;
         align-items: center;
 
         input {
           width: 100%;
-          font-size: 26rpx;
+          font-size: 24rpx;
+          color: #313030;
         }
       }
     }
-  }
 
-  .submit {
-    margin: 100rpx auto 0;
-    width: 592rpx;
-    height: 103rpx;
-    background: #0abf92;
-    border-radius: 52rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 32rpx;
-    color: #ffffff;
+    .submit {
+      width: 100%;
+      height: 80rpx;
+      background: #e8f480;
+      border-radius: 20rpx;
+      font-size: 32rpx;
+      color: #323131;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 }
 </style>

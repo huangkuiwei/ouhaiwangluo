@@ -156,41 +156,39 @@ export default {
 
 <style scoped lang="scss">
 .logout-page {
+  padding: 0 24rpx;
+
   .page-title {
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
+    padding: calc(var(--page-title-height)) 0 38rpx;
   }
 
   .tip {
-    background: #faeee5;
-    padding: 26rpx 36rpx;
-    font-size: 26rpx;
-    color: #ffaa00;
+    padding: 0 18rpx;
+    font-weight: 500;
+    font-size: 28rpx;
+    color: #e72d2d;
     line-height: 42rpx;
     margin-bottom: 52rpx;
   }
 
   .container {
-    padding: 0 32rpx;
-
     .title {
-      font-weight: 500;
-      font-size: 32rpx;
-      color: #111111;
-      margin-bottom: 25rpx;
+      font-weight: 600;
+      font-size: 28rpx;
+      color: #323131;
+      margin-bottom: 20rpx;
     }
 
     .sub-title {
-      font-size: 22rpx;
-      color: #999999;
-      margin-bottom: 88rpx;
+      font-size: 24rpx;
+      color: #32313180;
+      margin-bottom: 80rpx;
     }
 
     .input-box {
-      border-bottom: 2rpx solid #d9d9d9;
-      padding: 0 20rpx 18rpx;
       display: flex;
       align-items: center;
 
@@ -198,52 +196,56 @@ export default {
         flex-shrink: 0;
         font-weight: 500;
         font-size: 28rpx;
-        color: #111111;
-        margin-right: 47rpx;
+        color: #323131;
+        margin-right: 18rpx;
       }
 
       input {
         flex-grow: 1;
-        font-size: 22rpx;
+        font-size: 24rpx;
+        color: #323131;
+        border-bottom: 2rpx solid #323131;
+        text-align: center;
       }
 
       .get-code {
         flex-shrink: 0;
+        margin-left: 38rpx;
         font-size: 24rpx;
-        color: #0abf92;
+        color: #323131;
+        padding-bottom: 16rpx;
+        border-bottom: 2rpx solid #323131;
       }
     }
   }
 
   .btn {
     position: fixed;
-    left: 30rpx;
-    right: 30rpx;
+    left: 24rpx;
+    right: 24rpx;
     bottom: 100rpx;
     display: flex;
     flex-direction: column;
-    gap: 20rpx;
+    gap: 26rpx;
 
     view {
-      height: 103rpx;
+      height: 80rpx;
       border-radius: 20rpx;
-      font-weight: 500;
-      font-size: 32rpx;
+      font-size: 28rpx;
       display: flex;
       align-items: center;
       justify-content: center;
 
       &.btn1 {
         width: 100%;
-        background: #0abf92;
-        color: #ffffff;
+        background: #e8f480;
+        color: #323131;
       }
 
       &.btn2 {
         width: 100%;
-        background: #ffffff;
-        color: #0abf92;
-        border: 2rpx solid #0abf92;
+        background: #fcffea;
+        color: #323131;
       }
     }
   }

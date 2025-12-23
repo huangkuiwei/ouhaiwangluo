@@ -10,9 +10,8 @@
 
     <view class="banner"></view>
 
-    <view class="header">
+    <view class="header" @click="editHeaderImg">
       <image
-        @click="editHeaderImg"
         class="header-img"
         mode="aspectFill"
         :src="userInfo.avatar_url || 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/my/default_head.png'"
@@ -29,7 +28,7 @@
       <view class="nav">
         <view class="nav-item">
           <view class="nav-title">昵称</view>
-          <view class="name">{{ userInfo.uname }}</view>
+          <view class="name" style="color: #323131">{{ userInfo.uname }}</view>
         </view>
 
         <view class="nav-item">
@@ -59,7 +58,9 @@
           </view>
         </view>
       </view>
+    </view>
 
+    <view class="options">
       <view class="sign-out" @click="signOut">退出登录</view>
       <view class="logout" @click="$toRouter('/packageLogin/pages/logout/logout')">注销账号</view>
     </view>
@@ -224,75 +225,83 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  height: 100%;
 }
 </style>
 
 <style scoped lang="scss">
 .profile-page {
+  // TODO 背景颜色修改
+  background: linear-gradient(180deg, #e8f480 0%, #ffffff 100%);
+  padding: 0 26rpx 200rpx;
+  height: 100%;
+  overflow: auto;
+
   page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 88rpx;
   }
 
   .header {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 54rpx 0 60rpx;
+    padding: 0 0 44rpx;
     position: relative;
 
     .header-img {
-      width: 150rpx;
-      height: 150rpx;
+      width: 160rpx;
+      height: 160rpx;
       border-radius: 50%;
     }
 
     .cramer {
       position: absolute;
-      width: 50rpx;
-      bottom: 50rpx;
-      right: 300rpx;
+      width: 52rpx;
+      bottom: 40rpx;
+      right: 260rpx;
     }
   }
 
   .nav-container {
-    padding: 0 30rpx;
+    background: #f3f3f3;
+    border-radius: 20rpx;
+    padding: 30rpx 18rpx;
     display: flex;
     flex-direction: column;
     gap: 20rpx;
+    margin-bottom: 40rpx;
 
     .nav {
       background: #ffffff;
       border-radius: 20rpx;
-      padding: 32rpx 25rpx;
+      padding: 32rpx 20rpx;
       display: flex;
       flex-direction: column;
-      gap: 60rpx;
+      gap: 40rpx;
 
       .nav-item {
         display: flex;
         align-items: center;
 
         .nav-title {
+          font-weight: 500;
           font-size: 28rpx;
-          color: #1a1a1a;
+          color: #323131;
           flex-grow: 1;
 
           .phone {
             margin-left: 20rpx;
-            font-size: 24rpx;
-            color: #999999;
+            font-size: 28rpx;
+            color: #32313180;
           }
         }
 
         .name {
-          font-size: 24rpx;
-          color: #999999;
+          font-size: 28rpx;
+          color: #32313180;
 
           .version {
             margin-right: 20rpx;
@@ -300,31 +309,46 @@ page {
         }
       }
     }
+  }
 
+  .options {
     .sign-out {
-      height: 103rpx;
-      background: #0abf92;
+      height: 80rpx;
+      background: #e8f480;
       border-radius: 20rpx;
-      font-weight: 500;
-      font-size: 32rpx;
-      color: #ffffff;
+      font-size: 28rpx;
+      color: #323131;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-bottom: 26rpx;
     }
 
     .logout {
       font-size: 28rpx;
-      color: #0abf92;
+      color: #323131;
       text-align: center;
+      padding-bottom: 6rpx;
+      position: relative;
+
+      &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120rpx;
+        height: 2rpx;
+        background: #313030;
+      }
     }
   }
 
   .sign-out-dialog {
-    width: 589rpx;
+    width: 702rpx;
     background: #ffffff;
-    border-radius: 30rpx;
-    padding: 40rpx 90rpx;
+    border-radius: 40rpx;
+    padding: 60rpx 52rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -332,16 +356,17 @@ page {
     position: relative;
 
     .title {
-      font-weight: 500;
+      font-weight: 600;
       font-size: 32rpx;
-      color: #111111;
-      margin-bottom: 50rpx;
+      color: #000000;
+      margin-bottom: 82rpx;
     }
 
     .tip {
-      font-size: 26rpx;
-      color: #555555;
-      margin-bottom: 35rpx;
+      font-weight: 500;
+      font-size: 28rpx;
+      color: #000000;
+      margin-bottom: 108rpx;
 
       view {
         line-height: 45rpx;
@@ -351,24 +376,33 @@ page {
 
     .options {
       align-self: stretch;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40rpx;
 
       .btn1 {
-        width: 100%;
-        height: 90rpx;
-        background: #0abf92;
-        border-radius: 45rpx;
-        font-size: 30rpx;
-        color: #ffffff;
+        width: 280rpx;
+        height: 80rpx;
+        background: #e8f480;
+        border-radius: 60rpx;
+        font-size: 28rpx;
+        color: #323131;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 22rpx;
       }
 
       .btn2 {
-        font-size: 30rpx;
-        color: #999999;
-        text-align: center;
+        width: 280rpx;
+        height: 80rpx;
+        background: #fcffea;
+        border-radius: 60rpx;
+        font-size: 28rpx;
+        color: #323131;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

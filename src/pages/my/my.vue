@@ -43,12 +43,11 @@
       </view>
 
       <view class="vip-icon" @click="goVip">
-        <!-- TODO vip图片 -->
         <image
           mode="widthFix"
           :src="
             isVip
-              ? 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg1.png'
+              ? 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg06.png'
               : 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg1.png'
           "
         />
@@ -304,6 +303,7 @@ page {
 
 <style scoped lang="scss">
 .my-page {
+  // TODO 背景颜色修改
   background: linear-gradient(180deg, #e8f480 0%, #ffffff 100%);
   padding: 0 24rpx 200rpx;
   height: 100%;
@@ -422,7 +422,7 @@ page {
 
             .time {
               font-size: 20rpx;
-              color: #32313170;
+              color: #32313180;
             }
           }
         }

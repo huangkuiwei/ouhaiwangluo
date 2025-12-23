@@ -234,7 +234,7 @@ export default {
   }
 
   .container {
-    padding: 0 30rpx;
+    padding: 0 24rpx;
 
     .step {
       display: flex;
@@ -243,16 +243,16 @@ export default {
       justify-content: center;
 
       .title {
-        font-weight: 500;
+        font-weight: 600;
         font-size: 32rpx;
-        color: #111111;
-        margin-bottom: 36rpx;
+        color: #323131;
+        margin-bottom: 40rpx;
       }
 
       .sub-title {
-        font-size: 26rpx;
-        color: #999999;
-        margin-bottom: 57rpx;
+        font-size: 24rpx;
+        color: #31303080;
+        margin-bottom: 50rpx;
 
         view {
           line-height: 40rpx;
@@ -261,46 +261,48 @@ export default {
       }
 
       .phone {
-        font-weight: 500;
+        font-weight: 600;
         font-size: 32rpx;
-        color: #111111;
-        margin-bottom: 43rpx;
+        color: #323131;
+        margin-bottom: 40rpx;
       }
 
       .input-box {
         width: 100%;
-        height: 103rpx;
-        background: #ffffff;
+        height: 80rpx;
+        background: #f3f3f3;
         border-radius: 20rpx;
-        border: 2rpx solid #0abf92;
-        padding: 0 33rpx;
+        padding: 0 32rpx;
         display: flex;
         align-items: center;
 
         .suffix {
           flex-shrink: 0;
+          font-weight: 600;
           font-size: 24rpx;
-          color: #0abf92;
+          color: #313030;
           margin-right: 20rpx;
         }
 
         .line {
           flex-shrink: 0;
-          width: 1rpx;
-          height: 52rpx;
-          background: #999999;
+          width: 2rpx;
+          height: 40rpx;
+          background: #323131;
           margin-right: 20rpx;
         }
 
         input {
           flex-grow: 1;
-          font-size: 28rpx;
+          font-size: 24rpx;
         }
 
         .get-code {
           flex-shrink: 0;
           font-size: 24rpx;
-          color: #0abf92;
+          color: #313030;
+          padding-bottom: 8rpx;
+          border-bottom: 2rpx solid #323131;
         }
       }
     }
@@ -308,15 +310,14 @@ export default {
 
   .next {
     position: fixed;
-    left: 30rpx;
-    right: 30rpx;
+    left: 24rpx;
+    right: 24rpx;
     bottom: 100rpx;
-    height: 103rpx;
-    background: #0abf92;
+    height: 80rpx;
+    background: #e8f480;
     border-radius: 20rpx;
-    font-weight: 500;
     font-size: 32rpx;
-    color: #ffffff;
+    color: #323131;
     display: flex;
     align-items: center;
     justify-content: center;

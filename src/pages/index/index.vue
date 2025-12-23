@@ -297,10 +297,10 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import * as echarts from '@/uni_modules/lime-echart/static/echarts.min';
 import $http from '@/utils/http';
 import { verifyIsLogin } from '@/utils';
-import AddFoodRecodeDialog from '@/pages/recode/addFoodRecodeDialog.vue';
-import AddMotionRecodeDialog from '@/pages/recode/addMotionRecodeDialog.vue';
+import AddFoodRecodeDialog from '@/components/addFoodRecodeDialog.vue';
+import AddMotionRecodeDialog from '@/components/addMotionRecodeDialog.vue';
 import UpdateWeightDataDialog from '@/components/updateWeightDataDialog.vue';
-import ChangeRatioDialog from '@/pages/recode/changeRatioDialog.vue';
+import ChangeRatioDialog from '@/components/changeRatioDialog.vue';
 
 let chart = null;
 

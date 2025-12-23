@@ -3,7 +3,7 @@
     <view class="page-title">
       <text>每餐分析</text>
 
-      <view class="back" @click="$toSwitch('/pages/recode/recode')">
+      <view class="back" @click="$toSwitch('/pages/index/index')">
         <uni-icons class="back" color="#1A1A1A" type="left" size="22"></uni-icons>
       </view>
     </view>
@@ -108,7 +108,7 @@
       </view>
     </view>
 
-    <view class="know-btn" @click="$toSwitch('/pages/recode/recode')">我知道了</view>
+    <view class="know-btn" @click="$toSwitch('/pages/index/index')">我知道了</view>
   </view>
 </template>
 

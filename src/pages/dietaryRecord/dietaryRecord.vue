@@ -119,7 +119,7 @@
 <script>
 import * as echarts from '@/uni_modules/lime-echart/static/echarts.min';
 import $http from '@/utils/http';
-import AddFoodRecodeDialog from '@/pages/recode/addFoodRecodeDialog.vue';
+import AddFoodRecodeDialog from '@/components/addFoodRecodeDialog.vue';
 import ModifyFoodDialog from '@/pages/dietaryRecord/modifyFoodDialog.vue';
 
 let chart = null;

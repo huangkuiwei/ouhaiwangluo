@@ -16,11 +16,11 @@
       }
     },
     {
-      "path": "pages/recode/recode",
+      "path": "pages/AIAssistant/AIAssistant",
       "style": {
         "navigationStyle": "custom",
         // #ifndef H5
-        "navigationBarTitleText": "记录",
+        "navigationBarTitleText": "AI助理",
         // #endif
         "h5": {
           "titleNView": false
@@ -557,14 +557,14 @@
         "selectedIconPath": "static/tabBar/home1.png"
       },
       {
-        "pagePath": "pages/recode/recode",
-        "text": "记录",
+        "pagePath": "pages/AIAssistant/AIAssistant",
+        "text": "AI助理",
         "iconPath": "static/tabBar/recode.png",
         "selectedIconPath": "static/tabBar/recode1.png"
       },
       {
         "pagePath": "pages/sunshine/sunshine",
-        "text": "攒阳光",
+        "text": "健康树",
         "iconPath": "static/tabBar/sunshine.png",
         "selectedIconPath": "static/tabBar/sunshine1.png"
       },

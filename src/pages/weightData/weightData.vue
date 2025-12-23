@@ -349,7 +349,7 @@ export default {
       }
 
       if (this.hasCompletedPlan) {
-        this.$toSwitch('/pages/recode/recode');
+        this.$toSwitch('/pages/index/index');
         return;
       }
 

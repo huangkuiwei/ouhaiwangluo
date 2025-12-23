@@ -229,7 +229,7 @@
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex';
 import * as echarts from '@/uni_modules/lime-echart/static/echarts.min';
 import $http from '@/utils/http';
-import AddMotionRecodeDialog from '@/pages/recode/addMotionRecodeDialog.vue';
+import AddMotionRecodeDialog from '@/components/addMotionRecodeDialog.vue';
 
 let chart = null;
 

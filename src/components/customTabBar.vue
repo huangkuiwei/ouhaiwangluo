@@ -33,7 +33,7 @@ export default {
           active: false,
         },
         {
-          pagePath: 'pages/recode/recode',
+          pagePath: 'pages/AIAssistant/AIAssistant',
           text: 'AI助理',
           iconPath: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/tabbar/icon2.png',
           selectedIconPath: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/tabbar/icon2.png',

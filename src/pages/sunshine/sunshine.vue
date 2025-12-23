@@ -469,7 +469,7 @@ export default {
       if (item.task_name === '每日签到') {
         this.signIn();
       } else if (item.task_name === '每日记录') {
-        this.$toSwitch('/pages/recode/recode');
+        this.$toSwitch('/pages/index/index');
       } else if (item.task_name === '记录体重') {
         if (!this.userDetailInfo) {
           verifyIsLogin();

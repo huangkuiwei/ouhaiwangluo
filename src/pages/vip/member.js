@@ -19,7 +19,7 @@ export const onPay = (price, openid, mobile) => {
     mask: true,
   });
 
-  // 连续包月
+  // TODO 连续包月
   if (price.id === 10003) {
     $http
       .post('https://hsdzapi.laketay.com/api/business/ali_sign/create_sign', {

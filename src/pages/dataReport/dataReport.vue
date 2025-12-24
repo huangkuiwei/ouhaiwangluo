@@ -19,7 +19,6 @@
         @click="selectedTime = item"
       >
         <text class="name">{{ item.name }}</text>
-        <text class="highlight" v-if="selectedTime.id === item.id" />
       </view>
     </view>
 
@@ -37,21 +36,19 @@
             <template v-if="dataReport.weight_list && dataReport.weight_list.length">
               <view class="change-list">
                 <view class="day1">
-                  <text>{{ firstDay.weight }}公斤</text>
                   <text>{{ firstDay.date_time.slice(5, 10) }}</text>
+                  <text>{{ lastDay.date_time.slice(5, 10) }}</text>
                 </view>
 
-                <view class="line"></view>
-
                 <view class="day2">
+                  <text>{{ firstDay.weight }}公斤</text>
                   <text>{{ lastDay.weight }}公斤</text>
-                  <text>{{ lastDay.date_time.slice(5, 10) }}</text>
                 </view>
               </view>
             </template>
 
             <view v-else class="empty-recode">
-              <text>暂无记录</text>
+              <text>最近无体重记录</text>
             </view>
           </view>
 
@@ -61,31 +58,19 @@
             <template v-if="dataReport.weight_list && dataReport.weight_list.length">
               <view class="change-list">
                 <view class="day1">
-                  <text>{{ firstDay.bmi }}</text>
                   <text>{{ firstDay.date_time.slice(5, 10) }}</text>
-                </view>
-
-                <view class="line"></view>
-
-                <view class="day2">
-                  <text>{{ lastDay.bmi }}</text>
                   <text>{{ lastDay.date_time.slice(5, 10) }}</text>
                 </view>
-              </view>
 
-              <view class="summary">
-                <text v-if="firstDay.weight === lastDay.weight">{{ selectedTime.name }}体重无明显变化</text>
-                <text v-else-if="firstDay.weight > lastDay.weight">
-                  {{ selectedTime.name }}体重减少{{ Number((firstDay.weight - lastDay.weight).toFixed(2)) }}KG
-                </text>
-                <text v-else>
-                  {{ selectedTime.name }}体重增加{{ Number((lastDay.weight - firstDay.weight).toFixed(2)) }}KG
-                </text>
+                <view class="day2">
+                  <text>{{ lastDay.date_time.slice(5, 10) }}</text>
+                  <text>{{ firstDay.bmi }}</text>
+                </view>
               </view>
             </template>
 
             <view v-else class="empty-recode">
-              <text>暂无记录</text>
+              <text>最近无BMI记录</text>
             </view>
           </view>
         </view>
@@ -99,45 +84,35 @@
 
         <view class="data-info">
           <view class="data-info-item">
-            <view class="info-title">平均摄入</view>
+            <view class="info-title" style="background: #dad2ff">平均摄入</view>
 
-            <view class="change-list1">
+            <view class="change-list change-list1" style="background: #dad2ff">
               <view class="day1">
-                <text class="time">{{ selectedTime.name }}</text>
-                <text class="progress"></text>
-                <text class="number">{{ dataReport.calorie_average }}千卡</text>
+                <text>{{ selectedTime.name }}</text>
+                <text>{{ selectedTime.preName }}</text>
               </view>
 
               <view class="day2">
-                <text class="time">{{ selectedTime.preName }}</text>
-                <text class="number">{{ dataReport.previous_calorie_average }}千卡</text>
+                <text>{{ dataReport.calorie_average }}千卡</text>
+                <text>{{ dataReport.previous_calorie_average }}千卡</text>
               </view>
-            </view>
-
-            <view class="summary">
-              {{ selectedTime.name }}平均摄入热量{{ dataReport.calorie_average }}千卡，最高的一天摄入{{
-                dataReport.calorie_max
-              }}千卡
             </view>
           </view>
 
           <view class="data-info-item">
-            <view class="info-title">食物种类</view>
+            <view class="info-title" style="background: #dad2ff">食物种类</view>
 
-            <view class="change-list1">
+            <view class="change-list change-list1" style="background: #dad2ff">
               <view class="day1">
-                <text class="time">{{ selectedTime.name }}</text>
-                <text class="progress"></text>
-                <text class="number">{{ dataReport.food_num }}种</text>
+                <text>{{ selectedTime.name }}</text>
+                <text>{{ selectedTime.preName }}</text>
               </view>
 
               <view class="day2">
-                <text class="time">{{ selectedTime.preName }}</text>
-                <text class="number">{{ dataReport.previous_food_num }}种</text>
+                <text>{{ dataReport.food_num }}千卡</text>
+                <text>{{ dataReport.previous_food_num }}千卡</text>
               </view>
             </view>
-
-            <view class="summary">{{ selectedTime.name }}摄入食物{{ dataReport.food_num }}种</view>
           </view>
         </view>
       </view>
@@ -234,58 +209,51 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  background: #ffffff url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/dataReport/bg01.png') left top/100%
+    auto no-repeat;
 }
 </style>
 
 <style scoped lang="scss">
 .data-report-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 42rpx;
   }
 
   .nav-tab {
-    background: #ffffff;
-    padding: 48rpx 56rpx 32rpx;
+    padding: 0 16rpx 34rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 40rpx;
 
     .nav-item {
+      height: 40rpx;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &.active {
-        .name {
-          color: #1a1a1a;
-        }
+        border-radius: 20rpx;
+        background: #b3a1ff;
       }
 
       .name {
-        color: #999999;
-        font-size: 30rpx;
+        padding: 0 20rpx;
+        color: #323131;
+        font-size: 28rpx;
         position: relative;
         z-index: 1;
-      }
-
-      .highlight {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -2rpx;
-        height: 12rpx;
-        background: #0abf92;
-        border-radius: 6rpx;
       }
     }
   }
 
   .data-detail {
-    padding: 40rpx 30rpx;
+    padding: 0 40rpx;
 
     .data-item {
       margin-bottom: 44rpx;
@@ -298,130 +266,81 @@ page {
 
         text {
           &:nth-child(1) {
-            font-weight: 500;
-            font-size: 30rpx;
-            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 28rpx;
+            color: #323131;
           }
 
           &:nth-child(2) {
             font-size: 24rpx;
-            color: #333333;
+            color: #323131;
           }
         }
       }
 
       .data-info {
-        background: #ffffff;
+        background: #fcffea;
         border-radius: 20rpx;
-        padding: 30rpx 25rpx;
+        padding: 20rpx 12rpx;
         display: flex;
         flex-direction: column;
-        gap: 44rpx;
+        gap: 50rpx;
 
         .data-info-item {
           .info-title {
-            padding-left: 30rpx;
+            display: inline-flex;
+            background: #ffffff;
+            border-radius: 20rpx 20rpx 0rpx 0rpx;
+            padding: 6rpx 12rpx;
             font-size: 24rpx;
-            color: #999999;
-            margin-bottom: 30rpx;
+            color: #323131;
             position: relative;
-
-            &::after {
-              content: '';
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 10rpx;
-              height: 26rpx;
-              background: #0abf92;
-              border-radius: 5rpx;
-            }
           }
 
           .change-list {
-            background: #f5f6fa;
-            border-radius: 10rpx;
-            padding: 30rpx 52rpx;
+            background: #ffffff;
+            border-radius: 0rpx 10rpx 10rpx 10rpx;
+            padding: 20rpx;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            gap: 20rpx;
+
+            &.change-list1 {
+              .day1,
+              .day2 {
+                text {
+                  &:nth-child(1) {
+                    font-size: 24rpx;
+                    color: #323131;
+                  }
+
+                  &:nth-child(2) {
+                    font-size: 24rpx;
+                    color: #323131aa;
+                  }
+                }
+              }
+            }
 
             .day1,
             .day2 {
               flex-shrink: 0;
               display: flex;
-              flex-direction: column;
               align-items: center;
-              justify-content: center;
+              justify-content: space-between;
 
               text {
                 &:nth-child(1) {
-                  font-size: 28rpx;
-                  color: #1a1a1a;
-                  margin-bottom: 20rpx;
+                  font-size: 20rpx;
+                  color: #323131;
                 }
 
                 &:nth-child(2) {
-                  font-size: 26rpx;
-                  color: #666666;
+                  font-size: 24rpx;
+                  color: #323131;
                 }
               }
             }
-
-            .line {
-              flex-grow: 1;
-              border-top: 2rpx dashed #cbe1ff;
-              margin: 0 40rpx;
-            }
-          }
-
-          .change-list1 {
-            background: #f5f6fa;
-            border-radius: 10rpx;
-            padding: 30rpx 52rpx;
-            display: flex;
-            flex-direction: column;
-            gap: 16rpx;
-
-            .day1 {
-              display: flex;
-              align-items: center;
-              font-size: 28rpx;
-              color: #1a1a1a;
-
-              .time {
-                flex-shrink: 0;
-                white-space: nowrap;
-              }
-
-              .progress {
-                flex-grow: 1;
-                width: 317rpx;
-                height: 10rpx;
-                background: #cbe1ff;
-                border-radius: 5rpx;
-                margin: 0 34rpx;
-              }
-
-              .number {
-                flex-shrink: 0;
-                white-space: nowrap;
-              }
-            }
-
-            .day2 {
-              font-size: 26rpx;
-              color: #666666;
-
-              .time {
-                margin-right: 40rpx;
-              }
-            }
-          }
-
-          .summary {
-            margin-top: 32rpx;
-            font-size: 25rpx;
-            color: #666666;
           }
         }
       }
@@ -434,7 +353,8 @@ page {
   align-items: center;
   justify-content: center;
   font-size: 28rpx;
-  color: #aaaaaa;
+  color: #00000080;
+  background: #ffffff;
   padding: 30rpx 0;
 }
 </style>

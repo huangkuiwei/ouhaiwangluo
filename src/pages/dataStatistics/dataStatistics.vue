@@ -19,7 +19,6 @@
         @click="selectedTime = item"
       >
         <text class="name">{{ item.name }}</text>
-        <text class="highlight" v-if="selectedTime.id === item.id" />
       </view>
     </view>
 
@@ -83,6 +82,7 @@ export default {
       ],
       selectedTime: {},
       option1: {
+        backgroundColor: '#FCFFEA',
         title: {
           show: false,
         },
@@ -93,40 +93,51 @@ export default {
           },
         },
         legend: {
-          bottom: 0,
+          top: 10,
+          right: 10,
+          textStyle: {
+            color: '#323131',
+          },
         },
         grid: {
-          top: '5%',
+          top: '20%',
           left: '5%',
           right: '5%',
-          bottom: '10%',
+          bottom: '5%',
           containLabel: true,
         },
         yAxis: {
           type: 'value',
+          axisLabel: {
+            color: '#000000',
+          },
         },
         xAxis: {
           type: 'category',
           data: [],
+          axisLabel: {
+            color: '#000000',
+          },
         },
         series: [
           {
             name: '热量摄取',
             type: 'bar',
             data: [],
-            color: '#FFA537',
+            color: '#FFAF5F',
             barMaxWidth: 20,
           },
           {
             name: '运动量',
             type: 'bar',
             data: [],
-            color: '#0ABF92',
+            color: '#B3A0FD',
             barMaxWidth: 20,
           },
         ],
       },
       option2: {
+        backgroundColor: '#FCFFEA',
         title: {
           show: false,
         },
@@ -137,13 +148,17 @@ export default {
           },
         },
         legend: {
-          bottom: 0,
+          top: 10,
+          right: 10,
+          textStyle: {
+            color: '#323131',
+          },
         },
         grid: {
-          top: '5%',
+          top: '20%',
           left: '5%',
           right: '5%',
-          bottom: '10%',
+          bottom: '5%',
           containLabel: true,
         },
         yAxis: {
@@ -154,17 +169,23 @@ export default {
               type: 'solid',
             },
           },
+          axisLabel: {
+            color: '#000000',
+          },
         },
         xAxis: {
           type: 'category',
           data: [],
+          axisLabel: {
+            color: '#000000',
+          },
         },
         series: [
           {
             name: '热量缺口',
             type: 'bar',
             data: [],
-            color: '#0ABF92',
+            color: '#E8F480',
             barMaxWidth: 20,
           },
         ],
@@ -237,73 +258,66 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  background: #ffffff url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/dataReport/bg01.png') left top/100%
+    auto no-repeat;
 }
 </style>
 
 <style scoped lang="scss">
 .data-statistics-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 42rpx;
   }
 
   .nav-tab {
-    background: #ffffff;
-    padding: 48rpx 56rpx 32rpx;
+    padding: 0 16rpx 34rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 40rpx;
 
     .nav-item {
+      height: 40rpx;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &.active {
-        .name {
-          color: #1a1a1a;
-        }
+        border-radius: 20rpx;
+        background: #b3a1ff;
       }
 
       .name {
-        color: #999999;
-        font-size: 30rpx;
+        padding: 0 20rpx;
+        color: #323131;
+        font-size: 28rpx;
         position: relative;
         z-index: 1;
-      }
-
-      .highlight {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -2rpx;
-        height: 12rpx;
-        background: #0abf92;
-        border-radius: 6rpx;
       }
     }
   }
 
   .data-charts {
-    padding: 40rpx 30rpx;
+    padding: 0 40rpx;
 
     .chart-item {
-      margin-bottom: 50rpx;
+      margin-bottom: 40rpx;
 
       .chart-title {
-        font-weight: 500;
-        font-size: 30rpx;
-        color: #1a1a1a;
+        font-weight: 600;
+        font-size: 28rpx;
+        color: #323131;
         margin-bottom: 28rpx;
       }
 
       .chart-box {
         background: #ffffff;
         border-radius: 20rpx;
-        padding: 40rpx 20rpx 30rpx;
+        height: 460rpx;
       }
     }
   }

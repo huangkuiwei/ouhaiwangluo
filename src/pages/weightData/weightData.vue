@@ -11,75 +11,71 @@
     <view class="banner"> </view>
 
     <view class="data-charts">
-      <view class="chart1-box">
-        <view class="progress">
-          <view class="chart">
-            <l-echart ref="chart1Ref" @finished="init1" />
+      <view class="bmi">
+        <view class="value1">
+          <text>初始BMI值为：{{ userDetailInfo.initial_bmi }}</text>
+          <text class="no-normal" v-if="userDetailInfo.initial_bmi > 27.9">肥胖</text>
+          <text class="no-normal" v-else-if="userDetailInfo.initial_bmi > 24.9">超重</text>
+          <text class="normal" v-else-if="userDetailInfo.initial_bmi > 18.5">正常</text>
+          <text class="no-normal" v-else>偏瘦</text>
+        </view>
 
-            <view class="progress-tip">
-              <text v-if="isWeightLoss">累计减重（公斤）</text>
-              <text v-else>累计增肌（公斤）</text>
-              <text>{{ (isWeightLoss ? userDetailInfo.weight_loss : -userDetailInfo.weight_loss).toFixed(2) }}</text>
-              <text>{{ progress === 100 ? '目标已完成' : `目标完成${progress}%` }}</text>
+        <view class="value2">
+          <text>根据您的身高体重测算，推荐BMI范围：</text>
+          <text>18.5-24.9</text>
+        </view>
+      </view>
+
+      <view class="chart1-box">
+        <view class="detail">
+          <view class="item">
+            <view class="value">
+              <text>初始体重</text>
+              <text>{{ userDetailInfo.initial_weight }}公斤</text>
             </view>
+
+            <!-- <image -->
+            <!--   @click="updateWeightData(1)" -->
+            <!--   mode="widthFix" -->
+            <!--   src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightData/edit.png" -->
+            <!-- /> -->
           </view>
 
-          <view class="detail">
-            <view class="item">
-              <view class="value">
-                <text>初始体重</text>
-                <text>{{ userDetailInfo.initial_weight }}公斤</text>
-              </view>
-
-              <image
-                @click="updateWeightData(1)"
-                mode="widthFix"
-                src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightData/edit.png"
-              />
+          <view class="item">
+            <view class="value">
+              <text>目标体重</text>
+              <text>{{ userDetailInfo.target_weight }}公斤</text>
             </view>
 
-            <view class="item">
-              <view class="value">
-                <text>目标体重</text>
-                <text>{{ userDetailInfo.target_weight }}公斤</text>
-              </view>
+            <!-- <image -->
+            <!--   @click="updateWeightData(2)" -->
+            <!--   mode="widthFix" -->
+            <!--   src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightData/edit.png" -->
+            <!-- /> -->
+          </view>
 
-              <image
-                @click="updateWeightData(2)"
-                mode="widthFix"
-                src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightData/edit.png"
-              />
+          <view class="item">
+            <view class="value">
+              <text>最新体重</text>
+              <text>{{ userDetailInfo.current_weight }}公斤</text>
             </view>
 
-            <view class="item">
-              <view class="value">
-                <text>最新体重</text>
-                <text>{{ userDetailInfo.current_weight }}公斤</text>
-              </view>
-
-              <image
-                @click="updateWeightData(3)"
-                mode="widthFix"
-                src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightData/edit.png"
-              />
-            </view>
+            <image
+              @click="updateWeightData(3)"
+              mode="widthFix"
+              src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightData/icon1.png"
+            />
           </view>
         </view>
 
-        <view class="line"></view>
+        <view class="chart">
+          <l-echart ref="chart1Ref" @finished="init1" />
 
-        <view class="bmi">
-          <view class="value1">
-            <text>初始BMI值为：{{ userDetailInfo.initial_bmi }}</text>
-            <text v-if="userDetailInfo.initial_bmi > 27.9">肥胖</text>
-            <text v-else-if="userDetailInfo.initial_bmi > 24.9">超重</text>
-            <text v-else-if="userDetailInfo.initial_bmi > 18.5">正常</text>
-            <text v-else>偏瘦</text>
-          </view>
-
-          <view class="value2">
-            <text>根据您的身高体重测算，推荐BMI范围：</text>
-            <text>18.5-24.9</text>
+          <view class="progress-tip">
+            <text v-if="isWeightLoss">累计减重（公斤）</text>
+            <text v-else>累计增肌（公斤）</text>
+            <text>{{ (isWeightLoss ? userDetailInfo.weight_loss : -userDetailInfo.weight_loss).toFixed(2) }}</text>
+            <text>{{ progress === 100 ? '目标已完成' : `目标完成${progress}%` }}</text>
           </view>
         </view>
       </view>
@@ -87,7 +83,6 @@
       <view class="plan">
         <view class="btn1" v-if="hasCompletedPlan" @click="$toRouter('/pages/addPlan/addPlan')">创建新计划</view>
         <view class="btn1" v-else @click="previewPlan">查看计划</view>
-        <view class="btn2" @click="updateWeightData(3)">+更新最新体重</view>
       </view>
 
       <view class="chart2-box">
@@ -107,6 +102,7 @@
       </view>
     </view>
 
+    <!-- TODO 修改体重弹窗 -->
     <uni-popup ref="updateWeightDataDialog">
       <view class="update-weight-data-dialog">
         <view class="title" v-if="updateType === 1">更新初始体重</view>
@@ -165,36 +161,10 @@ export default {
       progress: 0,
       updateType: 1,
       option1: {
+        color: ['#DAD2FF', '#FEFFF7'],
         series: [
           {
-            type: 'gauge',
-            startAngle: 120,
-            endAngle: -240,
-            min: 0,
-            max: 100,
-            splitNumber: 12,
-            itemStyle: {
-              color: '#0ABF92',
-              shadowColor: 'transparent',
-              shadowBlur: 10,
-              shadowOffsetX: 2,
-              shadowOffsetY: 2,
-            },
-            progress: {
-              show: true,
-              roundCap: true,
-              width: 4,
-            },
-            pointer: {
-              show: false,
-            },
-            axisLine: {
-              roundCap: true,
-              lineStyle: {
-                width: 4,
-                color: [[1, '#F6F7FB']],
-              },
-            },
+            type: 'pie',
             radius: '100%',
             axisTick: {
               show: false,
@@ -213,13 +183,17 @@ export default {
             },
             data: [
               {
-                value: 20,
+                value: 0,
+              },
+              {
+                value: 0,
               },
             ],
           },
         ],
       },
       option2: {
+        backgroundColor: '#FCFFEA',
         title: {
           show: false,
         },
@@ -227,7 +201,7 @@ export default {
           trigger: 'axis',
         },
         legend: {
-          bottom: 0,
+          show: false,
         },
         grid: {
           top: '10%',
@@ -243,6 +217,9 @@ export default {
         },
         yAxis: {
           type: 'value',
+          splitLine: {
+            show: false, // 这里设置为 false 以隐藏 y 轴方向的网格线（横线）
+          },
         },
         series: [
           {
@@ -253,14 +230,15 @@ export default {
             },
             data: [],
             type: 'line',
-            color: '#FFA537',
+            color: '#D54242',
             areaStyle: {
-              color: '#FFEDD7',
+              color: '#FFEDD700',
             },
           },
         ],
       },
       option3: {
+        backgroundColor: '#FCFFEA',
         title: {
           show: false,
         },
@@ -268,7 +246,7 @@ export default {
           trigger: 'axis',
         },
         legend: {
-          bottom: 0,
+          show: false,
         },
         grid: {
           top: '10%',
@@ -284,6 +262,9 @@ export default {
         },
         yAxis: {
           type: 'value',
+          splitLine: {
+            show: false, // 这里设置为 false 以隐藏 y 轴方向的网格线（横线）
+          },
         },
         series: [
           {
@@ -294,9 +275,9 @@ export default {
             },
             data: [],
             type: 'line',
-            color: '#0ABF92',
+            color: '#DAD2FF',
             areaStyle: {
-              color: '#CEF2E9',
+              color: '#CEF2E900',
             },
           },
         ],
@@ -396,6 +377,7 @@ export default {
           }
 
           this.option1.series[0].data[0].value = this.progress;
+          this.option1.series[0].data[1].value = 100 - this.progress;
 
           setTimeout(() => {
             chart1.setOption(this.option1);
@@ -475,156 +457,164 @@ export default {
 
 <style>
 page {
-  background: #f6f7fb;
+  background: #ffffff url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/dataReport/bg01.png') left top/100%
+    200rpx no-repeat;
 }
 </style>
 
 <style scoped lang="scss">
 .weight-data-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 42rpx;
   }
 
   .data-charts {
-    padding: 20rpx 30rpx;
+    padding: 36rpx 24rpx 80rpx;
 
-    .chart1-box {
-      background: #ffffff;
-      border-radius: 20rpx;
-      padding: 30rpx 40rpx;
-      margin-bottom: 20rpx;
+    .bmi {
+      margin-bottom: 16rpx;
 
-      .progress {
+      .value1 {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12rpx;
+
+        text {
+          &:nth-child(1) {
+            font-weight: 600;
+            font-size: 28rpx;
+            color: #323131;
+            margin-right: 20rpx;
+          }
+
+          &:nth-child(2) {
+            padding: 8rpx 16rpx;
+            height: 40rpx;
+            border-radius: 20rpx;
+            font-size: 24rpx;
+            color: #323131;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.normal {
+              background: #e8f480;
+            }
+
+            &.no-normal {
+              background: #9faa43;
+            }
+          }
+        }
+      }
+
+      .value2 {
         display: flex;
         align-items: center;
 
-        .chart {
-          width: 220rpx;
-          height: 220rpx;
-          flex-shrink: 0;
+        text {
+          font-size: 20rpx;
+          color: #323131;
+
+          &:nth-child(2) {
+            font-weight: 600;
+          }
+        }
+      }
+    }
+
+    .chart1-box {
+      background: #fcffea;
+      border-radius: 20rpx;
+      padding: 32rpx 0;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20rpx;
+
+      .detail {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 108rpx;
+        margin-bottom: 38rpx;
+        position: relative;
+        z-index: 9;
+
+        .item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
           position: relative;
 
-          .progress-tip {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 20rpx;
-            bottom: 0;
+          .value {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 20rpx;
 
             text {
               &:nth-child(1) {
-                font-size: 22rpx;
-                color: #999999;
+                font-size: 24rpx;
+                color: #323131;
+                margin-bottom: 22rpx;
               }
 
               &:nth-child(2) {
-                font-size: 36rpx;
-                color: #1a1a1a;
-              }
-
-              &:nth-child(3) {
-                font-size: 22rpx;
-                color: #666666;
+                font-weight: 600;
+                font-size: 32rpx;
+                color: #323131;
+                padding-bottom: 12rpx;
+                border-bottom: 2rpx solid #323131;
               }
             }
           }
-        }
 
-        .detail {
-          flex-grow: 1;
-          flex-shrink: 0;
+          image {
+            position: absolute;
+            bottom: 15rpx;
+            right: -40rpx;
+            width: 26rpx;
+          }
+        }
+      }
+
+      .chart {
+        align-self: center;
+        width: 384rpx;
+        height: 384rpx;
+        position: relative;
+
+        .progress-tip {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 20rpx;
+          bottom: 0;
           display: flex;
           flex-direction: column;
-          align-items: flex-end;
-          gap: 40rpx;
-
-          .item {
-            display: flex;
-            align-items: center;
-
-            .value {
-              display: flex;
-              flex-direction: column;
-              margin-right: 70rpx;
-
-              text {
-                &:nth-child(1) {
-                  color: #999999;
-                  font-size: 24rpx;
-                  margin-bottom: 10rpx;
-                }
-
-                &:nth-child(2) {
-                  color: #1a1a1a;
-                  font-size: 30rpx;
-                }
-              }
-            }
-
-            image {
-              width: 28rpx;
-            }
-          }
-        }
-      }
-
-      .line {
-        margin: 30rpx 0;
-        height: 2rpx;
-        background: #f6f7fb;
-      }
-
-      .bmi {
-        .value1 {
-          display: flex;
           align-items: center;
-          margin-bottom: 20rpx;
+          justify-content: center;
+          gap: 12rpx;
 
           text {
             &:nth-child(1) {
-              font-weight: 500;
-              font-size: 28rpx;
-              color: #1a1a1a;
-              margin-right: 20rpx;
+              font-size: 24rpx;
+              color: #323131;
             }
 
             &:nth-child(2) {
-              width: 60rpx;
-              height: 32rpx;
-              background: #ffa537;
-              border-radius: 16rpx;
-              font-size: 22rpx;
-              color: #ffffff;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-          }
-        }
-
-        .value2 {
-          display: flex;
-          align-items: center;
-
-          text {
-            font-size: 22rpx;
-
-            &:nth-child(1) {
-              color: #999999;
+              font-weight: 600;
+              font-size: 40rpx;
+              color: #323131;
             }
 
-            &:nth-child(2) {
-              color: #ffa537;
+            &:nth-child(3) {
+              font-size: 24rpx;
+              color: #323131;
             }
           }
         }
@@ -636,43 +626,35 @@ page {
       align-items: center;
       justify-content: center;
       gap: 20rpx;
-      margin-bottom: 54rpx;
+      margin-bottom: 40rpx;
 
       view {
-        width: 274rpx;
-        height: 85rpx;
+        width: 100%;
+        height: 80rpx;
+        background: #dad2ff;
+        border-radius: 60rpx;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 28rpx;
-        color: #ffffff;
-        border-radius: 20rpx;
-
-        &:nth-child(1) {
-          background: #ffa537;
-        }
-
-        &:nth-child(2) {
-          background: #0abf92;
-        }
+        font-size: 32rpx;
+        color: #323131;
       }
     }
 
     .chart2-box,
     .chart3-box {
-      margin-bottom: 52rpx;
+      margin-bottom: 40rpx;
 
       .chart-title {
-        font-weight: 500;
-        font-size: 30rpx;
-        color: #1a1a1a;
-        margin-bottom: 30rpx;
+        font-weight: 600;
+        font-size: 28rpx;
+        color: #323131;
+        margin-bottom: 20rpx;
       }
 
       .chart {
         background: #ffffff;
         border-radius: 20rpx;
-        padding: 50rpx 20rpx;
       }
     }
   }

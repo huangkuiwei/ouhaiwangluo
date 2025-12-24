@@ -12,14 +12,16 @@
         <text>周</text>
       </view>
 
-      <view class="status">
-        <text v-if="isLogin" @click="goWeightManage">
-          <template v-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看计划</template>
-          <template v-else-if="homeWeightPlanData && homeWeightPlanData.state === 2">创建下阶段计划</template>
-          <template v-else>完善个人资料</template>
-        </text>
-        <text v-else @click="$toRouter('/packageLogin/pages/login/login')">请登录</text>
-      </view>
+      <!--<view class="status">-->
+      <!--  <text v-if="isLogin" @click="goWeightManage">-->
+      <!--    <template v-if="!userDetailInfo">完善个人资料</template>-->
+      <!--    <template v-else-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看计划</template>-->
+      <!--    <template v-else-if="!homeWeightPlanData || (homeWeightPlanData && homeWeightPlanData.state === 2)"-->
+      <!--      >创建计划</template-->
+      <!--    >-->
+      <!--  </text>-->
+      <!--  <text v-else @click="$toRouter('/packageLogin/pages/login/login')">请登录</text>-->
+      <!--</view>-->
 
       <view class="chart">
         <view class="left">
@@ -80,9 +82,11 @@
       <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/btn-bg1.png" />
 
       <template v-if="isLogin">
-        <text v-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看我的专属方案</text>
-        <text v-else-if="homeWeightPlanData && homeWeightPlanData.state === 2">制定我的专属方案</text>
-        <text v-else>完善个人资料</text>
+        <text v-if="!userDetailInfo">完善个人资料</text>
+        <text v-else-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看我的专属方案</text>
+        <text v-else-if="!homeWeightPlanData || (homeWeightPlanData && homeWeightPlanData.state === 2)"
+          >制定我的专属方案</text
+        >
       </template>
 
       <text v-else>请登录</text>

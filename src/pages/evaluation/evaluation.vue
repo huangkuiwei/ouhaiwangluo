@@ -61,9 +61,17 @@
               <text>年龄</text>
             </view>
 
-            <picker-view :value="age">
+            <picker-view :value="age" @change="age = $event.target.value">
               <picker-view-column>
-                <view class="age-item" v-for="(item, index) in ageList" :key="index">{{ item }}年</view>
+                <view
+                  class="age-item"
+                  v-for="(item, index) in ageList"
+                  :class="{ active: age[0] === index }"
+                  :key="index"
+                >
+                  <text>{{ item }}</text>
+                  <text v-if="age[0] === index">年</text>
+                </view>
               </picker-view-column>
             </picker-view>
           </view>
@@ -126,7 +134,7 @@
           </view>
         </view>
 
-        <view class="evaluation evaluation4" v-if="stepIndex === 2">
+        <view class="evaluation evaluation3" v-if="stepIndex === 2">
           <view class="habit-list">
             <view
               class="habit-item"
@@ -140,68 +148,94 @@
           </view>
         </view>
 
-        <view class="evaluation evaluation3" v-if="stepIndex === 3">
-          <calendar
-            ref="calendarRef"
-            :initialWeight="initialWeight"
-            :targetWeight="targetWeight"
-            @selectDayChange="onSelectDayChange"
-          />
-
-          <view class="expected-wrap">
-            <view class="expected" v-if="planData">
-              <view class="line1">
-                <view class="left">
-                  预计
-                  <text>{{ planData.week }}</text>
-                  周
-                </view>
-
-                <view class="right">
-                  每周{{ isWeightLoss ? '减重' : '增重' }}约
-                  <text>{{ planData.weight }}</text>
-                  公斤
-                </view>
+        <view class="evaluation evaluation4" v-if="stepIndex === 3">
+          <picker-view
+            indicator-style="height: 40px;"
+            style="width: 100%; height: 120px"
+            :value="end_date"
+            @change="onPickerChange"
+          >
+            <!-- 年 -->
+            <picker-view-column>
+              <view
+                class="column-item"
+                :class="{ active: end_date[0] === index }"
+                v-for="(year, index) in years1"
+                :key="year"
+              >
+                <text>{{ year }}</text>
+                <text v-if="end_date[0] === index">年</text>
               </view>
+            </picker-view-column>
 
-              <view class="line2" v-if="planData.weight > 0.7">
-                <text>困难模式：</text>
-                <text v-if="isWeightLoss">快速减重可能会导致营养不良、肌肉流失和新陈代谢问题</text>
-                <text v-else>增重速度过快，这可能会增加体内脂肪比例，对心脏和代谢健康产生不利影响。</text>
+            <!-- 月 -->
+            <picker-view-column>
+              <view
+                class="column-item"
+                :class="{ active: end_date[1] === index }"
+                v-for="(month, index) in months1"
+                :key="month"
+              >
+                <text>{{ month }}</text>
+                <text v-if="end_date[1] === index">月</text>
               </view>
+            </picker-view-column>
 
-              <view class="line2" v-else-if="planData.weight > 0.28">
-                <text>适中模式：</text>
-                <text>适合绝大多数人，你一也定可以的！ 加油！</text>
+            <!-- 日 -->
+            <picker-view-column>
+              <view
+                class="column-item"
+                :class="{ active: end_date[2] === index }"
+                v-for="(day, index) in days1"
+                :key="day"
+              >
+                <text>{{ day }}</text>
+                <text v-if="end_date[2] === index">日</text>
               </view>
+            </picker-view-column>
+          </picker-view>
 
-              <view class="line2" v-else>
-                <text>简单模式：</text>
-                <text>适合绝大多数人，你一也定可以的！ 加油！</text>
-              </view>
+          <view class="tips">
+            <view class="left">
+              预计
+              <text>{{ planData.week }}</text>
+              周
+            </view>
+
+            <view class="right">
+              每周{{ isWeightLoss ? '减重' : '增重' }}约
+              <text>{{ planData.weight }}</text>
+              公斤
             </view>
           </view>
         </view>
 
-        <view class="next" @click="next">{{ stepIndex > 2 ? '提交' : '下一步' }}</view>
+        <view class="next" @click="next">{{ stepIndex > 2 ? '完成' : '下一步' }}</view>
       </view>
     </view>
   </view>
 </template>
 
 <script>
-import Calendar from '@/components/calendar.vue';
 import $http from '@/utils/http';
 
 export default {
   name: 'evaluation',
 
-  components: {
-    Calendar,
-  },
+  components: {},
 
   data() {
     let ageList = [];
+    const years = [];
+    const months = [];
+
+    for (let i = 1925; i < 2025; i++) {
+      years.push(i);
+    }
+
+    for (let i = 1; i <= 12; i++) {
+      months.push(i < 10 ? '0' + i : i);
+    }
 
     for (let i = 1925; i < 2025; i++) {
       ageList.push(i);
@@ -286,6 +320,16 @@ export default {
         },
       ],
       planData: null,
+
+      years,
+      months,
+      dateMap: new Map(),
+      years1: [],
+      months1: [],
+      days1: [],
+      end_date: [0, 0, 0],
+      minDateStr: '',
+      selectedDate: '',
     };
   },
 
@@ -307,7 +351,116 @@ export default {
     };
   },
 
+  watch: {
+    minDateStr(value) {
+      const minDate = new Date(value);
+
+      if (isNaN(minDate)) {
+        throw new Error('最小日期格式无效，请使用 yyyy-MM-dd');
+      }
+
+      minDate.setHours(0, 0, 0, 0);
+
+      // 生成从 minDate 开始，到未来几年内的所有合法日期（比如到 2026 年）
+      const validDates = this.generateValidDateRange(minDate, 2026);
+
+      // 构建层级映射：year → month → day（字符串）
+      const dateMap = new Map();
+      const yearSet = new Set();
+
+      validDates.forEach((d) => {
+        const y = String(d.year);
+        const m = d.month < 10 ? `0${d.month}` : `${d.month}`;
+        const dd = d.day < 10 ? `0${d.day}` : `${d.day}`;
+
+        yearSet.add(y);
+        if (!dateMap.has(y)) dateMap.set(y, new Map());
+        if (!dateMap.get(y).has(m)) dateMap.get(y).set(m, new Set());
+        dateMap.get(y).get(m).add(dd);
+      });
+
+      this.dateMap = dateMap;
+
+      // 初始化选项
+      this.years1 = Array.from(yearSet).sort((a, b) => a - b);
+      this.months1 = dateMap.has(this.years1[0]) ? Array.from(dateMap.get(this.years1[0]).keys()).sort() : [];
+      this.days1 = this.months1.length > 0 ? Array.from(dateMap.get(this.years1[0]).get(this.months1[0])).sort() : [];
+    },
+  },
+
   methods: {
+    // 生成从 minDate 到 maxYear 年末的所有合法日期
+    generateValidDateRange(minDate, maxYear = 2026) {
+      const result = [];
+      let currentDate = new Date(minDate);
+
+      while (currentDate.getFullYear() <= maxYear) {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
+        const day = currentDate.getDate();
+
+        result.push({ year, month, day });
+
+        // 下一天
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return result;
+    },
+
+    // 滚动选择时触发
+    onPickerChange(e) {
+      const [yIdx, mIdx, dIdx] = e.detail.value;
+      const selectedYear = this.years1[yIdx];
+      const selectedMonth = this.months1[mIdx];
+
+      // 获取该年月下的可选日期
+      const daySet = this.dateMap.get(selectedYear)?.get(selectedMonth);
+      let validDays = [];
+
+      if (daySet) {
+        validDays = Array.from(daySet).sort();
+      } else {
+        let monthList = Array.from(this.dateMap.get(selectedYear).keys()).sort();
+        let daySet1 = this.dateMap.get(selectedYear)?.get(monthList[0]);
+        validDays = Array.from(daySet1).sort();
+      }
+
+      // 修正日索引（防止越界）
+      let newDayIdx = dIdx;
+      if (dIdx >= validDays.length) {
+        newDayIdx = 0;
+      }
+      const selectedDay = validDays[newDayIdx];
+
+      // 更新 data
+      this.months1 = Array.from(this.dateMap.get(selectedYear)?.keys() || []).sort();
+      this.days1 = validDays;
+
+      // 修正月份（如果原月份不在新列表中）
+      const actualMonth = this.months1.includes(selectedMonth) ? selectedMonth : this.months1[0];
+      const actualDay = validDays.includes(selectedDay) ? selectedDay : validDays[0];
+
+      // 修正 end_date
+      setTimeout(() => {
+        this.end_date = [yIdx, this.months1.indexOf(actualMonth), validDays.indexOf(actualDay)];
+      }, 0);
+
+      // 更新显示
+      this.selectedDate = `${selectedYear}/${actualMonth}/${actualDay}`;
+
+      let now = Date.now();
+      let selectDate = new Date(this.selectedDate).getTime();
+      let day = Math.ceil((selectDate - now) / (1000 * 60 * 60 * 24));
+      let week = day / 7;
+
+      this.planData = {
+        day,
+        week: Number(week.toFixed(1)),
+        weight: Number((Math.abs(this.initialWeight - this.targetWeight) / week).toFixed(2)),
+      };
+    },
+
     nextStep() {
       if (!this.selectTarget) {
         uni.showToast({
@@ -334,17 +487,66 @@ export default {
       }
 
       if (this.stepIndex === 2) {
+        uni.showLoading({
+          title: '加载中...',
+          mask: true,
+        });
+
         setTimeout(() => {
           let weight = Math.abs(this.initialWeight - this.targetWeight);
-          this.$refs.calendarRef.currentDate = Date.now() + 7 * 24 * 60 * 60 * 1000 * Math.ceil(weight / 0.5);
+          let time = Date.now() + 7 * 24 * 60 * 60 * 1000 * Math.ceil(weight / 0.5);
+          let time1 = Date.now() + 7 * 24 * 60 * 60 * 1000 * Math.ceil(weight / 1);
 
-          let currentDate = new Date(this.$refs.calendarRef.currentDate);
+          let currentDate = new Date(time);
+          let currentDate1 = new Date(time1);
 
           const year = currentDate.getFullYear();
           const month = currentDate.getMonth() + 1 > 9 ? currentDate.getMonth() + 1 : `0${currentDate.getMonth() + 1}`;
           const date = currentDate.getDate() > 9 ? currentDate.getDate() : `0${currentDate.getDate()}`;
 
-          this.$refs.calendarRef.selectedDate = `${year}/${month}/${date}`;
+          const year1 = currentDate1.getFullYear();
+          const month1 =
+            currentDate1.getMonth() + 1 > 9 ? currentDate1.getMonth() + 1 : `0${currentDate1.getMonth() + 1}`;
+          const date1 = currentDate1.getDate() > 9 ? currentDate1.getDate() : `0${currentDate1.getDate()}`;
+
+          this.minDateStr = `${year1}/${month1}/${date1}`;
+
+          setTimeout(() => {
+            let index1 = this.years1.findIndex((item) => Number(item) === Number(year));
+            this.end_date = [index1, 0, 0];
+
+            this.onPickerChange({
+              detail: {
+                value: this.end_date,
+              },
+            });
+
+            setTimeout(() => {
+              let index2 = this.months1.findIndex((item) => Number(item) === Number(month));
+              this.end_date = [index1, index2, 0];
+
+              this.onPickerChange({
+                detail: {
+                  value: this.end_date,
+                },
+              });
+
+              setTimeout(() => {
+                let index3 = this.days1.findIndex((item) => Number(item) === Number(date));
+                this.end_date = [index1, index2, index3];
+
+                this.onPickerChange({
+                  detail: {
+                    value: this.end_date,
+                  },
+                });
+
+                setTimeout(() => {
+                  uni.hideLoading();
+                }, 200);
+              }, 0);
+            }, 0);
+          });
         }, 0);
       }
 
@@ -363,7 +565,7 @@ export default {
             target_weight: this.targetWeight,
             exercise_habits: this.currentHabit.value,
             begin_date: new Date().format(),
-            end_date: new Date(this.$refs.calendarRef.selectedDate).format(),
+            end_date: this.selectedDate,
           })
           .then(() => {
             uni.hideLoading();
@@ -387,30 +589,6 @@ export default {
 
     onScroll1(event) {
       this.height = Math.round((event.detail.scrollLeft / 61) * 10) + 20;
-    },
-
-    onScroll2(event) {
-      this.initialWeight = Math.round((event.detail.scrollLeft / 61) * 10) + 20;
-    },
-    onScroll3(event) {
-      this.targetWeight = Math.round((event.detail.scrollLeft / 61) * 10) + 20;
-    },
-
-    onSelectDayChange() {
-      if (this.$refs.calendarRef) {
-        let selectedDate = this.$refs.calendarRef.selectedDate;
-
-        let now = Date.now();
-        let selectDate = new Date(selectedDate).getTime();
-        let day = Math.ceil((selectDate - now) / (1000 * 60 * 60 * 24));
-        let week = day / 7;
-
-        this.planData = {
-          day,
-          week: Number(week.toFixed(1)),
-          weight: Number((Math.abs(this.initialWeight - this.targetWeight) / week).toFixed(2)),
-        };
-      }
     },
 
     onHabitChange(item) {
@@ -516,7 +694,6 @@ page {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 30rpx;
 
         text {
           &:nth-child(1) {
@@ -596,6 +773,34 @@ page {
             justify-content: center;
             font-size: 30rpx;
             color: #111111;
+
+            &.active {
+              text {
+                &:nth-child(1) {
+                  background: #dbd3ff;
+                  padding: 12rpx 26rpx;
+                  border-radius: 60rpx;
+                }
+
+                &:nth-child(2) {
+                  color: #dbd3ff;
+                }
+              }
+            }
+
+            text {
+              &:nth-child(1) {
+                font-size: 28rpx;
+                color: #323131;
+              }
+
+              &:nth-child(2) {
+                font-size: 24rpx;
+                margin-left: 15rpx;
+                position: relative;
+                top: 4rpx;
+              }
+            }
           }
         }
       }
@@ -757,64 +962,11 @@ page {
       }
 
       .evaluation3 {
-        padding: 0 24rpx;
         width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-
-        .expected-wrap {
-          .expected {
-            background: #ffffff;
-            border-radius: 25rpx;
-            border: 2px solid #0abf92;
-            padding: 32rpx;
-
-            .line1 {
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              font-weight: 500;
-              font-size: 28rpx;
-              color: #1a1a1a;
-              margin-bottom: 40rpx;
-
-              view {
-                display: flex;
-                align-items: center;
-
-                text {
-                  height: 60rpx;
-                  padding: 0 16rpx;
-                  background: #0abf92;
-                  border-radius: 10rpx;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 42rpx;
-                  color: #ffffff;
-                  margin: 0 6rpx;
-                }
-              }
-            }
-
-            .line2 {
-              color: #1a1a1a;
-              font-size: 28rpx;
-              line-height: 40rpx;
-
-              text {
-                &:nth-child(1) {
-                  font-weight: 500;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      .evaluation4 {
-        margin-top: 66rpx;
+        align-items: center;
+        justify-content: center;
 
         .habit-list {
           display: flex;
@@ -835,6 +987,77 @@ page {
 
             &.active {
               background: #dad2ff;
+            }
+          }
+        }
+      }
+
+      .evaluation4 {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 120rpx;
+
+        picker-view {
+          padding: 0 120rpx;
+
+          .column-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &.active {
+              text {
+                &:nth-child(1) {
+                  background: #dbd3ff;
+                  padding: 12rpx 26rpx;
+                  border-radius: 60rpx;
+                }
+
+                &:nth-child(2) {
+                  color: #dbd3ff;
+                }
+              }
+            }
+
+            text {
+              &:nth-child(1) {
+                font-size: 28rpx;
+                color: #323131;
+              }
+
+              &:nth-child(2) {
+                font-size: 24rpx;
+                margin-left: 15rpx;
+                position: relative;
+                top: 4rpx;
+              }
+            }
+          }
+        }
+
+        .tips {
+          width: 702rpx;
+          margin: 0 auto;
+          height: 80rpx;
+          background: #e8f480;
+          border-radius: 40rpx;
+          padding: 0 40rpx;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .left,
+          .right {
+            font-size: 28rpx;
+            color: #323131;
+
+            text {
+              font-weight: 600;
+              font-size: 36rpx;
+              color: #000000;
+              padding: 0 10rpx;
             }
           }
         }

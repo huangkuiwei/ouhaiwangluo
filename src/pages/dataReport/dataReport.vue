@@ -89,11 +89,11 @@
             <view class="change-list change-list1" style="background: #dad2ff">
               <view class="day1">
                 <text>{{ selectedTime.name }}</text>
-                <text>{{ selectedTime.preName }}</text>
+                <text>{{ dataReport.calorie_average }}千卡</text>
               </view>
 
               <view class="day2">
-                <text>{{ dataReport.calorie_average }}千卡</text>
+                <text>{{ selectedTime.preName }}</text>
                 <text>{{ dataReport.previous_calorie_average }}千卡</text>
               </view>
             </view>
@@ -105,11 +105,11 @@
             <view class="change-list change-list1" style="background: #dad2ff">
               <view class="day1">
                 <text>{{ selectedTime.name }}</text>
-                <text>{{ selectedTime.preName }}</text>
+                <text>{{ dataReport.food_num }}千卡</text>
               </view>
 
               <view class="day2">
-                <text>{{ dataReport.food_num }}千卡</text>
+                <text>{{ selectedTime.preName }}</text>
                 <text>{{ dataReport.previous_food_num }}千卡</text>
               </view>
             </view>
@@ -273,7 +273,7 @@ page {
 
           &:nth-child(2) {
             font-size: 24rpx;
-            color: #323131;
+            color: #323131aa;
           }
         }
       }
@@ -308,16 +308,14 @@ page {
             &.change-list1 {
               .day1,
               .day2 {
-                text {
-                  &:nth-child(1) {
-                    font-size: 24rpx;
-                    color: #323131;
-                  }
+                &.day1 {
+                  font-size: 24rpx;
+                  color: #323131;
+                }
 
-                  &:nth-child(2) {
-                    font-size: 24rpx;
-                    color: #323131aa;
-                  }
+                &.day2 {
+                  font-size: 24rpx;
+                  color: #323131aa;
                 }
               }
             }
@@ -329,16 +327,14 @@ page {
               align-items: center;
               justify-content: space-between;
 
-              text {
-                &:nth-child(1) {
-                  font-size: 20rpx;
-                  color: #323131;
-                }
+              &.day1 {
+                font-size: 20rpx;
+                color: #323131;
+              }
 
-                &:nth-child(2) {
-                  font-size: 24rpx;
-                  color: #323131;
-                }
+              &.day2 {
+                font-size: 24rpx;
+                color: #323131;
               }
             }
           }

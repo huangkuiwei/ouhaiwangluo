@@ -22,7 +22,7 @@
 
       <view class="right" v-if="isLogin">
         <text>{{ userInfo.uname }}</text>
-        <text v-if="!isVip">您还未开通会员</text>
+        <text>{{ isVip ? '您已开通会员' : '您还未开通会员' }}</text>
       </view>
 
       <view class="right" v-else @click="$toRouter('/packageLogin/pages/login/login')">

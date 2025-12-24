@@ -8,15 +8,24 @@
       </view>
     </view>
 
-    <view class="banner"> </view>
+    <view class="banner"></view>
 
     <view class="evaluation-container">
-      <view class="evaluation-box">
-        <view class="tip">完成数据，为您生成专属方案</view>
-        <view class="progress">
-          <text :style="{ width: (stepIndex / 4) * 100 + '%' }"></text>
+      <view class="evaluation-target" v-if="stepIndex === -1">
+        <view class="title">你的目标是什么？</view>
+
+        <view class="target-list">
+          <view class="target-item" :class="{ active: selectTarget === 1 }" @click="selectTarget = 1">减重</view>
+          <view class="target-item" :class="{ active: selectTarget === 2 }" @click="selectTarget = 2">增重</view>
+          <view class="target-item" :class="{ active: selectTarget === 3 }" @click="selectTarget = 3"
+            >提高健康水平</view
+          >
         </view>
 
+        <view class="next-step" @click="nextStep">下一步</view>
+      </view>
+
+      <view class="evaluation-box" v-else>
         <view class="evaluation-title">
           <text>{{ evaluationList[stepIndex].title }}</text>
           <text>{{ evaluationList[stepIndex].subTitle }}</text>
@@ -24,34 +33,40 @@
 
         <view class="evaluation evaluation1" v-if="stepIndex === 0">
           <view class="gender">
-            <view class="gender-item" @click="gender = 1">
-              <image
-                mode="widthFix"
-                src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/evaluation/gender1.png"
-              />
-              <text>男生</text>
-              <view class="checked" v-if="gender === 1">
-                <uni-icons color="#3dff00" type="checkmarkempty" size="30"></uni-icons>
+            <view class="gender-item" :class="{ active: gender === 1 }" @click="gender = 1">
+              <view class="gender-item-icon gender-item-icon1">
+                <image
+                  mode="widthFix"
+                  src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/evaluation/icon01.png"
+                />
               </view>
+
+              <text>男生</text>
             </view>
 
-            <view class="gender-item" @click="gender = 2">
-              <image
-                mode="widthFix"
-                src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/evaluation/gender2.png"
-              />
-              <text>女生</text>
-              <view class="checked" v-if="gender === 2">
-                <uni-icons color="#3dff00" type="checkmarkempty" size="30"></uni-icons>
+            <view class="gender-item" :class="{ active: gender === 2 }" @click="gender = 2">
+              <view class="gender-item-icon gender-item-icon2">
+                <image
+                  mode="widthFix"
+                  src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/evaluation/icon02.png"
+                />
               </view>
+
+              <text>女生</text>
             </view>
           </view>
 
-          <picker-view :value="age">
-            <picker-view-column>
-              <view class="age-item" v-for="(item, index) in ageList" :key="index">{{ item }}年</view>
-            </picker-view-column>
-          </picker-view>
+          <view>
+            <view class="evaluation-title" style="margin-bottom: 60rpx">
+              <text>年龄</text>
+            </view>
+
+            <picker-view :value="age">
+              <picker-view-column>
+                <view class="age-item" v-for="(item, index) in ageList" :key="index">{{ item }}年</view>
+              </picker-view-column>
+            </picker-view>
+          </view>
         </view>
 
         <view class="evaluation evaluation2" v-if="stepIndex === 1">
@@ -65,85 +80,67 @@
 
             <view class="scale"></view>
 
-            <scroll-view
-              class="ruler-line"
-              :scroll-into-view="initPosition1"
-              :scroll-x="true"
-              :enable-flex="true"
-              @scroll="onScroll1"
-            >
-              <view
-                :id="`ruler1-${item}`"
-                class="ruler-line-item"
-                :class="{ 'int-line': item % 10 === 0 }"
-                v-for="item of rulerLineList1"
-                :key="item"
+            <view class="ruler-line-wrap">
+              <scroll-view
+                class="ruler-line"
+                :scroll-into-view="initPosition1"
+                :scroll-x="true"
+                :enable-flex="true"
+                @scroll="onScroll1"
               >
-                <text v-if="item && item % 10 === 0">{{ item }}</text>
-              </view>
-            </scroll-view>
+                <view
+                  :id="`ruler1-${item}`"
+                  class="ruler-line-item"
+                  :class="{ 'int-line': item % 10 === 0 }"
+                  v-for="item of rulerLineList1"
+                  :key="item"
+                >
+                  <!-- <text v-if="item && item % 10 === 0">{{ item }}</text> -->
+                </view>
+              </scroll-view>
+            </view>
           </view>
 
-          <view class="evaluation-item">
-            <view class="evaluation-item-title">当前体重</view>
+          <view class="evaluation-item" style="padding-bottom: 150rpx">
+            <view class="evaluation-item-title" style="margin-bottom: 50rpx">体重</view>
 
-            <view class="evaluation-item-value">
-              {{ initialWeight }}
-              <text class="unit">公斤</text>
-            </view>
-
-            <view class="scale"></view>
-
-            <scroll-view
-              class="ruler-line"
-              :scroll-into-view="initPosition2"
-              :scroll-x="true"
-              :enable-flex="true"
-              @scroll="onScroll2"
-            >
-              <view
-                :id="`ruler2-${item}`"
-                class="ruler-line-item"
-                :class="{ 'int-line': item % 10 === 0 }"
-                v-for="item of rulerLineList2"
-                :key="item"
-              >
-                <text v-if="item && item % 10 === 0">{{ item }}</text>
+            <view class="evaluation-item-values">
+              <view class="items">
+                <text>当前体重</text>
+                <!-- TODO 缺少一张图片 -->
+                <text>目标体重</text>
               </view>
-            </scroll-view>
-          </view>
 
-          <view class="evaluation-item">
-            <view class="evaluation-item-title">目标体重</view>
+              <view class="values">
+                <view class="values-item">
+                  <input type="number" v-model="initialWeight" />
+                  <text>公斤</text>
+                </view>
 
-            <view class="evaluation-item-value">
-              {{ targetWeight }}
-              <text class="unit">公斤</text>
-            </view>
-
-            <view class="scale"></view>
-
-            <scroll-view
-              class="ruler-line"
-              :scroll-into-view="initPosition3"
-              :scroll-x="true"
-              :enable-flex="true"
-              @scroll="onScroll3"
-            >
-              <view
-                :id="`ruler3-${item}`"
-                class="ruler-line-item"
-                :class="{ 'int-line': item % 10 === 0 }"
-                v-for="item of rulerLineList3"
-                :key="item"
-              >
-                <text v-if="item && item % 10 === 0">{{ item }}</text>
+                <view class="values-item">
+                  <input type="number" v-model="targetWeight" />
+                  <text>公斤</text>
+                </view>
               </view>
-            </scroll-view>
+            </view>
           </view>
         </view>
 
-        <view class="evaluation evaluation3" v-if="stepIndex === 2">
+        <view class="evaluation evaluation4" v-if="stepIndex === 2">
+          <view class="habit-list">
+            <view
+              class="habit-item"
+              :class="{ active: item.active }"
+              @click="onHabitChange(item)"
+              v-for="item of exerciseHabits"
+              :key="item.id"
+            >
+              <text>{{ item.text }}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="evaluation evaluation3" v-if="stepIndex === 3">
           <calendar
             ref="calendarRef"
             :initialWeight="initialWeight"
@@ -186,21 +183,7 @@
           </view>
         </view>
 
-        <view class="evaluation evaluation4" v-if="stepIndex === 3">
-          <view class="habit-list">
-            <view
-              class="habit-item"
-              :class="{ active: item.active }"
-              @click="onHabitChange(item)"
-              v-for="item of exerciseHabits"
-              :key="item.id"
-            >
-              <text>{{ item.text }}</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="next" @click="next">{{ stepIndex > 2 ? '提交' : '继续' }}</view>
+        <view class="next" @click="next">{{ stepIndex > 2 ? '提交' : '下一步' }}</view>
       </view>
     </view>
   </view>
@@ -240,23 +223,24 @@ export default {
     return {
       evaluationList: [
         {
-          title: '请选择你的性别年龄',
-          subTitle: '用来准确的计算你的BMI值',
+          title: '请选择你的性别、年龄',
+          subTitle: '',
         },
         {
-          title: '请选择你的身高体重和目标体重',
-          subTitle: '用来准确的计算你的BMI值',
-        },
-        {
-          title: '预计达成时间',
+          title: '请选择你的身高、体重',
           subTitle: '',
         },
         {
           title: '请选择你的运动量',
-          subTitle: '用来准确的计算你的BMI值',
+          subTitle: '',
+        },
+        {
+          title: '你期望达成的时间',
+          subTitle: '',
         },
       ],
-      stepIndex: 0,
+      selectTarget: 0,
+      stepIndex: -1,
       gender: null,
       age: [80],
       ageList: ageList,
@@ -324,6 +308,19 @@ export default {
   },
 
   methods: {
+    nextStep() {
+      if (!this.selectTarget) {
+        uni.showToast({
+          title: '请选择目标',
+          icon: 'none',
+        });
+
+        return;
+      }
+
+      this.stepIndex = 0;
+    },
+
     next() {
       if (this.stepIndex === 0) {
         if (!this.gender) {
@@ -336,7 +333,7 @@ export default {
         }
       }
 
-      if (this.stepIndex === 1) {
+      if (this.stepIndex === 2) {
         setTimeout(() => {
           let weight = Math.abs(this.initialWeight - this.targetWeight);
           this.$refs.calendarRef.currentDate = Date.now() + 7 * 24 * 60 * 60 * 1000 * Math.ceil(weight / 0.5);
@@ -427,13 +424,13 @@ export default {
 <style lang="scss">
 page {
   height: 100%;
+  background: #ffffff;
 }
 </style>
 
 <style scoped lang="scss">
 .evaluation-page {
   height: 100%;
-  background: linear-gradient(to bottom, #ccffee, #fbffff, #f6f7fb);
   padding-bottom: 40rpx;
   display: flex;
   flex-direction: column;
@@ -447,45 +444,71 @@ page {
   }
 
   .evaluation-container {
-    padding: 60rpx 30rpx 0;
+    padding: 60rpx 0 0;
     flex-grow: 1;
     overflow: hidden;
 
+    .evaluation-target {
+      padding: 52rpx 48rpx;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+
+      .title {
+        font-weight: 600;
+        font-size: 32rpx;
+        color: #000000;
+      }
+
+      .target-list {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        gap: 40rpx;
+
+        .target-item {
+          width: 100%;
+          height: 80rpx;
+          background: #f3f3f3;
+          border-radius: 60rpx;
+          font-weight: 600;
+          font-size: 28rpx;
+          color: #323131;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &.active {
+            background: #dad2ff;
+          }
+        }
+      }
+
+      .next-step {
+        width: 100%;
+        height: 80rpx;
+        background: #e8f480;
+        border-radius: 60rpx;
+        font-weight: 600;
+        font-size: 28rpx;
+        color: #323131;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
     .evaluation-box {
       height: 100%;
-      padding: 52rpx 30rpx;
+      padding: 52rpx 0;
       background: #ffffff;
       border-radius: 8rpx;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-
-      .tip {
-        flex-shrink: 0;
-        font-size: 24rpx;
-        color: #999999;
-        margin-bottom: 20rpx;
-      }
-
-      .progress {
-        flex-shrink: 0;
-        width: 100%;
-        height: 15rpx;
-        background: #f5f6fa;
-        border-radius: 8rpx;
-        position: relative;
-        margin-bottom: 48rpx;
-
-        text {
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          background: #0abf92;
-          border-radius: 8rpx;
-        }
-      }
 
       .evaluation-title {
         flex-shrink: 0;
@@ -497,9 +520,9 @@ page {
 
         text {
           &:nth-child(1) {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 32rpx;
-            color: #333333;
+            color: #000000;
           }
 
           &:nth-child(2) {
@@ -519,7 +542,7 @@ page {
         .gender {
           display: flex;
           align-items: center;
-          gap: 110rpx;
+          gap: 100rpx;
           margin-bottom: 100rpx;
 
           .gender-item {
@@ -527,30 +550,39 @@ page {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 20rpx;
+            gap: 34rpx;
             position: relative;
 
-            image {
-              width: 148rpx;
-              border-radius: 50%;
+            &.active {
+              .gender-item-icon {
+                background: #fcffea;
+              }
+            }
+
+            .gender-item-icon {
+              width: 240rpx;
+              height: 280rpx;
+              background: #f3f3f3;
+              display: flex;
+              align-items: flex-end;
+              justify-content: center;
+              border-radius: 10rpx;
+
+              &.gender-item-icon2 {
+                image {
+                  width: 224rpx;
+                }
+              }
+
+              image {
+                width: 180rpx;
+              }
             }
 
             text {
-              font-size: 24rpx;
-              color: #333333;
-            }
-
-            .checked {
-              position: absolute;
-              left: 0;
-              width: 148rpx;
-              top: 0;
-              height: 148rpx;
-              background: #00000080;
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
+              font-weight: 600;
+              font-size: 28rpx;
+              color: #323131;
             }
           }
         }
@@ -578,20 +610,21 @@ page {
           position: relative;
 
           .evaluation-item-title {
-            font-weight: 500;
-            font-size: 26rpx;
-            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #323131;
             text-align: center;
             padding-left: 16px;
             margin-bottom: 18rpx;
           }
 
           .evaluation-item-value {
-            font-weight: 500;
-            font-size: 30rpx;
-            color: #333333;
+            font-weight: 600;
+            font-size: 36rpx;
+            color: #604fa6;
             text-align: center;
             padding-left: 16px;
+            padding-bottom: 20rpx;
             margin-bottom: 22rpx;
 
             .unit {
@@ -603,45 +636,120 @@ page {
 
           .scale {
             position: absolute;
-            width: 4px;
-            height: 15px;
-            background: #0abf92;
+            width: 2px;
+            height: 49px;
+            background: #604fa6;
             border-radius: 4rpx;
-            top: 88rpx;
-            left: calc(50% - 1px);
+            top: 55px;
+            left: calc(50%);
+            z-index: 9;
           }
 
-          .ruler-line {
-            display: flex;
-            width: 244px;
-            margin: 0 auto;
-            overflow: auto;
+          .ruler-line-wrap {
+            &:after {
+              content: '';
+              position: absolute;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              height: 35px;
+              background: #dad2ffaa;
+            }
 
-            .ruler-line-item {
-              flex-shrink: 0;
-              margin-right: 5px;
-              width: 1px;
-              height: 17px;
-              background: #0abf9240;
-              border-radius: 2rpx;
+            .ruler-line {
+              display: flex;
+              width: 365px;
+              margin: 0 auto;
+              overflow: auto;
+              height: 40px;
               position: relative;
+              z-index: 9;
 
-              &.int-line {
-                width: 2px;
-                height: 33px;
-                background: #0abf92aa;
+              .ruler-line-item {
+                flex-shrink: 0;
+                margin-right: 5px;
+                width: 1px;
+                height: 20px;
+                position: relative;
+                background: #808080;
+                border-radius: 2rpx;
+
+                &.int-line {
+                  width: 2px;
+                  height: 40px;
+                  background: #595858;
+                }
+
+                &:not(.int-line) {
+                  top: 20px;
+                }
+
+                text {
+                  position: absolute;
+                  left: 0;
+                  right: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  bottom: -40rpx;
+                  font-size: 22rpx;
+                  color: #666666;
+                }
               }
+            }
+          }
+
+          .evaluation-item-values {
+            .items {
+              display: flex;
+              align-items: center;
+              justify-content: space-around;
+              margin-bottom: 60rpx;
 
               text {
-                position: absolute;
-                left: 0;
-                right: 0;
+                font-weight: 600;
+                font-size: 28rpx;
+                color: #323131;
+              }
+            }
+
+            .values {
+              display: flex;
+              align-items: center;
+              justify-content: space-around;
+
+              .values-item {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                bottom: -40rpx;
-                font-size: 22rpx;
-                color: #666666;
+                gap: 10rpx;
+
+                input {
+                  width: 160rpx;
+                  height: 60rpx;
+                  background: #d9d9d9;
+                  border-radius: 20rpx;
+                  font-weight: 600;
+                  font-size: 32rpx;
+                  color: #604fa6;
+                  text-align: center;
+                  position: relative;
+
+                  &:after {
+                    content: '';
+                    position: absolute;
+                    bottom: 8rpx;
+                    left: 15rpx;
+                    right: 15rpx;
+                    height: 2rpx;
+                    border-radius: 4rpx;
+                    background: #323131;
+                  }
+                }
+
+                text {
+                  font-size: 28rpx;
+                  color: #323131;
+                }
               }
             }
           }
@@ -649,6 +757,7 @@ page {
       }
 
       .evaluation3 {
+        padding: 0 24rpx;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -710,24 +819,22 @@ page {
         .habit-list {
           display: flex;
           flex-direction: column;
-          gap: 20rpx;
+          gap: 40rpx;
 
           .habit-item {
-            width: 592rpx;
-            height: 103rpx;
-            background: #f6f6f8;
-            border-radius: 20rpx;
-            font-size: 32rpx;
-            color: #555555;
-            border: 6rpx solid transparent;
-            padding-left: 40rpx;
+            width: 654rpx;
+            height: 80rpx;
+            background: #f3f3f3;
+            border-radius: 60rpx;
+            font-weight: 600;
+            font-size: 28rpx;
+            color: #323131;
             display: flex;
             align-items: center;
+            justify-content: center;
 
             &.active {
-              background: #f1fffc;
-              color: #1a1a1a;
-              border: 6rpx solid #0abf92;
+              background: #dad2ff;
             }
           }
         }
@@ -735,13 +842,14 @@ page {
 
       .next {
         flex-shrink: 0;
-        width: 592rpx;
-        height: 103rpx;
-        background: #0abf92;
-        border-radius: 52rpx;
-        font-weight: 500;
-        font-size: 32rpx;
-        color: #ffffff;
+        width: 654rpx;
+        margin: 0 auto;
+        height: 80rpx;
+        background: #e8f480;
+        border-radius: 60rpx;
+        font-weight: 600;
+        font-size: 28rpx;
+        color: #323131;
         display: flex;
         align-items: center;
         justify-content: center;

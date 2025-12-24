@@ -945,7 +945,6 @@ export default {
         }
 
         .label {
-          margin-left: 16rpx;
           font-size: 24rpx;
         }
       }

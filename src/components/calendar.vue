@@ -5,8 +5,8 @@
       <text class="time">{{ currentMonth }}</text>
 
       <view class="toggle">
-        <uni-icons @click="prevMonth" color="#999999" type="left" size="16"></uni-icons>
-        <uni-icons @click="nextMonth" color="#999999" type="right" size="16"></uni-icons>
+        <uni-icons @click="prevMonth" color="#323131" type="left" size="16"></uni-icons>
+        <uni-icons @click="nextMonth" color="#323131" type="right" size="16"></uni-icons>
       </view>
     </view>
 
@@ -163,6 +163,10 @@ export default {
 
 <style scoped lang="scss">
 .calendar-com {
+  border-radius: 10rpx;
+  border: 4rpx solid #323131;
+  padding: 24rpx 20rpx;
+
   .calendar-header {
     display: flex;
     align-items: center;
@@ -170,9 +174,8 @@ export default {
     margin-bottom: 54rpx;
 
     .time {
-      font-weight: 500;
-      font-size: 38rpx;
-      color: #333333;
+      font-size: 28rpx;
+      color: #323131;
     }
 
     .toggle {
@@ -189,8 +192,8 @@ export default {
     margin-bottom: 20rpx;
 
     .weekday {
-      font-size: 26rpx;
-      color: #999999;
+      font-size: 24rpx;
+      color: #323131;
       flex-grow: 1;
       text-align: center;
     }
@@ -204,17 +207,15 @@ export default {
       width: calc(100% / 7);
       padding: 2rpx 0;
       cursor: pointer;
-      font-size: 26rpx;
-      color: #333333;
+      font-size: 24rpx;
+      color: #323131;
       display: flex;
       align-items: center;
       justify-content: center;
 
       &.selected {
-        color: #ffffff;
-
         text {
-          background: #0abf92;
+          background: #dad2ff;
         }
       }
 
@@ -223,8 +224,8 @@ export default {
       }
 
       text {
-        width: 58rpx;
-        height: 58rpx;
+        width: 48rpx;
+        height: 48rpx;
         border-radius: 50%;
         display: flex;
         align-items: center;

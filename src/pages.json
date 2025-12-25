@@ -31,11 +31,11 @@
       }
     },
     {
-      "path": "pages/sunshine/sunshine",
+      "path": "pages/healthTree/healthTree",
       "style": {
         "navigationStyle": "custom",
         // #ifndef H5
-        "navigationBarTitleText": "攒阳光",
+        "navigationBarTitleText": "健康树",
         // #endif
         "h5": {
           "titleNView": false
@@ -563,7 +563,7 @@
         "selectedIconPath": "static/tabBar/recode1.png"
       },
       {
-        "pagePath": "pages/sunshine/sunshine",
+        "pagePath": "pages/healthTree/healthTree",
         "text": "健康树",
         "iconPath": "static/tabBar/sunshine.png",
         "selectedIconPath": "static/tabBar/sunshine1.png"

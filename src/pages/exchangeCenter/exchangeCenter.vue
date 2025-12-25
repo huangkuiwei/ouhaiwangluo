@@ -120,7 +120,7 @@ export default {
   methods: {
     goSignIn() {
       uni.setStorageSync('goSignIn', true);
-      this.$toSwitch('/pages/sunshine/sunshine');
+      this.$toSwitch('/pages/healthTree/healthTree');
     },
 
     getSignInfo() {

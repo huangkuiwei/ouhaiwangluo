@@ -40,7 +40,7 @@ export default {
           active: false,
         },
         {
-          pagePath: 'pages/sunshine/sunshine',
+          pagePath: 'pages/healthTree/healthTree',
           text: '健康树',
           iconPath: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/tabbar/icon3.png',
           selectedIconPath: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/tabbar/icon3.png',

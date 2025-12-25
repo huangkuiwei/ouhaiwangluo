@@ -1,9 +1,8 @@
 <template>
-  <uni-popup ref="popupRef" :is-mask-click="false">
+  <uni-popup ref="popupRef">
     <view class="custom-dialog">
       <view class="title">
         <text>{{ title }}</text>
-        <text class="line"></text>
       </view>
 
       <view class="content-box">
@@ -11,10 +10,6 @@
       </view>
 
       <slot name="footer"></slot>
-    </view>
-
-    <view class="close" v-show="shopClose">
-      <uni-icons color="#ffffff" type="close" size="30" @click="close"></uni-icons>
     </view>
   </uni-popup>
 </template>
@@ -27,11 +22,6 @@ export default {
     title: {
       type: String,
       default: '',
-    },
-
-    shopClose: {
-      type: Boolean,
-      default: true,
     },
   },
 
@@ -49,32 +39,22 @@ export default {
 
 <style scoped lang="scss">
 .custom-dialog {
-  width: 690rpx;
+  width: 702rpx;
   background: #ffffff;
-  border-radius: 50rpx;
-  padding: 38rpx 44rpx;
+  border-radius: 40rpx;
+  padding: 20rpx 40rpx;
 
   .title {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 50rpx;
+    margin-bottom: 16rpx;
 
     text {
-      &:nth-child(1) {
-        font-weight: bold;
-        font-size: 32rpx;
-        color: #1a1a1a;
-        margin-bottom: 12rpx;
-      }
-
-      &:nth-child(2) {
-        width: 120rpx;
-        height: 6rpx;
-        background: #0abf92;
-        border-radius: 5rpx;
-      }
+      font-weight: 600;
+      font-size: 28rpx;
+      color: #323131;
     }
   }
 
@@ -82,10 +62,5 @@ export default {
     max-height: 50vh;
     overflow: auto;
   }
-}
-
-.close {
-  text-align: center;
-  padding-top: 28rpx;
 }
 </style>

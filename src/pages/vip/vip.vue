@@ -320,7 +320,7 @@ export default {
 
         &:nth-child(2) {
           font-size: 28rpx;
-          color: #323131aa;
+          color: #323131cc;
         }
       }
     }

@@ -1,21 +1,19 @@
 <template>
-  <custom-dialog ref="recodeDialog" title="成长记录">
+  <custom-dialog ref="exchangeRecodeDialog" title="兑换记录">
     <view class="content">
       <view class="recode-list">
-        <template v-if="recodeList.length">
-          <view class="recode-item" v-for="(item, index) of recodeList" :key="index">
-            <text>{{ item.create_at.slice(0, 10) }}</text>
-            <text v-if="item.change_type === 1">施肥1次，小树增高{{ item.change_height }}厘米</text>
-            <text v-else-if="item.change_type === 2">兑换会员，小树增高{{ item.change_height }}厘米</text>
-            <text v-else-if="item.change_type === 3">小树增高{{ item.change_height }}厘米</text>
+        <template v-if="exchangeList.length">
+          <view class="recode-item" v-for="item of exchangeList" :key="item.id">
+            <text>{{ item.exchange_time.slice(0, 10) }}</text>
+            <text>{{ item.name }}</text>
           </view>
         </template>
 
-        <view class="empty-recode" v-else>暂无施肥记录</view>
+        <view class="empty-recode" v-else>暂无兑换记录</view>
       </view>
     </view>
 
-    <view slot="footer" class="btn" @click="close">我知道了</view>
+    <view slot="footer" class="btn" @click="back">确定</view>
   </custom-dialog>
 </template>
 
@@ -24,7 +22,7 @@ import customDialog from '@/components/customDialog.vue';
 import $http from '@/utils/http';
 
 export default {
-  name: 'recodeDialog',
+  name: 'exchangeRecodeDialog',
 
   components: {
     customDialog,
@@ -32,37 +30,40 @@ export default {
 
   data() {
     return {
-      recodeList: [],
+      exchangeList: [],
     };
   },
 
   methods: {
-    getRecodeList() {
+    getExchangeList() {
       uni.showLoading({
         title: '加载中...',
         mask: true,
       });
 
-      // TODO 接口异常
       $http
-        .post('api/health-tree/tree-record', {
+        .post('api/health-tree/exchange-records', {
           pageIndex: 1,
           pageSize: 9999,
         })
         .then((res) => {
           uni.hideLoading();
-
-          this.recodeList = res.data.Items;
+          this.exchangeList = res.data.Items;
         });
     },
 
     open() {
-      this.getRecodeList();
-      this.$refs.recodeDialog.open();
+      this.getExchangeList();
+      this.$refs.exchangeRecodeDialog.open();
     },
 
     close() {
-      this.$refs.recodeDialog.close();
+      this.$refs.exchangeRecodeDialog.close();
+    },
+
+    back() {
+      this.$emit('back');
+      this.close();
     },
   },
 };

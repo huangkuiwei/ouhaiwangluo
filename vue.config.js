@@ -4,7 +4,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'https://tool.laketay.com',
+        target: 'https://ohxcx.ohiisp.com',
         changeOrigin: true,
       },
     },

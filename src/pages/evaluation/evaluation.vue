@@ -732,14 +732,14 @@ page {
 
             &.active {
               .gender-item-icon {
-                background: #fcffea;
+                opacity: 1;
               }
             }
 
             .gender-item-icon {
               width: 240rpx;
               height: 280rpx;
-              background: #f3f3f3;
+              opacity: 0.6;
               display: flex;
               align-items: flex-end;
               justify-content: center;

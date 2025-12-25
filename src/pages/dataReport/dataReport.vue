@@ -273,7 +273,7 @@ page {
 
           &:nth-child(2) {
             font-size: 24rpx;
-            color: #323131aa;
+            color: #323131cc;
           }
         }
       }
@@ -315,7 +315,7 @@ page {
 
                 &.day2 {
                   font-size: 24rpx;
-                  color: #323131aa;
+                  color: #323131cc;
                 }
               }
             }

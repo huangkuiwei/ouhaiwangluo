@@ -7,44 +7,51 @@
     <view class="left">
       <view class="cur-height">
         <text>当前高度：</text>
-        <!-- TODO 数据 -->
-        <text>0厘米</text>
+        <text>{{ accountInfo.tree_height || 0 }}厘米</text>
       </view>
 
       <view class="history-height">
         <text>当前高度：</text>
-        <!-- TODO 数据 -->
-        <text>0厘米</text>
+        <text>{{ accountInfo.tree_history_height || 0 }}厘米</text>
       </view>
 
       <view class="icon1" @click="fertilize">
         <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon01.png" />
-        <!-- TODO 数据 -->
-        <text>X2</text>
+        <text class="number">x{{ accountInfo.points || 0 }}</text>
+        <text class="name">施肥</text>
       </view>
 
-      <image
-        @click="openRecodeDialog"
-        class="icon2"
-        mode="widthFix"
-        src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon02.png"
-      />
+      <view class="icon2">
+        <image
+          @click="openRecodeDialog"
+          mode="widthFix"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon02.png"
+        />
+
+        <text class="name">记录</text>
+      </view>
     </view>
 
     <view class="right">
-      <image
-        @click="harvest"
-        class="icon3"
-        mode="widthFix"
-        src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon03.png"
-      />
+      <view class="icon3">
+        <image
+          @click="openExchangeDialog"
+          mode="widthFix"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon03.png"
+        />
 
-      <image
-        @click="openRuleDialog"
-        class="icon4"
-        mode="widthFix"
-        src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon04.png"
-      />
+        <text class="name">收获</text>
+      </view>
+
+      <view class="icon4">
+        <image
+          @click="openRuleDialog"
+          mode="widthFix"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/icon04.png"
+        />
+
+        <text class="name">规则</text>
+      </view>
     </view>
 
     <view class="tip-dialog" v-if="showTip">
@@ -84,7 +91,7 @@
           <view class="fertilizer-item" v-for="item of signInDayList" :key="item.index">
             <image mode="widthFix" :src="item.signIn ? item.signedImg : item.img" />
 
-            <text>第{{ item.index + 1 }}天</text>
+            <text>第{{ item.index }}天</text>
           </view>
         </view>
 
@@ -96,6 +103,8 @@
 
     <rule-dialog ref="ruleDialog" />
     <recode-dialog ref="recodeDialog" />
+    <exchange-dialog ref="exchangeDialog" @openExchangeRecodeDialog="openExchangeRecodeDialog" />
+    <exchange-recode-dialog ref="exchangeRecodeDialog" @back="openExchangeDialog" />
 
     <custom-tab-bar />
   </view>
@@ -107,18 +116,21 @@ import $http from '@/utils/http';
 import { verifyIsLogin } from '@/utils';
 import RuleDialog from '@/pages/healthTree/ruleDialog.vue';
 import RecodeDialog from '@/pages/healthTree/recodeDialog.vue';
+import ExchangeDialog from '@/pages/healthTree/exchangeDialog.vue';
+import ExchangeRecodeDialog from '@/pages/healthTree/exchangeRecodeDialog.vue';
 
 export default {
   name: 'healthTree',
 
   components: {
+    ExchangeRecodeDialog,
+    ExchangeDialog,
     RecodeDialog,
     RuleDialog,
   },
 
   data() {
     return {
-      taskStatusData: [],
       accountInfo: {},
       signInDayList: [
         {
@@ -221,48 +233,19 @@ export default {
     ...mapGetters('app', ['isLogin']),
 
     hasSignIn() {
-      let signInTask = this.taskStatusData.find((item) => item.task_name === '每日签到');
-
-      if (signInTask) {
-        return signInTask.completed_count === 1;
+      if (this.accountInfo.last_sign_date) {
+        return new Date().format().slice(0, 10) === new Date(this.accountInfo.last_sign_date).format().slice(0, 10);
       }
 
       return false;
     },
 
+    // TODO 7个等级判定
     treeInfo() {
-      if (this.accountInfo.tree_level === 1) {
+      if (this.accountInfo.tree_level === 7) {
         return {
-          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree01.png',
-          widthProportion: 100 / 750,
-          bottom: 40,
-          zIndex: 3,
-        };
-      } else if (this.accountInfo.tree_level === 2) {
-        return {
-          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree02.png',
-          widthProportion: 142 / 750,
-          bottom: 40,
-          zIndex: 1,
-        };
-      } else if (this.accountInfo.tree_level === 3) {
-        return {
-          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree03.png',
-          widthProportion: 184 / 750,
-          bottom: 40,
-          zIndex: 1,
-        };
-      } else if (this.accountInfo.tree_level === 4) {
-        return {
-          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree04.png',
-          widthProportion: 246 / 750,
-          bottom: 40,
-          zIndex: 1,
-        };
-      } else if (this.accountInfo.tree_level === 5) {
-        return {
-          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree05.png',
-          widthProportion: 682 / 750,
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree07.png',
+          widthProportion: 1,
           bottom: 0,
           zIndex: 1,
         };
@@ -273,15 +256,42 @@ export default {
           bottom: 40,
           zIndex: 1,
         };
+      } else if (this.accountInfo.tree_level === 5) {
+        return {
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree05.png',
+          widthProportion: 682 / 750,
+          bottom: 0,
+          zIndex: 1,
+        };
+      } else if (this.accountInfo.tree_level === 4) {
+        return {
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree04.png',
+          widthProportion: 246 / 750,
+          bottom: 40,
+          zIndex: 1,
+        };
+      } else if (this.accountInfo.tree_level === 3) {
+        return {
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree03.png',
+          widthProportion: 184 / 750,
+          bottom: 40,
+          zIndex: 1,
+        };
+      } else if (this.accountInfo.tree_level === 2) {
+        return {
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree02.png',
+          widthProportion: 142 / 750,
+          bottom: 40,
+          zIndex: 1,
+        };
+      } else {
+        return {
+          url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree01.png',
+          widthProportion: 100 / 750,
+          bottom: 40,
+          zIndex: 3,
+        };
       }
-
-      return {
-        url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree07.png',
-        widthProportion: 1,
-        levelPoints: 100,
-        bottom: 0,
-        zIndex: 1,
-      };
     },
   },
 
@@ -309,7 +319,6 @@ export default {
         });
       }
 
-      await this.getTaskStatusData().catch(() => {});
       await this.getAccountInfo().catch(() => {});
 
       if (showToast) {
@@ -317,18 +326,9 @@ export default {
       }
     },
 
-    getTaskStatusData() {
-      return $http.get('api/sunshine/task-status').then((res) => {
-        this.taskStatusData = res.data;
-      });
-    },
-
     getAccountInfo() {
-      return $http.get('api/sunshine/account-info').then((res) => {
+      return $http.get('api/health-tree/account-info').then((res) => {
         this.accountInfo = res.data;
-
-        // TODO 测试
-        // this.accountInfo.tree_level = 7;
 
         if (this.accountInfo.sign_continuous_days > 0) {
           this.signInDayList.forEach((item, index) => {
@@ -350,11 +350,11 @@ export default {
         mask: true,
       });
 
-      $http.get('api/sunshine/sign-in').then((res) => {
+      $http.get('api/health-tree/sign-in').then((res) => {
         uni.hideLoading();
 
         uni.showToast({
-          title: `签到成功，获取${res.data.points}阳光`,
+          title: `签到成功，获取${res.data.points}袋化肥`,
           icon: 'none',
         });
 
@@ -378,18 +378,40 @@ export default {
       this.$refs.recodeDialog.open();
     },
 
-    goExchangeCenter() {
+    openExchangeDialog() {
       verifyIsLogin();
-      this.$toRouter('/pages/exchangeCenter/exchangeCenter', `hasSignIn=${this.hasSignIn}`);
+      this.$refs.exchangeDialog.open();
     },
 
-    // TODO 施肥
+    openExchangeRecodeDialog() {
+      this.$refs.exchangeRecodeDialog.open();
+    },
+
     fertilize() {
-      this.showTipDialog();
-    },
+      verifyIsLogin();
 
-    // TODO 收获
-    harvest() {},
+      uni.showLoading({
+        title: '施肥中...',
+        mask: true,
+      });
+
+      // TODO 接口404
+      $http.get('api/health-tree/fertilize').then((res) => {
+        uni.hideLoading();
+
+        uni.showToast({
+          title: `施肥成功，小树增高${res.data.height}厘米`,
+          icon: 'none',
+        });
+
+        this.initData();
+        this.showTipDialog();
+
+        setTimeout(() => {
+          this.showTip = false;
+        }, 5000);
+      });
+    },
   },
 };
 </script>
@@ -472,18 +494,42 @@ page {
         width: 100%;
       }
 
-      text {
+      .number {
         position: absolute;
         right: 4rpx;
         top: 4rpx;
         font-size: 32rpx;
         color: #323131;
       }
+
+      .name {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 14rpx;
+        text-align: center;
+        font-size: 20rpx;
+        color: #323131;
+      }
     }
 
     .icon2 {
       width: 120rpx;
-      margin-bottom: 30rpx;
+      position: relative;
+
+      image {
+        width: 100%;
+      }
+
+      .name {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 14rpx;
+        text-align: center;
+        font-size: 20rpx;
+        color: #323131;
+      }
     }
   }
 
@@ -498,11 +544,40 @@ page {
     .icon3 {
       width: 120rpx;
       margin-bottom: 30rpx;
+      position: relative;
+
+      image {
+        width: 100%;
+      }
+
+      .name {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 14rpx;
+        text-align: center;
+        font-size: 20rpx;
+        color: #323131;
+      }
     }
 
     .icon4 {
       width: 120rpx;
-      margin-bottom: 30rpx;
+      position: relative;
+
+      image {
+        width: 100%;
+      }
+
+      .name {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 14rpx;
+        text-align: center;
+        font-size: 20rpx;
+        color: #323131;
+      }
     }
   }
 

@@ -1,56 +1,50 @@
 <template>
   <view class="calendar-com">
-    <!-- 年月标题与切换按钮 -->
-    <view class="calendar-header">
-      <view class="toggle">
-        <uni-icons @click="prevMonth" color="#000000" type="left" size="16"></uni-icons>
-        <text class="time">{{ currentMonth }}</text>
-        <uni-icons @click="nextMonth" color="#000000" type="right" size="16"></uni-icons>
-      </view>
-
-      <image
-        @click="showCalendar = !showCalendar"
-        class="toggle-calendar"
-        mode="widthFix"
-        src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app3/recode/calendar-icon.png"
-      />
+    <view class="month" @click="$refs.selectMonthDialog.open()">
+      <text class="time">{{ currentMonth }}</text>
+      <text class="icon"></text>
     </view>
 
-    <view class="calendar-wrapper" v-show="showCalendar">
-      <!-- 星期行 -->
-      <view class="calendar-weekdays">
-        <view v-for="day in weekDays" :key="day" class="weekday">{{ day }}</view>
-      </view>
+    <view class="line"></view>
 
+    <scroll-view
+      :scroll-x="true"
+      :scroll-into-view="scrollDay"
+      :enable-flex="true"
+      :show-scrollbar="false"
+      class="calendar-days"
+    >
       <!-- 日期展示 -->
-      <view class="calendar-days">
-        <view
-          v-for="day in calendarDays"
-          :key="day.date"
-          class="calendar-day"
-          :class="{
-            disabled: day.disabled,
-            selected: day.selected,
-            today: day.isToday,
-          }"
-          @click="selectDay(day)"
-        >
-          <view>
-            <text>{{ day.value }}</text>
-            <text>{{ day.value && lunarByDate(day.dateStr) }}</text>
-          </view>
-        </view>
+      <view
+        v-for="day in calendarDays"
+        :key="day.date"
+        class="calendar-day"
+        :id="`days-${day.value}`"
+        :class="{
+          disabled: day.disabled,
+          selected: day.selected,
+          today: day.isToday,
+        }"
+        @click="selectDay(day)"
+      >
+        {{ day.value }}
       </view>
-    </view>
+    </scroll-view>
+
+    <select-month-dialog ref="selectMonthDialog" :selectedDate="selectedDate" @submit="selectMonthSubmit" />
   </view>
 </template>
 
 <script>
-import solarlunar from 'solarlunar';
 import { verifyIsLogin } from '@/utils';
+import SelectMonthDialog from '@/components/selectMonthDialog.vue';
 
 export default {
-  name: 'calendar',
+  name: 'calendar2',
+
+  components: {
+    SelectMonthDialog,
+  },
 
   props: {
     initialWeight: {
@@ -69,6 +63,7 @@ export default {
       minSelectableDate: null, // 最小可选日期（明天）
       weekDays: ['一', '二', '三', '四', '五', '六', '日'],
       showCalendar: true,
+      scrollDay: undefined,
     };
   },
 
@@ -79,19 +74,13 @@ export default {
     const day = date.getDate();
 
     this.selectedDate = `${year}/${month + 1 > 9 ? month + 1 : `0${month + 1}`}/${day > 9 ? day : `0${day}`}`;
+    this.scrollDay = `days-${day > 9 ? day : `0${day}`}`;
   },
 
   computed: {
-    lunarByDate() {
-      return (dateStr) => {
-        let date = new Date(dateStr);
-        return solarlunar.solar2lunar(date.getFullYear(), date.getMonth() + 1, date.getDate()).dayCn;
-      };
-    },
-
     currentMonth() {
       const date = new Date(this.currentDate);
-      return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+      return `${date.getMonth() + 1}月`;
     },
 
     calendarDays() {
@@ -99,20 +88,20 @@ export default {
       const year = date.getFullYear();
       const month = date.getMonth();
 
-      const firstDay = new Date(year, month, 1); // 本月第一天
+      // const firstDay = new Date(year, month, 1); // 本月第一天
       const lastDay = new Date(year, month + 1, 0); // 本月最后一天
       const totalDays = lastDay.getDate(); // 总天数
-      const startDay = firstDay.getDay(); // 第一天是星期几（0=周日）
+      // const startDay = firstDay.getDay(); // 第一天是星期几（0=周日）
 
       const days = [];
       const today = new Date(); // 当前时间
       const minDate = this.minSelectableDate;
 
       // 补齐前面空白的格子（周一为第一列）
-      const offset = (startDay + 6) % 7; // 调整成周一为第一天
-      for (let i = 0; i < offset; i++) {
-        days.push({ value: '', disabled: true });
-      }
+      // const offset = (startDay + 6) % 7; // 调整成周一为第一天
+      // for (let i = 0; i < offset; i++) {
+      //   days.push({ value: '', disabled: true });
+      // }
 
       // 添加当月的每一天
       for (let day = 1; day <= totalDays; day++) {
@@ -124,7 +113,7 @@ export default {
 
         days.push({
           dateStr,
-          value: day,
+          value: day > 9 ? day : `0${day}`,
           date: currDate,
           isToday,
           disabled: isDisabled,
@@ -133,11 +122,11 @@ export default {
       }
 
       // 补齐最后一行（最多补6个空格）
-      const totalCells = offset + totalDays;
-      const fillCount = (7 - (totalCells % 7)) % 7;
-      for (let i = 0; i < fillCount; i++) {
-        days.push({ value: '', disabled: true });
-      }
+      // const totalCells = offset + totalDays;
+      // const fillCount = (7 - (totalCells % 7)) % 7;
+      // for (let i = 0; i < fillCount; i++) {
+      //   days.push({ value: '', disabled: true });
+      // }
 
       return days;
     },
@@ -173,108 +162,88 @@ export default {
       verifyIsLogin();
       this.selectedDate = day.dateStr;
     },
+
+    selectMonthSubmit(event) {
+      this.currentDate = new Date(event + '/01').getTime();
+
+      this.scrollDay = `days-99`;
+
+      setTimeout(() => {
+        this.scrollDay = `days-01`;
+        this.selectedDate = event + '/01';
+      });
+    },
   },
 };
 </script>
 
 <style scoped lang="scss">
 .calendar-com {
-  .calendar-header {
+  display: flex;
+  align-items: center;
+
+  .month {
+    flex-shrink: 0;
+    width: 110rpx;
+    height: 40rpx;
+    background: #b3a1ff;
+    border-radius: 20rpx;
+    margin-right: 24rpx;
     display: flex;
     align-items: center;
+    gap: 4rpx;
     justify-content: center;
-    margin-bottom: 36rpx;
-    position: relative;
 
     .time {
-      width: 180rpx;
-      text-align: center;
-      font-weight: 500;
-      font-size: 25rpx;
-      color: #000000;
+      font-size: 28rpx;
+      color: #323131;
     }
 
-    .toggle {
-      display: flex;
-      align-items: center;
-    }
-
-    .toggle-calendar {
-      position: absolute;
-      top: 0;
-      right: 40rpx;
-      width: 35rpx;
+    .icon {
+      border-top: 10rpx solid #323131;
+      border-bottom: 10rpx solid transparent;
+      border-right: 10rpx solid transparent;
+      border-left: 10rpx solid transparent;
+      position: relative;
+      top: 6rpx;
     }
   }
 
-  .calendar-wrapper {
-    transition: all 0.3s;
+  .line {
+    flex-shrink: 0;
+    width: 2rpx;
+    height: 30rpx;
+    background: #6b6b6b50;
+    margin-right: 6rpx;
+  }
 
-    .calendar-weekdays {
+  .calendar-days {
+    width: 580rpx;
+    height: 60rpx;
+    display: flex;
+    align-items: center;
+
+    .calendar-day {
+      flex-shrink: 0;
+      width: 60rpx;
+      height: 60rpx;
+      border-radius: 50%;
+      font-size: 28rpx;
+      color: #323131;
+      position: relative;
+      top: 20rpx;
+      margin-right: 26rpx;
       display: flex;
-      justify-content: space-between;
-      text-align: center;
-      margin-bottom: 26rpx;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
-      .weekday {
-        font-size: 24rpx;
-        color: #000000;
-        flex-grow: 1;
-        text-align: center;
+      &.selected {
+        background: #ffffff;
       }
-    }
 
-    .calendar-days {
-      display: flex;
-      flex-wrap: wrap;
-
-      .calendar-day {
-        width: calc(100% / 7);
-        padding: 2rpx 0;
-        cursor: pointer;
-        font-size: 24rpx;
-        color: #333333;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        view {
-        }
-
-        &.selected {
-          color: #ffffff;
-
-          view {
-            background: #35d16e;
-          }
-        }
-
-        &.disabled {
-          view {
-            color: #aaaaaa;
-          }
-        }
-
-        view {
-          width: 68rpx;
-          height: 68rpx;
-          border-radius: 50%;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 4rpx;
-
-          text {
-            &:nth-child(1) {
-              font-size: 24rpx;
-            }
-
-            &:nth-child(2) {
-              font-size: 19rpx;
-            }
-          }
-        }
+      &.disabled {
+        color: #32313180;
       }
     }
   }

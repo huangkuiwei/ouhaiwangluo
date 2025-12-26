@@ -742,7 +742,7 @@ export default {
       this.$refs.addFoodRecodeDialog.close();
 
       this.$toRouter(
-        '/pages/dietaryRecord/dietaryRecord',
+        '/pages/foodRecord/foodRecord',
         `text=${encodeURIComponent(event.text)}&type=${event.type}&input_type=${
           event.input_type
         }&date_time=${new Date().format()}`,
@@ -753,7 +753,7 @@ export default {
       this.$refs.addFoodRecodeDialog.close();
 
       this.$toRouter(
-        '/pages/dietaryRecord/dietaryRecord',
+        '/pages/foodRecord/foodRecord',
         `text=&url=${encodeURIComponent(event.url)}&type=${event.type}&input_type=${
           event.input_type
         }&date_time=${new Date().format()}`,

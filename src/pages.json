@@ -271,7 +271,7 @@
       }
     },
     {
-      "path": "pages/dietaryRecord/dietaryRecord",
+      "path": "pages/foodRecord/foodRecord",
       "style": {
         "navigationStyle": "custom",
         // #ifndef H5

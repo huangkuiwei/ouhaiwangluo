@@ -125,7 +125,7 @@ import ModifyFoodDialog from '@/pages/foodRecord/modifyFoodDialog.vue';
 let chart = null;
 
 export default {
-  name: 'dietaryRecord',
+  name: 'foodRecord',
 
   components: {
     ModifyFoodDialog,

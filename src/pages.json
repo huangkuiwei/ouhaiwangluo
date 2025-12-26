@@ -447,6 +447,21 @@
           "softinputMode": "adjustResize"
         }
       }
+    },
+    {
+      "path": "pages/dietaryRecord/dietaryRecord",
+      "style": {
+        "navigationStyle": "custom",
+        // #ifndef H5
+        "navigationBarTitleText": "饮食记录",
+        // #endif
+        "h5": {
+          "titleNView": false
+        },
+        "app-plus": {
+          "softinputMode": "adjustResize"
+        }
+      }
     }
   ],
   "subPackages": [

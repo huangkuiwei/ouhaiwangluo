@@ -67,8 +67,7 @@
       </view>
 
       <view class="data">
-        <!-- TODO 饮食记录 -->
-        <view class="item">
+        <view class="item" @click="previewDataPage('/pages/dietaryRecord/dietaryRecord')">
           <view class="data-title">饮食记录</view>
           <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg02.png" />
         </view>

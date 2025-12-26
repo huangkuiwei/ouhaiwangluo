@@ -15,37 +15,37 @@
 
       <view class="plan-box-wrap">
         <view class="plan-box" v-for="item of historyPlanList.filter((x) => x.state === 1)" :key="item.plan_id">
-          <view class="data">
-            <view class="progress">
-              <text :style="{ width: item.progress + '%' }"></text>
-            </view>
-
-            <view class="time">
-              <text>{{ item.start_date.slice(0, 10) }}</text>
-              <text>{{ item.end_date.slice(0, 10) }}</text>
-            </view>
-
-            <view class="value">
-              <view class="value-item">
-                <text>初始</text>
-                <text>{{ item.plan_initial_weight }}公斤</text>
+          <view class="data-wrapper">
+            <view class="data">
+              <view class="time">
+                <text>{{ item.start_date.slice(0, 10) }}</text>
+                <text>{{ item.end_date.slice(0, 10) }}</text>
               </view>
 
-              <view class="value-item">
-                <text>{{ isWeightLoss(item) ? '已减重' : '已增重' }}</text>
-                <text>{{ isWeightLoss(item) ? item.loss_weight : -item.loss_weight }}公斤</text>
-              </view>
+              <view class="value">
+                <view class="value-item">
+                  <text>初始</text>
+                  <text>{{ item.plan_initial_weight }}公斤</text>
+                </view>
 
-              <view class="value-item">
-                <text>目标</text>
-                <text>{{ item.plan_target_weight }}公斤</text>
+                <view class="value-item">
+                  <text>{{ isWeightLoss(item) ? '已减重' : '已增重' }}</text>
+                  <text>{{ isWeightLoss(item) ? item.loss_weight : -item.loss_weight }}公斤</text>
+                </view>
+
+                <view class="value-item">
+                  <text>目标</text>
+                  <text>{{ item.plan_target_weight }}公斤</text>
+                </view>
               </view>
             </view>
-          </view>
 
-          <view class="tip" @click="$toBack()">
-            <text class="progress-tip">最新体重{{ item.current_weight }}公斤，当前进度{{ item.progress }}%</text>
-            <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+            <view class="tip" @click="$toBack()">
+              <text class="progress-tip">当前进度{{ item.progress }}%</text>
+              <view class="icon" :class="{ active: item.showDetail }" @click="item.showDetail = !item.showDetail">
+                <uni-icons class="back" color="#323131" type="right" size="18"></uni-icons>
+              </view>
+            </view>
           </view>
         </view>
       </view>
@@ -56,37 +56,91 @@
 
       <view class="plan-box-wrap">
         <view class="plan-box" v-for="item of historyPlanList.filter((x) => x.state !== 1)" :key="item.plan_id">
-          <view class="data">
-            <view class="progress">
-              <text :style="{ width: item.progress + '%' }"></text>
-            </view>
-
-            <view class="time">
-              <text>{{ item.start_date.slice(0, 10) }}</text>
-              <text>{{ item.end_date.slice(0, 10) }}</text>
-            </view>
-
-            <view class="value">
-              <view class="value-item">
-                <text>初始</text>
-                <text>{{ item.plan_initial_weight }}公斤</text>
+          <view class="data-wrapper">
+            <view class="data">
+              <view class="progress">
+                <text :style="{ width: item.progress + '%' }"></text>
               </view>
 
-              <view class="value-item">
-                <text>{{ isWeightLoss(item) ? '已减重' : '已增重' }}</text>
-                <text>{{ isWeightLoss(item) ? item.loss_weight : -item.loss_weight }}公斤</text>
+              <view class="time">
+                <text>{{ item.start_date.slice(0, 10) }}</text>
+                <text>{{ item.end_date.slice(0, 10) }}</text>
               </view>
 
-              <view class="value-item">
-                <text>目标</text>
-                <text>{{ item.plan_target_weight }}公斤</text>
+              <view class="value">
+                <view class="value-item">
+                  <text>初始</text>
+                  <text>{{ item.plan_initial_weight }}公斤</text>
+                </view>
+
+                <view class="value-item">
+                  <text>{{ isWeightLoss(item) ? '已减重' : '已增重' }}</text>
+                  <text>{{ isWeightLoss(item) ? item.loss_weight : -item.loss_weight }}公斤</text>
+                </view>
+
+                <view class="value-item">
+                  <text>目标</text>
+                  <text>{{ item.plan_target_weight }}公斤</text>
+                </view>
+              </view>
+            </view>
+
+            <view class="tip" @click="toggleDetail(item)">
+              <text class="progress-tip">计划结束时体重：{{ item.current_weight }}公斤</text>
+              <view class="icon" :class="{ active: item.showDetail }">
+                <uni-icons class="back" color="#323131" type="right" size="18"></uni-icons>
               </view>
             </view>
           </view>
 
-          <view class="tip" @click="previewPlan(item)">
-            <text class="progress-tip">方案结束时体重：{{ item.current_weight }}公斤</text>
-            <uni-icons class="back" color="#999999" type="right" size="18"></uni-icons>
+          <view class="weight-data-wrapper" v-if="item.showDetail">
+            <view class="chart-title"
+              >目标在 <text>{{ item.end_date && item.end_date.slice(0, 10) }}</text> 到
+              <text>{{ item.plan_target_weight || 0 }}kg</text></view
+            >
+
+            <view class="time-wrapper">
+              <view class="time">{{ item.start_date.slice(0, 10) }}</view>
+
+              <view class="loss-data">
+                <text
+                  >每周{{
+                    isWeightLoss(item) ? `减重${item.weekly_loss_weight}` : `增重${-item.weekly_loss_weight}`
+                  }}kg</text
+                >
+              </view>
+
+              <view class="time">{{ item.end_date.slice(0, 10) }}</view>
+            </view>
+
+            <view class="weight-data">
+              <view class="weight-data-item">
+                <text>初始BMI值为：{{ item.plan_initial_bmi || 0 }}</text>
+              </view>
+
+              <view class="weight-data-item">
+                <text>初始体重值为：{{ item.plan_initial_weight || 0 }}KG</text>
+              </view>
+
+              <view class="weight-data-item">
+                <text>当前体重值为：{{ item.current_weight || 0 }}KG</text>
+              </view>
+            </view>
+
+            <view class="options">
+              <text class="loss-data2">
+                {{ isWeightLoss(item) ? '已减重：' : '已增重：' }}：
+                <template v-if="isWeightLoss">
+                  {{ Number((item.plan_initial_weight - item.current_weight).toFixed(2)) }}KG
+                </template>
+
+                <template v-else>
+                  {{ -Number((item.plan_initial_weight - item.current_weight).toFixed(2)) }}KG
+                </template>
+              </text>
+
+              <text class="delete" @click="deletePlan(item)">删除方案</text>
+            </view>
           </view>
         </view>
       </view>
@@ -153,15 +207,51 @@ export default {
             } else if (item.progress < 0) {
               item.progress = 0;
             }
+
+            item.showDetail = false;
           });
 
           this.historyPlanList = res.data.Items;
         });
     },
 
-    previewPlan(item) {
-      uni.setStorageSync('lastPlanData', item);
-      this.$toRouter('/pages/historyWeightManagementPlan/historyWeightManagementPlan', `plan_id=${item.plan_id}`);
+    // TODO 切换无效
+    toggleDetail(item) {
+      item.showDetail = !item.showDetail;
+    },
+
+    /**
+     * 删除计划
+     */
+    deletePlan(item) {
+      uni.showModal({
+        title: '温馨提示',
+        content: '确定要删除计划吗？',
+        success: (res) => {
+          if (res.confirm) {
+            uni.showLoading({
+              title: '加载中...',
+              mask: true,
+            });
+
+            $http
+              .post('api/diet-info/weight-plan/delete', {
+                plan_id: item.plan_id,
+              })
+              .then(() => {
+                uni.hideLoading();
+
+                uni.showToast({
+                  title: '删除成功',
+                  icon: 'none',
+                  mask: true,
+                });
+
+                this.getHistoryPlanList();
+              });
+          }
+        },
+      });
     },
   },
 };
@@ -169,185 +259,222 @@ export default {
 
 <style lang="scss">
 page {
-  background: #f6f7fb;
+  background: #ffffff;
 }
 </style>
 
 <style scoped lang="scss">
 .history-plan-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 28rpx;
   }
 
   .current-plan,
   .history-plan {
     &.current-plan {
-      margin-top: 38rpx;
+      .data-wrapper {
+        background: #dad2ff !important;
+      }
     }
 
-    padding: 0 30rpx;
+    padding: 0 24rpx;
     position: relative;
-    margin-bottom: 52rpx;
-
-    &.current-plan {
-      &::after {
-        content: '';
-        position: absolute;
-        left: 30rpx;
-        top: 10rpx;
-        width: 12rpx;
-        height: 12rpx;
-        border-radius: 50%;
-        background: #0abf92;
-      }
-    }
-
-    &.history-plan {
-      &::after {
-        content: '';
-        position: absolute;
-        left: 30rpx;
-        top: 10rpx;
-        width: 12rpx;
-        height: 12rpx;
-        border-radius: 50%;
-        background: #d0d0d0;
-      }
-    }
+    margin-bottom: 40rpx;
 
     .plan-title {
-      font-weight: 500;
-      font-size: 30rpx;
-      color: #1a1a1a;
-      padding-left: 30rpx;
-      margin-bottom: 30rpx;
+      font-size: 28rpx;
+      color: #000000;
+      margin-bottom: 20rpx;
     }
 
     .plan-box-wrap {
       .plan-box {
-        background: #ffffff;
+        background: #fcffea;
         border-radius: 20rpx;
 
-        &:not(:last-child) {
-          margin-bottom: 20rpx;
-        }
+        .data-wrapper {
+          background: #f3f3f3;
+          padding: 20rpx;
+          border-radius: 20rpx;
 
-        .data {
-          padding: 30rpx 25rpx 44rpx;
+          &:not(:last-child) {
+            margin-bottom: 20rpx;
+          }
 
-          .progress {
-            width: 100%;
-            height: 15rpx;
-            background: #f6f7fb;
-            border-radius: 8rpx;
-            position: relative;
-            margin-bottom: 22rpx;
+          .data {
+            .time {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 36rpx;
 
-            text {
-              position: absolute;
-              left: 0;
-              top: 0;
-              height: 100%;
-              background: #0abf92;
-              border-radius: 8rpx;
+              text {
+                font-size: 24rpx;
+                color: #323131;
+              }
+            }
+
+            .value {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 90rpx;
+              margin-bottom: 32rpx;
+
+              .value-item {
+                &:nth-child(1),
+                &:nth-child(3) {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 30rpx;
+
+                  text {
+                    &:nth-child(1) {
+                      width: 120rpx;
+                      height: 40rpx;
+                      background: #ffffff;
+                      border-radius: 60rpx;
+                      font-size: 24rpx;
+                      color: #323131;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+
+                    &:nth-child(2) {
+                      font-size: 32rpx;
+                      color: #323131;
+                    }
+                  }
+                }
+
+                &:nth-child(2) {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 30rpx;
+
+                  text {
+                    &:nth-child(1) {
+                      width: 120rpx;
+                      height: 40rpx;
+                      background: #e8f480;
+                      border-radius: 60rpx;
+                      font-size: 24rpx;
+                      color: #323131;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    }
+
+                    &:nth-child(2) {
+                      font-weight: 600;
+                      font-size: 36rpx;
+                      color: #323131;
+                    }
+                  }
+                }
+              }
             }
           }
 
-          .time {
+          .tip {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            .progress-tip {
+              font-size: 24rpx;
+              color: #323131;
+            }
+
+            .icon {
+              &.active {
+                transform: rotate(90deg);
+              }
+            }
+          }
+        }
+
+        .weight-data-wrapper {
+          padding: 28rpx 20rpx;
+
+          .chart-title {
+            font-size: 24rpx;
+            color: #313030;
+            margin-bottom: 16rpx;
+
+            text {
+              color: #000000;
+              padding: 0 10rpx;
+            }
+          }
+
+          .time-wrapper {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 50rpx;
+            margin-bottom: 20rpx;
 
-            text {
-              font-size: 24rpx;
-              color: #999999;
+            .time {
+              font-size: 20rpx;
+              color: #000000;
+            }
+
+            .loss-data {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              text {
+                padding: 8rpx;
+                background: #ffffff;
+                border-radius: 40rpx;
+                font-size: 20rpx;
+                color: #000000;
+              }
             }
           }
 
-          .value {
+          .weight-data {
+            display: flex;
+            flex-direction: column;
+            gap: 20rpx;
+            margin-bottom: 20rpx;
+
+            .weight-data-item {
+              font-size: 24rpx;
+              color: #000000;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            }
+          }
+
+          .options {
+            font-size: 20rpx;
+            color: #000000;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 90rpx;
+            justify-content: space-between;
 
-            .value-item {
-              &:nth-child(1),
-              &:nth-child(3) {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 30rpx;
-
-                text {
-                  &:nth-child(1) {
-                    width: 97rpx;
-                    height: 48rpx;
-                    background: #eeeeee;
-                    border-radius: 10rpx;
-                    font-size: 26rpx;
-                    color: #333333;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  }
-
-                  &:nth-child(2) {
-                    font-weight: 500;
-                    font-size: 32rpx;
-                    color: #1a1a1a;
-                  }
-                }
-              }
-
-              &:nth-child(2) {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 30rpx;
-
-                text {
-                  &:nth-child(1) {
-                    width: 97rpx;
-                    height: 48rpx;
-                    background: #f2fff4;
-                    border-radius: 10rpx;
-                    border: 1px solid #0abf92;
-                    font-size: 26rpx;
-                    color: #0abf92;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  }
-
-                  &:nth-child(2) {
-                    font-weight: 500;
-                    font-size: 32rpx;
-                    color: #0abf92;
-                  }
-                }
-              }
+            .loss-data2 {
+              padding: 8rpx 20rpx;
+              background: #d4e86c;
+              border-radius: 40rpx;
             }
-          }
-        }
 
-        .tip {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 30rpx 23rpx;
-          border-top: 2rpx solid #efeff1;
-
-          .progress-tip {
-            font-size: 26rpx;
-            color: #333333;
+            .delete {
+              padding: 6rpx 72rpx;
+              background: #f3f3f3;
+              border-radius: 40rpx;
+            }
           }
         }
       }

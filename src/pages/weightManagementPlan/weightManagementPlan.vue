@@ -222,8 +222,8 @@ export default {
         },
         grid: {
           top: '10%',
-          left: '2%',
-          right: '2%',
+          left: '5%',
+          right: '5%',
           bottom: '5%',
           containLabel: true,
         },
@@ -247,9 +247,6 @@ export default {
             data: [],
             type: 'line',
             color: '#D54242',
-            areaStyle: {
-              color: '#D54242',
-            },
           },
         ],
       },

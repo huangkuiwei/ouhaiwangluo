@@ -11,18 +11,18 @@
     <view class="banner"></view>
 
     <scroll-view class="chat-box" :scroll-y="true" :show-scrollbar="false" :scroll-top="scrollTop">
-      <view class="chat-introduce">
-        <view class="title">{{ aiTitle }}</view>
+      <!--<view class="chat-introduce">-->
+      <!--  <view class="title">{{ aiTitle }}</view>-->
 
-        <view class="question">
-          <view class="question-title">猜你想说</view>
-          <view class="question-list">
-            <view class="question-item" v-for="item of questionList" :key="item.id" @click="selectQuestion(item)">
-              {{ item.text }}
-            </view>
-          </view>
-        </view>
-      </view>
+      <!--  <view class="question">-->
+      <!--    <view class="question-title">猜你想说</view>-->
+      <!--    <view class="question-list">-->
+      <!--      <view class="question-item" v-for="item of questionList" :key="item.id" @click="selectQuestion(item)">-->
+      <!--        {{ item.text }}-->
+      <!--      </view>-->
+      <!--    </view>-->
+      <!--  </view>-->
+      <!--</view>-->
 
       <view class="chat-list">
         <view
@@ -38,20 +38,13 @@
     </scroll-view>
 
     <view class="message-box">
-      <view class="input-box">
-        <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/aiChat/edit.png" />
+      <view class="ai-tip"> 本服务为AI生成内容，结果仅供参考 </view>
 
-        <input
-          type="text"
-          placeholder="说点什么..."
-          :value="questionText"
-          @input="questionText = $event.detail.value"
-        />
+      <view class="input-box">
+        <input type="text" :value="questionText" @input="questionText = $event.detail.value" />
       </view>
 
       <view class="send" :class="{ disabled: answering }" @click="sendMessage">发送</view>
-
-      <view class="ai-tip"> 本服务为AI生成内容，结果仅供参考 </view>
     </view>
   </view>
 </template>
@@ -466,7 +459,6 @@ export default {
 <style lang="scss">
 page {
   height: 100%;
-  background: #f6f7fb;
 }
 </style>
 
@@ -475,8 +467,7 @@ page {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/aiChat/bg1.png') left top/100% auto
-    no-repeat;
+  background: linear-gradient(181deg, #e8f480 0%, #ffffff 41.56%);
 
   .page-title {
   }
@@ -487,50 +478,50 @@ page {
   }
 
   .chat-box {
-    padding: 104rpx 30rpx 50rpx;
+    padding: 60rpx 48rpx 50rpx;
     flex-grow: 1;
     overflow: auto;
 
-    .chat-introduce {
-      background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/aiChat/bg3.png') left top/100% 100%
-        no-repeat;
-      padding: 84rpx 22rpx 50rpx;
-      margin-bottom: 43rpx;
-
-      .title {
-        font-size: 26rpx;
-        color: #111111;
-        margin-bottom: 73rpx;
-        padding-left: 103rpx;
-        white-space: nowrap;
-      }
-
-      .question {
-        .question-title {
-          font-weight: bold;
-          font-size: 26rpx;
-          color: #111111;
-          margin-bottom: 33rpx;
-        }
-
-        .question-list {
-          display: flex;
-          flex-direction: column;
-          gap: 10rpx;
-
-          .question-item {
-            height: 60rpx;
-            background: #ffffff;
-            border-radius: 30rpx;
-            padding: 0 30rpx;
-            display: flex;
-            align-items: center;
-            font-size: 24rpx;
-            color: #333333;
-          }
-        }
-      }
-    }
+    // .chat-introduce {
+    //   background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/aiChat/bg3.png') left top/100% 100%
+    //     no-repeat;
+    //   padding: 84rpx 22rpx 50rpx;
+    //   margin-bottom: 43rpx;
+    //
+    //   .title {
+    //     font-size: 26rpx;
+    //     color: #111111;
+    //     margin-bottom: 73rpx;
+    //     padding-left: 103rpx;
+    //     white-space: nowrap;
+    //   }
+    //
+    //   .question {
+    //     .question-title {
+    //       font-weight: bold;
+    //       font-size: 26rpx;
+    //       color: #111111;
+    //       margin-bottom: 33rpx;
+    //     }
+    //
+    //     .question-list {
+    //       display: flex;
+    //       flex-direction: column;
+    //       gap: 10rpx;
+    //
+    //       .question-item {
+    //         height: 60rpx;
+    //         background: #ffffff;
+    //         border-radius: 30rpx;
+    //         padding: 0 30rpx;
+    //         display: flex;
+    //         align-items: center;
+    //         font-size: 24rpx;
+    //         color: #333333;
+    //       }
+    //     }
+    //   }
+    // }
 
     .chat-list {
       display: flex;
@@ -545,19 +536,21 @@ page {
         font-size: 26rpx;
 
         &.question {
-          padding: 18rpx 24rpx;
-          background: #0abf92;
-          border-radius: 25rpx 5rpx 25rpx 25rpx;
-          color: #ffffff;
+          padding: 20rpx 20rpx;
+          background: #dad2ff;
+          border-radius: 40rpx 0 40rpx 40rpx;
+          font-size: 24rpx;
+          color: #000000;
           align-self: flex-end;
         }
 
         &.answer {
           padding: 0 24rpx;
           min-width: 50%;
-          background: #ffffff;
-          border-radius: 5rpx 25rpx 25rpx 25rpx;
-          color: #111111;
+          background: #e8f480;
+          border-radius: 0 40rpx 40rpx 40rpx;
+          font-size: 24rpx;
+          color: #000000;
           align-self: flex-start;
         }
       }
@@ -566,22 +559,32 @@ page {
 
   .message-box {
     flex-shrink: 0;
-    padding: 0 30rpx 60rpx;
+    box-shadow: 0rpx -8rpx 43rpx 0rpx rgba(0, 0, 0, 0.25);
+    padding: 0 30rpx 10rpx;
     height: 160rpx;
     background: #ffffff;
     display: flex;
     align-items: center;
     position: relative;
 
+    .ai-tip {
+      position: absolute;
+      top: 6rpx;
+      left: 48rpx;
+      right: 0;
+      font-size: 16rpx;
+      color: #323131;
+    }
+
     .input-box {
       flex-grow: 1;
-      height: 80rpx;
+      height: 60rpx;
       padding: 0 30rpx;
-      background: #f8f8f8;
-      border-radius: 40rpx;
+      background: #e7e6e8;
+      border-radius: 60rpx;
       display: flex;
       align-items: center;
-      margin-right: 20rpx;
+      margin-right: 14rpx;
 
       image {
         width: 32rpx;
@@ -596,13 +599,13 @@ page {
 
     .send {
       flex-shrink: 0;
-      width: 180rpx;
-      height: 80rpx;
-      background: #0abf92;
-      border-radius: 40rpx;
-      font-weight: 500;
-      font-size: 32rpx;
-      color: #ffffff;
+      width: 160rpx;
+      height: 60rpx;
+      background: #dad2ff;
+      border-radius: 60rpx;
+      font-weight: 600;
+      font-size: 24rpx;
+      color: #323131;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -611,16 +614,6 @@ page {
         background: #aaaaaa;
         color: #ffffff;
       }
-    }
-
-    .ai-tip {
-      position: absolute;
-      bottom: 30rpx;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 20rpx;
-      color: #cccccc;
     }
   }
 }

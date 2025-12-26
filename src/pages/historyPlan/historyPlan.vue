@@ -14,7 +14,7 @@
       <view class="plan-title">当前方案</view>
 
       <view class="plan-box-wrap">
-        <view class="plan-box" v-for="item of historyPlanList.filter((x) => x.state === 1)" :key="item.plan_id">
+        <view class="plan-box" v-for="item of currentPlanList" :key="item.plan_id">
           <view class="data-wrapper">
             <view class="data">
               <view class="time">
@@ -55,7 +55,7 @@
       <view class="plan-title">历史方案</view>
 
       <view class="plan-box-wrap">
-        <view class="plan-box" v-for="item of historyPlanList.filter((x) => x.state !== 1)" :key="item.plan_id">
+        <view class="plan-box" v-for="item of historyPlanList" :key="item.plan_id">
           <view class="data-wrapper">
             <view class="data">
               <view class="progress">
@@ -157,6 +157,7 @@ export default {
   data() {
     return {
       historyPlanList: [],
+      currentPlanList: [],
     };
   },
 
@@ -211,11 +212,11 @@ export default {
             item.showDetail = false;
           });
 
-          this.historyPlanList = res.data.Items;
+          this.historyPlanList = res.data.Items.filter((x) => x.state !== 1);
+          this.currentPlanList = res.data.Items.filter((x) => x.state === 1);
         });
     },
 
-    // TODO 切换无效
     toggleDetail(item) {
       item.showDetail = !item.showDetail;
     },
@@ -465,15 +466,23 @@ page {
             justify-content: space-between;
 
             .loss-data2 {
-              padding: 8rpx 20rpx;
+              height: 40rpx;
+              padding: 0 20rpx;
               background: #d4e86c;
               border-radius: 40rpx;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
 
             .delete {
-              padding: 6rpx 72rpx;
+              height: 40rpx;
+              padding: 0 72rpx;
               background: #f3f3f3;
               border-radius: 40rpx;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
           }
         }

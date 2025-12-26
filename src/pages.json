@@ -181,21 +181,6 @@
       }
     },
     {
-      "path": "pages/setReminder/setReminder",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "设置提醒",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
       "path": "pages/evaluation/evaluation",
       "style": {
         "navigationStyle": "custom",
@@ -231,21 +216,6 @@
         "navigationStyle": "custom",
         // #ifndef H5
         "navigationBarTitleText": "重置方案",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
-      "path": "pages/historyWeightManagementPlan/historyWeightManagementPlan",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "体重管理方案",
         // #endif
         "h5": {
           "titleNView": false
@@ -394,21 +364,6 @@
         "navigationStyle": "custom",
         // #ifndef H5
         "navigationBarTitleText": "更改手机号",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
-      "path": "pages/renewalManage/renewalManage",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "续订管理",
         // #endif
         "h5": {
           "titleNView": false

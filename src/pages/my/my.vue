@@ -52,7 +52,7 @@
           "
         />
 
-        <view class="desc" v-if="isVip">
+        <view class="desc" v-if="isVip" :style="{ paddingTop: '26rpx' }">
           <view>你已是尊贵的会员</view>
           <view>
             <text>已解锁全部功能</text>

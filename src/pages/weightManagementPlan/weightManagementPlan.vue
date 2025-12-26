@@ -1,42 +1,81 @@
 <template>
   <view class="weight-management-plan-page">
     <view class="page-title">
-      <text>体重管理方案</text>
+      <text>体重管理</text>
 
       <view class="back" @click="$toBack">
         <uni-icons class="back" color="#1A1A1A" type="left" size="22"></uni-icons>
       </view>
     </view>
 
-    <view class="banner"> </view>
+    <view class="banner"></view>
 
     <view class="plan-box">
-      <view class="plan-title">我的定制体重管理方案</view>
-      <view class="plan-tip">
-        <text>目标在</text>
-        <text>{{ lastPlanData.end_date && lastPlanData.end_date.slice(0, 10) }}</text>
-        <text>达到</text>
-        <text>{{ lastPlanData.plan_target_weight }}KG</text>
+      <view class="title">智能评估</view>
+
+      <view class="info-list">
+        <view class="info-item">
+          <text>身高</text>
+          <text>{{ userDetailInfo.height || 0 }}厘米</text>
+        </view>
+
+        <view class="info-item">
+          <text>减重目标</text>
+          <text>{{ lastPlanData.plan_initial_weight || 0 }}kg → {{ lastPlanData.plan_target_weight || 0 }}kg</text>
+        </view>
+
+        <view class="info-item">
+          <text>每周</text>
+          <text
+            >{{
+              isWeightLoss ? `减重${lastPlanData.weekly_loss_weight}` : `增重${-lastPlanData.weekly_loss_weight}`
+            }}kg</text
+          >
+        </view>
+
+        <!-- TODO 燃脂心率数据 -->
+        <view class="info-item">
+          <text>燃脂心率</text>
+          <text>119~158次/分</text>
+        </view>
+
+        <view class="info-item">
+          <text>基础代谢</text>
+          <text>{{ lastPlanData.plan_initial_bmr || 0 }}千卡</text>
+        </view>
       </view>
 
       <view class="chart-box">
-        <view class="chart-item1">
-          <view class="chart-title">
-            <text>初始BMI值为：{{ lastPlanData.plan_initial_bmi }}</text>
-            <text @click="$toRouter('/pages/historyPlan/historyPlan')">历史记录</text>
+        <view class="chart-title"
+          >目标在 <text>{{ lastPlanData.end_date && lastPlanData.end_date.slice(0, 10) }}</text> 到
+          <text>{{ lastPlanData.plan_target_weight || 0 }}kg</text></view
+        >
+
+        <view class="chart">
+          <l-echart ref="chartRef" @finished="init" />
+        </view>
+
+        <view class="loss-data">
+          <text
+            >每周{{
+              isWeightLoss ? `减重${lastPlanData.weekly_loss_weight}` : `增重${-lastPlanData.weekly_loss_weight}`
+            }}kg</text
+          >
+        </view>
+
+        <view class="weight-data">
+          <view class="weight-data-item">
+            <text>初始BMI值为：{{ lastPlanData.plan_initial_bmi || 0 }}</text>
           </view>
 
-          <view class="chart-title">
-            <text>初始体重值为：{{ lastPlanData.plan_initial_weight }}KG</text>
+          <view class="weight-data-item">
+            <text>初始体重值为：{{ lastPlanData.plan_initial_weight || 0 }}KG</text>
           </view>
 
-          <view class="chart-title">
-            <text>当前体重值为：{{ lastPlanData.current_weight }}KG</text>
-          </view>
-
-          <view class="chart-title">
-            <text style="color: #ffa537">
-              {{ isWeightLoss ? '已减重：' : '已增重：' }}
+          <view class="weight-data-item">
+            <text>当前体重值为：{{ lastPlanData.current_weight || 0 }}KG</text>
+            <text class="loss-data2">
+              {{ isWeightLoss ? '已减重：' : '已增重：' }}：
               <template v-if="isWeightLoss">
                 {{ Number((lastPlanData.plan_initial_weight - lastPlanData.current_weight).toFixed(2)) }}KG
               </template>
@@ -46,179 +85,102 @@
               </template>
             </text>
           </view>
-
-          <view class="chart-tip">
-            根据您的身高体重测算，推荐BMI范围：
-            <text>18.5-24.9</text>
-          </view>
         </view>
 
-        <view class="chart-item2">
-          <view class="time">
-            <text class="time1">{{ lastPlanData.start_date && lastPlanData.start_date.slice(0, 10) }}</text>
+        <view class="recode-btn" @click="$toRouter('/pages/weightData/weightData')">记录体重</view>
+      </view>
 
-            <text class="line"></text>
-            <text class="tip">
-              每周{{
-                isWeightLoss ? `减重${lastPlanData.weekly_loss_weight}` : `增重${-lastPlanData.weekly_loss_weight}`
-              }}kg
-            </text>
-            <text class="line"></text>
+      <view class="options">
+        <view
+          class="btn change-plan"
+          @click="
+            $toRouter(
+              '/pages/resetPlan/resetPlan',
+              `plan_id=${lastPlanData.plan_id}&plan_initial_weight=${lastPlanData.plan_initial_weight}&plan_target_weight=${lastPlanData.plan_target_weight}&start_date=${lastPlanData.start_date}&end_date=${lastPlanData.end_date}`,
+            )
+          "
+          >更改新方案</view
+        >
 
-            <view class="time2">
-              <text class="value">{{ lastPlanData.end_date && lastPlanData.end_date.slice(0, 10) }}</text>
-              <!--<uni-icons color="#666666" type="right" size="18"></uni-icons>-->
-            </view>
-          </view>
-
-          <view class="chart">
-            <l-echart ref="chartRef" @finished="init" />
-          </view>
-
-          <!--<view class="expected">-->
-          <!--  <text>一周后</text>-->
-          <!--  <text>的理想变化</text>-->
-          <!--  <text>-{{ lastPlanData.weekly_loss_weight }}kg</text>-->
-          <!--</view>-->
-
-          <view class="recode" @click="$toRouter('/pages/weightData/weightData')">记录体重》</view>
-
-          <view class="options">
-            <text
-              @click="
-                $toRouter(
-                  '/pages/resetPlan/resetPlan',
-                  `plan_id=${lastPlanData.plan_id}&plan_initial_weight=${lastPlanData.plan_initial_weight}&plan_target_weight=${lastPlanData.plan_target_weight}&start_date=${lastPlanData.start_date}&end_date=${lastPlanData.end_date}`,
-                )
-              "
-            >
-              重置方案
-            </text>
-            <text @click="deletePlan">删除方案</text>
-          </view>
+        <view class="btns">
+          <view class="btn history-plan" @click="$toRouter('/pages/historyPlan/historyPlan')">历史方案</view>
+          <view class="btn delete-plan" @click="deletePlan">删除方案</view>
         </view>
       </view>
 
-      <view class="cookbook-box">
-        <view class="cookbook-title">每日食谱</view>
-
-        <view class="time-nav">
-          <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey = key">
-            <text class="date">{{ key.slice(5, 10) }}</text>
-            <text class="line" :style="{ background: selectDateKey === key ? '#0abf92' : 'translate' }"></text>
-          </view>
-        </view>
-
-        <view class="cookbook-list">
-          <view class="cookbook-item" v-for="(item, key) of dateList[selectDateKey]" :key="key">
-            <view class="cookbook-title">
-              <text>{{ currentFoodData(item, key).typeName }}</text>
-              <text>{{ currentFoodData(item).currentCalorie }}千卡（{{ currentFoodData(item).ratio }}%）</text>
-            </view>
-
-            <view class="food-list">
-              <view class="food-item" v-for="(item1, key1) of item" :key="key1">
-                <text>{{ item1.name }}</text>
-                <text>{{ item1.calorie }}千卡/{{ item1.weight }}克</text>
+      <template v-if="isVip">
+        <view class="plan-item motion-plan">
+          <view class="plan-detail">
+            <view class="time-nav">
+              <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey1 = key">
+                <text class="date" :class="{ active: selectDateKey1 === key }">{{
+                  isToday(key) ? '今日训练' : key.slice(5, 10)
+                }}</text>
               </view>
             </view>
-          </view>
-        </view>
-      </view>
 
-      <view class="plan-item motion-plan" :class="{ vip: isVip }">
-        <view class="plan-name">定制化运动方案</view>
+            <view class="exercises-list">
+              <view class="exercises-item" v-for="item of exercisesPlanData" :key="item.id">
+                <template v-if="isNotStart">
+                  <view class="no-start">未开始</view>
+                </template>
 
-        <view class="plan-detail1" v-if="isVip">
-          <view class="progress">
-            <text :style="{ width: exercisesProgress.progress + '%' }"></text>
-          </view>
+                <view @click.capture.stop="onCheckboxClick(item)" v-else>
+                  <checkbox-group>
+                    <checkbox value="1" :checked="item.is_completed.includes('1')" />
+                  </checkbox-group>
+                </view>
 
-          <view class="progress-tip">
-            <text>减重计划</text>
-            <text>第{{ exercisesProgress.finishDay }}/{{ exercisesProgress.totalDay }}天</text>
-          </view>
-
-          <view class="time-nav">
-            <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey1 = key">
-              <text class="date">{{ isToday(key) ? '今日训练' : key.slice(5, 10) }}</text>
-              <text class="line" :style="{ background: selectDateKey1 === key ? '#0abf92' : 'translate' }"></text>
-            </view>
-          </view>
-
-          <view class="exercises-list">
-            <view class="exercises-item" v-for="item of exercisesPlanData" :key="item.id">
-              <image mode="widthFix" :src="item.image_url" />
-
-              <view class="info">
-                <view class="name">{{ item.name }}</view>
-
-                <view class="content">
+                <view class="info">
+                  <text>{{ item.name }}</text>
                   <text>{{ item.content }}</text>
                   <text>{{ item.calorie }}千卡</text>
                 </view>
               </view>
-
-              <template v-if="isNotStart">
-                <view class="no-start">未开始</view>
-              </template>
-
-              <view @click.capture.stop="onCheckboxClick(item)" v-else>
-                <checkbox-group>
-                  <checkbox value="1" :checked="item.is_completed.includes('1')" />
-                </checkbox-group>
-              </view>
             </view>
           </view>
         </view>
 
-        <view class="no-permission" v-else>
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightManagementPlan/lock.png"
-          />
+        <view class="cookbook-box">
+          <view class="cookbook-title">每日食谱</view>
 
-          <text>会员专享</text>
-        </view>
-      </view>
+          <view class="time-nav">
+            <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey = key">
+              <text class="date" :class="{ active: selectDateKey === key }">{{ key.slice(5, 10) }}</text>
+            </view>
+          </view>
 
-      <view class="plan-item life-plan" :class="{ vip: isVip }">
-        <view class="plan-name">定制化生活方案</view>
+          <view class="cookbook-list">
+            <view class="cookbook-item" v-for="(item, key) of dateList[selectDateKey]" :key="key">
+              <view class="cookbook-title1">
+                <text>{{ currentFoodData(item, key).typeName }}</text>
+                <text>{{ currentFoodData(item).currentCalorie }}千卡({{ currentFoodData(item).ratio }}%)</text>
+              </view>
 
-        <view class="plan-detail2" v-if="isVip">
-          <view class="replace" @click="refreshLife">换一换</view>
-
-          <view class="left-title">今日生活计划</view>
-
-          <view class="life-list">
-            <view class="life-item" v-for="item of lifestylePlanData" :key="item.category">
-              <image mode="widthFix" :src="item.image_url" />
-
-              <view class="info">
-                <view class="name">{{ item.content }}</view>
-                <view class="content">{{ item.benefit }}</view>
+              <view class="food-list">
+                <view class="food-item" v-for="(item1, key1) of item" :key="key1">
+                  <text>{{ item1.name }}</text>
+                  <text>{{ item1.calorie }}千卡/{{ item1.weight }}克</text>
+                </view>
               </view>
             </view>
           </view>
         </view>
+      </template>
 
-        <view class="no-permission" v-else>
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/weightManagementPlan/lock.png"
-          />
+      <template v-else>
+        <image
+          mode="widthFix"
+          style="width: 100%; margin-bottom: 12rpx"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock01.png"
+        />
 
-          <text>会员专享</text>
-        </view>
-      </view>
-
-      <view class="unlock" v-if="!isVip">
-        <text @click="$toRouter('/pages/vip/vip')">解锁会员体验更多功能</text>
-      </view>
-
-      <view class="unlock" v-else>
-        <text @click="recode">去记录</text>
-      </view>
+        <image
+          mode="widthFix"
+          style="width: 100%"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock02.png"
+        />
+      </template>
     </view>
 
     <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
@@ -256,30 +218,37 @@ export default {
         },
         legend: {
           bottom: 0,
+          show: false,
         },
         grid: {
-          top: '5%',
-          left: '5%',
-          right: '5%',
-          bottom: '10%',
+          top: '10%',
+          left: '2%',
+          right: '2%',
+          bottom: '5%',
           containLabel: true,
         },
         xAxis: {
           type: 'category',
           data: [],
           boundaryGap: false,
+          axisLabel: {
+            color: '#000000',
+          },
         },
         yAxis: {
           type: 'value',
+          axisLabel: {
+            color: '#000000',
+          },
         },
         series: [
           {
             name: '体重',
             data: [],
             type: 'line',
-            color: '#FFA537',
+            color: '#D54242',
             areaStyle: {
-              color: '#FFEDD7',
+              color: '#D54242',
             },
           },
         ],
@@ -295,7 +264,7 @@ export default {
   },
 
   computed: {
-    ...mapState('app', ['userInfo', 'lifestylePlanData']),
+    ...mapState('app', ['userInfo', 'lifestylePlanData', 'userDetailInfo']),
     ...mapGetters('app', ['isVip']),
 
     currentFoodData() {
@@ -663,217 +632,250 @@ export default {
 
 <style lang="scss">
 page {
-  background: #f6f7fb;
+  background: #ffffff;
 }
 </style>
 
 <style scoped lang="scss">
 .weight-management-plan-page {
   .page-title {
-    background: #ffffff;
   }
 
   .banner {
-    padding: calc(var(--page-title-height)) 0 0;
-    background: #ffffff;
+    padding: calc(var(--page-title-height)) 0 8rpx;
   }
 
   .plan-box {
-    background: linear-gradient(to bottom, #ffdecf, #fcebbf, #e3ffcf) left top/100% 620rpx no-repeat;
-    padding: 64rpx 30rpx;
+    padding: 0 24rpx 80rpx;
     display: flex;
     flex-direction: column;
-    align-items: center;
 
-    .plan-title {
-      font-weight: bold;
-      font-size: 46rpx;
-      color: #333333;
-      margin-bottom: 24rpx;
+    .title {
+      width: 120rpx;
+      height: 48rpx;
+      background: #dad2ff;
+      border-radius: 40rpx;
+      font-weight: 600;
+      font-size: 24rpx;
+      color: #313030;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16rpx;
     }
 
-    .plan-tip {
-      font-size: 30rpx;
-      color: #1a1a1a;
-      margin-bottom: 67rpx;
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16rpx;
+      margin-bottom: 40rpx;
 
-      text {
+      .info-item {
+        height: 40rpx;
+        background: #b3a1ff;
+        border-radius: 40rpx;
+        font-size: 24rpx;
+        color: #313030;
+        padding: 0 20rpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &:nth-child(1),
         &:nth-child(2) {
-          color: #b36408;
-        }
-
-        &:nth-child(4) {
-          color: #b36408;
-          font-size: 40rpx;
-          font-weight: bold;
+          background: #dad2ff;
         }
       }
     }
 
     .chart-box {
-      background: #ffffff;
-      box-shadow: 0 2rpx 23rpx 7rpx rgba(241, 203, 151, 0.24);
-      border-radius: 20rpx;
-      align-self: stretch;
-      margin-bottom: 22rpx;
+      padding: 14rpx 40rpx;
+      background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/bg.png') left
+        top/100% 100% no-repeat;
+      margin-bottom: 24rpx;
 
-      .chart-item1 {
-        padding: 32rpx 25rpx 34rpx;
-        border-bottom: 2rpx dashed #dddddd;
+      .chart-title {
+        font-size: 24rpx;
+        color: #313030;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
 
-        .chart-title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 20rpx;
-
-          text {
-            &:nth-child(1) {
-              font-weight: 500;
-              font-size: 28rpx;
-              color: #1a1a1a;
-            }
-
-            &:nth-child(2) {
-              font-size: 26rpx;
-              color: #b97420;
-            }
-          }
-        }
-
-        .chart-tip {
-          font-size: 22rpx;
-          color: #999999;
-
-          text {
-            color: #ffa537;
-          }
+        text {
+          color: #000000;
+          padding: 0 10rpx;
         }
       }
 
-      .chart-item2 {
-        padding: 32rpx 14rpx;
+      .chart {
+        height: 420rpx;
+      }
 
-        .time {
+      .loss-data {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 6rpx;
+
+        text {
+          padding: 8rpx;
+          background: #d4e86c;
+          border-radius: 40rpx;
+          font-size: 20rpx;
+          color: #000000;
+        }
+      }
+
+      .weight-data {
+        display: flex;
+        flex-direction: column;
+        gap: 8rpx;
+        margin-bottom: 20rpx;
+
+        .weight-data-item {
+          font-size: 24rpx;
+          color: #000000;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 35rpx;
-          font-size: 26rpx;
-
-          .time1 {
-            color: #333333;
-          }
-
-          .line {
-            flex-grow: 1;
-            border-bottom: 2rpx dashed #dddddd;
-          }
-
-          .tip {
-            font-size: 22rpx;
-            background: #fef7dd;
-            color: #b46408;
-            padding: 8rpx 30rpx;
-            border-radius: 20rpx;
-          }
-
-          .time2 {
-            display: flex;
-            align-items: center;
-
-            .value {
-              font-size: 26rpx;
-              color: #333333;
-            }
-          }
         }
 
-        .chart {
-          margin-bottom: 35rpx;
-        }
-
-        .expected {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 45rpx;
-
-          text {
-            &:nth-child(1) {
-              width: 120rpx;
-              height: 51rpx;
-              background: #ffa537;
-              border-radius: 15rpx;
-              font-weight: 500;
-              font-size: 30rpx;
-              color: #ffffff;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-right: 22rpx;
-            }
-
-            &:nth-child(2) {
-              color: #1a1a1a;
-              font-size: 28rpx;
-              margin-right: 10rpx;
-            }
-
-            &:nth-child(3) {
-              color: #b56505;
-              font-size: 32rpx;
-            }
-          }
-        }
-
-        .recode {
-          width: 100%;
-          height: 86rpx;
-          background: #fef7dd;
+        .loss-data2 {
+          padding: 6rpx 12rpx;
+          background: #d4e86c;
           border-radius: 40rpx;
-          font-weight: bold;
-          font-size: 32rpx;
-          color: #b46408;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 42rpx;
+        }
+      }
+
+      .recode-btn {
+        height: 60rpx;
+        background: #fcffea;
+        border-radius: 40rpx;
+        font-weight: 600;
+        font-size: 28rpx;
+        color: #000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .options {
+      font-size: 24rpx;
+      color: #313030;
+      margin-bottom: 22rpx;
+
+      .btn {
+        height: 56rpx;
+        border-radius: 60rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .change-plan {
+        background: #e8f480;
+        margin-bottom: 20rpx;
+      }
+
+      .btns {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .history-plan {
+          width: 460rpx;
+          height: 40rpx;
+          background: #dad2ff;
         }
 
-        .options {
+        .delete-plan {
+          width: 219rpx;
+          height: 40rpx;
+          background: #b3a1ff;
+        }
+      }
+    }
+
+    .plan-item {
+      padding: 0 24rpx;
+      margin-bottom: 24rpx;
+
+      .plan-detail {
+        background: #323131;
+        border-radius: 20rpx;
+
+        .time-nav {
           display: flex;
           align-items: center;
-          justify-content: center;
-          gap: 20rpx;
+          justify-content: space-between;
+          padding: 10rpx 10rpx;
 
-          text {
-            width: 274rpx;
-            height: 85rpx;
-            background: #f7f6fb;
-            border-radius: 20rpx;
-            font-size: 28rpx;
-            color: #333333;
+          .time-item {
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24rpx;
+            color: #ffffff;
+
+            .date {
+              padding: 4rpx 6rpx;
+
+              &.active {
+                background: #ffffff;
+                border-radius: 40rpx;
+                font-weight: 600;
+                color: #323131;
+              }
+            }
+          }
+        }
+
+        .exercises-list {
+          border: 4rpx solid #323131;
+          background: #ffffff;
+          display: flex;
+          flex-direction: column;
+          padding: 8rpx 0;
+
+          .exercises-item {
+            display: flex;
+            align-items: center;
+
+            .no-start {
+              font-size: 20rpx;
+              color: #313030aa;
+              padding: 14rpx;
+              margin-right: 10rpx;
+            }
+
+            checkbox {
+              transform: scale(0.6);
+            }
+
+            .info {
+              font-size: 20rpx;
+              color: #313030;
+              flex-grow: 1;
+              display: flex;
+              align-items: center;
+              gap: 8rpx;
+            }
           }
         }
       }
     }
 
     .cookbook-box {
-      padding: 43rpx 25rpx;
-      align-self: stretch;
-      background: #ffffff;
+      padding: 22rpx 20rpx;
+      background: #dad2ff;
       border-radius: 20rpx;
-      margin-bottom: 20rpx;
 
       .cookbook-title {
-        font-weight: 500;
-        font-size: 28rpx;
-        color: #1a1a1a;
-        margin-bottom: 33rpx;
+        font-weight: 600;
+        font-size: 24rpx;
+        color: #313030;
+        margin-bottom: 14rpx;
       }
 
       .time-nav {
@@ -890,50 +892,44 @@ page {
 
           .date {
             font-size: 24rpx;
-            color: #1a1a1a;
-            padding-bottom: 14rpx;
-          }
+            color: #313030;
+            padding: 8rpx 12rpx;
 
-          .line {
-            width: 60rpx;
-            height: 5rpx;
+            &.active {
+              background: #ffffff;
+              border-radius: 40rpx;
+            }
           }
         }
       }
 
       .cookbook-list {
+        padding: 0 14rpx;
         display: flex;
         flex-direction: column;
-        gap: 20rpx;
+        gap: 8rpx;
 
         .cookbook-item {
-          background: #e1faff;
+          background: #b3a1ff;
           border-radius: 20rpx;
-          padding: 24rpx;
+          padding: 12rpx;
 
-          .cookbook-title {
+          .cookbook-title1 {
             display: flex;
             align-items: center;
-            margin-bottom: 26rpx;
+            justify-content: space-between;
+            margin-bottom: 8rpx;
 
             text {
-              &:nth-child(1) {
-                font-size: 28rpx;
-                color: #1a1a1a;
-                margin-right: 14rpx;
-              }
-
-              &:nth-child(2) {
-                font-size: 22rpx;
-                color: #fe5b1f;
-              }
+              font-size: 20rpx;
+              color: #323131;
             }
           }
 
           .food-list {
             display: flex;
             flex-direction: column;
-            gap: 20rpx;
+            gap: 8rpx;
 
             .food-item {
               display: flex;
@@ -941,238 +937,12 @@ page {
               justify-content: space-between;
 
               text {
-                font-size: 22rpx;
-                color: #1a1a1a;
+                font-size: 20rpx;
+                color: #323131;
               }
             }
           }
         }
-      }
-    }
-
-    .plan-item {
-      align-self: stretch;
-      background: #ffffff;
-      border-radius: 20rpx;
-      padding: 40rpx 25rpx;
-      margin-bottom: 20rpx;
-      position: relative;
-
-      &.life-plan {
-        margin-bottom: 30rpx;
-      }
-
-      &.vip {
-        background: linear-gradient(180deg, rgba(204, 255, 238, 0.9) 0%, rgba(255, 255, 255, 0.93) 25%, #ffffff 100%);
-      }
-
-      .plan-name {
-        font-weight: 500;
-        font-size: 28rpx;
-        color: #1a1a1a;
-      }
-
-      .plan-detail1 {
-        .progress {
-          margin: 44rpx 0 25rpx;
-          height: 18rpx;
-          background: #f6f7fb;
-          border-radius: 9rpx;
-          position: relative;
-
-          text {
-            position: absolute;
-            height: 18rpx;
-            background: #0abf92;
-            border-radius: 9rpx;
-          }
-        }
-
-        .progress-tip {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 50rpx;
-
-          text {
-            font-size: 26rpx;
-
-            &:nth-child(1) {
-              color: #333333;
-            }
-
-            &:nth-child(2) {
-              color: #555555;
-            }
-          }
-        }
-
-        .time-nav {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 18rpx;
-
-          .time-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-
-            .date {
-              font-size: 24rpx;
-              color: #1a1a1a;
-              padding-bottom: 14rpx;
-            }
-
-            .line {
-              width: 60rpx;
-              height: 5rpx;
-            }
-          }
-        }
-
-        .exercises-list {
-          display: flex;
-          flex-direction: column;
-          gap: 20rpx;
-
-          .exercises-item {
-            background: #f6f7fb;
-            padding: 16rpx;
-            display: flex;
-            border-radius: 20rpx;
-            align-items: center;
-
-            image {
-              width: 80rpx;
-              border-radius: 20rpx;
-              margin-right: 26rpx;
-            }
-
-            .info {
-              flex-grow: 1;
-              display: flex;
-              flex-direction: column;
-              gap: 15rpx;
-
-              .name {
-                font-size: 26rpx;
-                color: #333333;
-              }
-
-              .content {
-                text {
-                  &:nth-child(1) {
-                    color: #999999;
-                    font-size: 22rpx;
-                    margin-right: 10rpx;
-                  }
-
-                  &:nth-child(2) {
-                    color: #ffa537;
-                    font-size: 22rpx;
-                  }
-                }
-              }
-            }
-
-            .no-start {
-              font-size: 24rpx;
-              color: #999999;
-            }
-
-            checkbox {
-              transform: scale(0.6);
-            }
-          }
-        }
-      }
-
-      .plan-detail2 {
-        .replace {
-          position: absolute;
-          right: 20rpx;
-          top: 42rpx;
-          font-size: 24rpx;
-          color: #0abf92;
-        }
-
-        .left-title {
-          padding: 48rpx 0 30rpx;
-          font-size: 26rpx;
-          color: #333333;
-        }
-
-        .life-list {
-          display: flex;
-          flex-direction: column;
-          gap: 20rpx;
-
-          .life-item {
-            display: flex;
-            align-items: center;
-
-            image {
-              width: 80rpx;
-              border-radius: 20rpx;
-              margin-right: 26rpx;
-            }
-
-            .info {
-              flex-grow: 1;
-              display: flex;
-              flex-direction: column;
-              gap: 15rpx;
-
-              .name {
-                font-size: 26rpx;
-                color: #333333;
-              }
-
-              .content {
-                font-size: 22rpx;
-                color: #999999;
-              }
-            }
-          }
-        }
-      }
-
-      .no-permission {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 50rpx 0;
-
-        image {
-          width: 60rpx;
-          margin-bottom: 20rpx;
-        }
-
-        text {
-          font-size: 26rpx;
-          color: #333333;
-        }
-      }
-    }
-
-    .unlock {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      text {
-        width: 590rpx;
-        height: 100rpx;
-        background: #0abf92;
-        border-radius: 50rpx;
-        font-size: 32rpx;
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
     }
   }

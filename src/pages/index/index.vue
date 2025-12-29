@@ -97,13 +97,12 @@
         <view class="header">
           <text class="header-title">热量计算</text>
           <view class="options">
-            <view class="option-item" @click="showAddFoodRecodeDialog">
+            <view class="option-item" @click="goAddFoodRecodePage">
               <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon1.png" />
               <text>对话记饮食</text>
             </view>
 
-            <!-- TODO 拍照记饮食 -->
-            <view class="option-item" @click="showAddFoodRecodeDialog">
+            <view class="option-item" @click="selectImage">
               <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon2.png" />
               <text>拍照记饮食</text>
             </view>
@@ -111,7 +110,7 @@
         </view>
 
         <view class="food-types">
-          <view class="food-item" v-for="item of foodRecodeList" :key="item.type" @click="selectRecodeItem = item">
+          <view class="food-item" v-for="item of foodRecodeList" :key="item.type" @click="selectRecodeType(item)">
             <image class="icon" mode="widthFix" :src="item.icon" />
             <text>{{ item.text }}</text>
 
@@ -287,7 +286,12 @@
       <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/lock-box.png" />
     </view>
 
-    <add-food-recode-dialog ref="addFoodRecodeDialog" @addRecode="addRecode" @addImageRecode="addImageRecode" />
+    <add-food-recode-dialog
+      ref="addFoodRecodeDialog"
+      @addRecode="addRecode"
+      @addImageRecode="addImageRecode"
+      :type="selectRecodeItem.type"
+    />
     <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
     <update-weight-data-dialog ref="updateWeightDataDialog" @updateSuccess="initData" />
     <change-ratio-dialog ref="changeRatioDialog" @success="initData" />
@@ -670,6 +674,14 @@ export default {
         });
     },
 
+    selectRecodeType(item) {
+      this.selectRecodeItem = item;
+
+      setTimeout(() => {
+        this.showAddFoodRecodeDialog();
+      });
+    },
+
     onCheckboxClick(item) {
       console.log(this.exercisesPlanData);
       if (!item.is_completed.includes('1')) {
@@ -738,26 +750,40 @@ export default {
       }
     },
 
+    selectImage() {
+      uni.chooseMedia({
+        count: 1,
+        mediaType: ['image'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          let filePath = res.tempFiles[0].tempFilePath;
+
+          this.$toRouter('/pages/foodRecord/foodRecord', `text=&url=${encodeURIComponent(filePath)}`);
+        },
+      });
+    },
+
+    goAddFoodRecodePage() {
+      if (!this.userDetailInfo) {
+        verifyIsLogin();
+
+        this.$toRouter('/pages/evaluation/evaluation');
+        return;
+      }
+
+      this.$toRouter('/pages/foodRecord/foodRecord');
+    },
+
     addRecode(event) {
       this.$refs.addFoodRecodeDialog.close();
 
-      this.$toRouter(
-        '/pages/foodRecord/foodRecord',
-        `text=${encodeURIComponent(event.text)}&type=${event.type}&input_type=${
-          event.input_type
-        }&date_time=${new Date().format()}`,
-      );
+      this.$toRouter('/pages/foodRecord/foodRecord', `text=${encodeURIComponent(event.text)}&type=${event.type}`);
     },
 
     addImageRecode(event) {
       this.$refs.addFoodRecodeDialog.close();
 
-      this.$toRouter(
-        '/pages/foodRecord/foodRecord',
-        `text=&url=${encodeURIComponent(event.url)}&type=${event.type}&input_type=${
-          event.input_type
-        }&date_time=${new Date().format()}`,
-      );
+      this.$toRouter('/pages/foodRecord/foodRecord', `text=&url=${encodeURIComponent(event.url)}&type=${event.type}`);
     },
 
     addMotionRecode(event) {

@@ -124,9 +124,16 @@ export default {
   methods: {
     open() {
       if (this.type) {
-        this.selectRecode = this.recodeList.find((item) => Number(item.type) === Number(this.type));
+        if (this.type === 2 || this.type === 4 || this.type === 6) {
+          this.selectRecode = this.recodeList.find((item) => Number(item.type) === 2);
+          this.selectAddRecode = this.addMealList.find((item) => Number(item.type) === Number(this.type));
+        } else {
+          this.selectRecode = this.recodeList.find((item) => Number(item.type) === Number(this.type));
+          this.selectAddRecode = {};
+        }
       } else {
         this.selectRecode = this.recodeList[0];
+        this.selectAddRecode = {};
       }
 
       this.$refs.addRecodePopup.open();

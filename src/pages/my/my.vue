@@ -302,8 +302,7 @@ page {
 
 <style scoped lang="scss">
 .my-page {
-  // TODO 背景颜色修改
-  background: linear-gradient(180deg, #e8f480 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #e8f480cc 0%, #ffffff 100%);
   padding: 0 24rpx 200rpx;
   height: 100%;
   overflow: auto;

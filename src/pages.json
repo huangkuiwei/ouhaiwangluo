@@ -244,6 +244,11 @@
       "path": "pages/foodRecord/foodRecord",
       "style": {
         "navigationStyle": "custom",
+        // #ifdef MP-WEIXIN
+        "usingComponents": {
+          "towxml": "/wxcomponents/towxml/towxml"
+        },
+        // #endif
         // #ifndef H5
         "navigationBarTitleText": "添加饮食",
         // #endif

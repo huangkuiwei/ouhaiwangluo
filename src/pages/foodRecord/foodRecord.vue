@@ -33,13 +33,28 @@
 
           <view class="food-list-wrap" v-else-if="item.role === 3">
             <view class="food-container">
-              <!-- TODO 数据 -->
               <view class="title">
-                <text>12-09</text>
-                <text>早餐</text>
+                <picker
+                  mode="date"
+                  @change="onDateChange($event, item)"
+                  :value="item.date_time"
+                  :disabled="item.hasSave"
+                >
+                  <text>{{ item.date_time.slice(5, 10) }}</text>
+                </picker>
+
+                <picker
+                  @change="onMealChange($event, item)"
+                  :value="item.type"
+                  range-key="text"
+                  :range="foodTypeList"
+                  :disabled="item.hasSave"
+                >
+                  <text>{{ foodTypeList[item.type].text }}</text>
+                </picker>
               </view>
 
-              <view class="total">845千卡</view>
+              <view class="total">{{ foodComponentInfo(item.foodList).calorie }}千卡</view>
 
               <view class="food-list">
                 <view class="food-item" v-for="item1 of item.foodList" :key="item1.id">
@@ -61,9 +76,30 @@
           </view>
 
           <view class="evaluation-list2" v-else-if="item.role === 5">
-            <!-- TODO -->
-            <view>
+            <view class="appraisal">
               <text>饮食评价：</text>
+
+              <text v-if="foodComponentInfo(item.foodList).calorie > calorieAnalysis(item.type).max">吃多了</text>
+              <text
+                v-else-if="
+                  foodComponentInfo(item.foodList).calorie <= calorieAnalysis(item.type).max &&
+                  foodComponentInfo(item.foodList).calorie >= calorieAnalysis(item.type).min
+                "
+              >
+                合适
+              </text>
+              <text v-else>吃少了</text>
+            </view>
+
+            <view class="weight"
+              >根据您的BMI（{{
+                (userDetailInfo.current_weight / ((userDetailInfo.height * userDetailInfo.height) / 10000)).toFixed(2)
+              }}）和当前体重（{{ userDetailInfo.current_weight }}千克）</view
+            >
+
+            <view class="suggest" v-if="item.evaluationList">
+              <text>优化建议：</text>
+              <text>{{ item.evaluationList[0].content }}</text>
             </view>
           </view>
         </view>
@@ -85,27 +121,126 @@
 <script>
 import { verifyIsLogin } from '@/utils';
 import $http from '@/utils/http';
+import { mapState } from 'vuex';
 
 export default {
   name: 'aiChat',
 
   data() {
     return {
-      type: 1,
+      type: 0,
       aiName: '饮食速记',
       scrollTop: 99999,
       chatList: [],
       questionText: '',
       answering: false,
       thinkText: '正在思考，请稍等...',
-      date_time: new Date().format(),
+      date_time: new Date().format().replace(/\//g, '-').slice(0, 10),
       evaluationList: [],
+      dailyCalorie: {},
+      foodTypeList: [
+        {
+          type: 1,
+          text: '早餐',
+        },
+        {
+          type: 2,
+          text: '早加餐',
+        },
+        {
+          type: 3,
+          text: '午餐',
+        },
+        {
+          type: 4,
+          text: '午加餐',
+        },
+        {
+          type: 5,
+          text: '晚餐',
+        },
+        {
+          type: 6,
+          text: '晚加餐',
+        },
+      ],
     };
   },
 
   onLoad(options) {
+    this.getDailyCalorie(this.date_time);
+
+    // type 默认从0开始，0 => 早餐
     if (options.type) {
-      this.type = options.type;
+      this.type = Number(options.type) - 1;
+    }
+
+    if (options.date_time) {
+      this.date_time = decodeURIComponent(options.date_time);
+    }
+
+    if (options.type && options.date_time) {
+      uni.showLoading({
+        title: '正在分析...',
+        mask: true,
+      });
+
+      $http
+        .post(
+          'api/diet-info/meal-report',
+          {
+            type: this.type + 1,
+            date_time: this.date_time,
+          },
+          {
+            timeout: 90000,
+          },
+        )
+        .then((res) => {
+          uni.hideLoading();
+
+          this.evaluationList = res.data.evaluation.split('\n').map((item) => {
+            return {
+              title: item.slice(0, 3),
+              content: item.slice(3),
+            };
+          });
+
+          this.chatList.push({
+            id: Math.random().toString(),
+            role: 3,
+            content: '',
+            img: '',
+            foodList: res.data.die_list,
+            type: this.type,
+            input_type: 1,
+            analysisText: '',
+            date_time: this.date_time,
+            hasSave: true,
+          });
+
+          this.chatList.push({
+            id: Math.random().toString(),
+            role: 4,
+            content: '',
+            img: '',
+            evaluationList: this.evaluationList.slice(0, 2),
+            foodList: res.data.die_list,
+          });
+
+          this.chatList.push({
+            id: Math.random().toString(),
+            role: 5,
+            content: '',
+            img: '',
+            evaluationList: this.evaluationList.slice(2),
+            foodList: res.data.die_list,
+          });
+
+          this.$nextTick(() => {
+            this.scrollTop += 1;
+          });
+        });
     }
 
     this.chatList = [
@@ -116,7 +251,7 @@ export default {
           '你好，我可以快速为你记录饮食，描述的越清晰，数据记录越准确。\n' +
             '你可以这样问说：\n' +
             '“今天早上吃了两个肉包子”\n' +
-            '“今天中午吃了l香干炒肉，一碗混沌”\n',
+            '“今天中午吃了香干炒肉，一碗混沌”\n',
           'markdown',
         ),
         img: '',
@@ -176,41 +311,52 @@ export default {
   },
 
   computed: {
+    ...mapState('app', ['userDetailInfo']),
+
     foodComponentInfo() {
       return (foodList) => {
         let calorie = 0;
-        let carbohydrate = 0;
-        let protein = 0;
-        let fat = 0;
 
         foodList.forEach((item) => {
           calorie += item.calorie;
-          carbohydrate += item.carbohydrate;
-          protein += item.protein;
-          fat += item.fat;
         });
-
-        let total = carbohydrate + protein + fat;
-
-        let carbohydrateR = ((carbohydrate / total) * 100).toFixed(2);
-        let proteinR = ((protein / total) * 100).toFixed(2);
-        let fatR = ((fat / total) * 100).toFixed(2);
-
-        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-        this.option.series[0].data = [
-          { name: '', value: carbohydrateR },
-          { name: '', value: proteinR },
-          { name: '', value: fatR },
-        ];
 
         return {
           calorie,
-          carbohydrate: carbohydrate.toFixed(2),
-          protein: protein.toFixed(2),
-          fat: fat.toFixed(2),
-          carbohydrateR,
-          proteinR,
-          fatR,
+        };
+      };
+    },
+
+    calorieAnalysis() {
+      return (type) => {
+        let min = 0;
+        let max = 0;
+        type = Number(type) + 1;
+        let total = this.dailyCalorie.calorie_requirement;
+
+        if (type === 1) {
+          min = 0.25;
+          max = 0.3;
+        } else if (type === 2) {
+          min = 0.05;
+          max = 0.1;
+        } else if (type === 3) {
+          min = 0.3;
+          max = 0.35;
+        } else if (type === 4) {
+          min = 0.05;
+          max = 0.1;
+        } else if (type === 5) {
+          min = 0.25;
+          max = 0.3;
+        } else if (type === 6) {
+          min = 0.05;
+          max = 0.1;
+        }
+
+        return {
+          min: Math.round(total * min),
+          max: Math.round(total * max),
         };
       };
     },
@@ -225,72 +371,136 @@ export default {
   },
 
   methods: {
-    analysisData(type, input_type, analysisText, date_time) {
-      setTimeout(() => {
-        this.answering = true;
-
-        uni.showLoading({
-          title: '正在分析...',
-          mask: true,
+    getDailyCalorie(date_time) {
+      return $http
+        .post('api/diet-info/daily-calorie', {
+          date: date_time,
+        })
+        .then((res) => {
+          this.dailyCalorie = res.data;
         });
+    },
+
+    onMealChange(event, item) {
+      item.type = Number(event.detail.value);
+    },
+
+    onDateChange(event, item) {
+      item.date_time = event.detail.value;
+    },
+
+    analysisData(type, input_type, analysisText, date_time, addRecode = true) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          this.answering = true;
+
+          uni.showLoading({
+            title: '正在分析...',
+            mask: true,
+          });
+        });
+
+        $http
+          .post(
+            'api/diet-info/food-analysis',
+            {
+              text: analysisText,
+              input_type: input_type,
+              type: type + 1,
+              date_time: date_time,
+            },
+            {
+              timeout: 90000,
+            },
+          )
+          .then((res) => {
+            // 未检测到食物，返回上一级
+            if (res.data && !res.data.length) {
+              this.chatList.push({
+                id: Math.random().toString(),
+                role: 2,
+                content: this.$towxml('未检出到食物，请重新输入', 'markdown'),
+                img: '',
+              });
+
+              return;
+            }
+
+            if (addRecode) {
+              this.chatList.push({
+                id: Math.random().toString(),
+                role: 3,
+                content: '',
+                img: '',
+                foodList: res.data,
+                type,
+                input_type,
+                analysisText,
+                date_time,
+                hasSave: false,
+              });
+            }
+
+            resolve(res);
+          })
+          .catch((error) => {
+            if (addRecode) {
+              this.chatList.push({
+                id: Math.random().toString(),
+                role: 2,
+                content: this.$towxml(error.Msg || error.msg, 'markdown'),
+                img: '',
+              });
+            }
+
+            reject(error);
+          })
+          .finally(() => {
+            this.answering = false;
+            uni.hideLoading();
+
+            this.$nextTick(() => {
+              this.scrollTop += 1;
+            });
+          });
+      });
+    },
+
+    async saveAndAnalysis(item) {
+      if (this.answering) {
+        uni.showToast({
+          title: '分析未完成',
+          icon: 'none',
+        });
+
+        return;
+      }
+
+      uni.showLoading({
+        title: '正在分析...',
+        mask: true,
       });
 
-      $http
-        .post(
-          'api/diet-info/food-analysis',
-          {
-            text: analysisText,
-            input_type: input_type,
-            type: type,
-            date_time: date_time,
-          },
-          {
-            timeout: 90000,
-          },
-        )
-        .then((res) => {
-          // 未检测到食物，返回上一级
-          if (res.data && !res.data.length) {
-            this.chatList.push({
-              id: Math.random().toString(),
-              role: 2,
-              content: this.$towxml('未检出到食物，请重新输入', 'markdown'),
-              img: '',
-            });
-
-            return;
-          }
-
-          this.chatList.push({
-            id: Math.random().toString(),
-            role: 3,
-            content: '',
-            img: '',
-            foodList: res.data,
-            type,
-            input_type,
-            analysisText,
-            date_time,
-            hasSave: false,
+      this.analysisData(item.type, 1, item.analysisText, item.date_time, false).then((res) => {
+        $http
+          .post(
+            'api/diet-info/create-batch',
+            {
+              food_batch: res.data,
+            },
+            {
+              timeout: 90000,
+            },
+          )
+          .then(() => {
+            this.getAnalysisData(item);
           });
-        })
-        .catch((error) => {
-          this.chatList.push({
-            id: Math.random().toString(),
-            role: 2,
-            content: this.$towxml(error.Msg || error.msg, 'markdown'),
-            img: '',
-          });
-        })
-        .finally(() => {
-          this.answering = false;
-          uni.hideLoading();
-        });
+      });
     },
 
     getAnalysisData(item) {
       uni.showLoading({
-        title: '加载中...',
+        title: '正在分析...',
         mask: true,
       });
 
@@ -298,7 +508,7 @@ export default {
         .post(
           'api/diet-info/meal-report',
           {
-            type: item.type,
+            type: item.type + 1,
             date_time: item.date_time,
           },
           {
@@ -307,7 +517,6 @@ export default {
         )
         .then((res) => {
           uni.hideLoading();
-          this.analysisData = res.data;
           item.hasSave = true;
 
           this.evaluationList = res.data.evaluation.split('\n').map((item) => {
@@ -323,6 +532,7 @@ export default {
             content: '',
             img: '',
             evaluationList: this.evaluationList.slice(0, 2),
+            foodList: item.foodList,
           });
 
           setTimeout(() => {
@@ -332,38 +542,14 @@ export default {
               content: '',
               img: '',
               evaluationList: this.evaluationList.slice(2),
+              foodList: item.foodList,
             });
           });
-        });
-    },
-
-    saveAndAnalysis(item) {
-      if (this.answering) {
-        uni.showToast({
-          title: '分析未完成',
-          icon: 'none',
-        });
-
-        return;
-      }
-
-      uni.showLoading({
-        title: '操作中...',
-        mask: true,
-      });
-
-      $http
-        .post(
-          'api/diet-info/create-batch',
-          {
-            food_batch: item.foodList,
-          },
-          {
-            timeout: 90000,
-          },
-        )
-        .then(() => {
-          this.getAnalysisData(item);
+        })
+        .finally(() => {
+          this.$nextTick(() => {
+            this.scrollTop += 1;
+          });
         });
     },
 
@@ -392,19 +578,12 @@ export default {
         img: '',
       });
 
-      let answerObj = {
-        id: Math.random().toString(),
-        role: 2,
-        content: this.$towxml(this.thinkText, 'markdown'),
-      };
-
-      this.chatList.push(answerObj);
-
       this.$nextTick(() => {
         this.scrollTop += 1;
       });
 
-      // TODO
+      this.analysisData(this.type, 1, this.questionText, this.date_time);
+      this.questionText = '';
     },
   },
 };
@@ -567,11 +746,11 @@ page {
             display: flex;
             flex-direction: column;
             gap: 20rpx;
-            background: #ffffff;
-            border-radius: 20rpx;
-            padding: 20rpx;
 
             .evaluation-item {
+              background: #ffffff;
+              border-radius: 20rpx;
+              padding: 20rpx;
               display: flex;
               flex-direction: column;
 
@@ -591,7 +770,7 @@ page {
         }
 
         &.evaluationList2 {
-          padding: 0 24rpx;
+          padding: 20rpx 24rpx;
           min-width: 50%;
           background: #e8f480;
           border-radius: 0 40rpx 40rpx 40rpx;
@@ -600,6 +779,22 @@ page {
           align-self: flex-start;
 
           .evaluation-list2 {
+            .appraisal,
+            .suggest {
+              text {
+                font-size: 24rpx;
+                color: #000000;
+                line-height: 32rpx;
+
+                &:nth-child(1) {
+                  color: #604fa6;
+                }
+              }
+            }
+
+            .weight {
+              line-height: 32rpx;
+            }
           }
         }
       }

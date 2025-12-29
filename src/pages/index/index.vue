@@ -177,7 +177,7 @@
           <view
             v-for="(item, index) of selectRecodeItem.foodList"
             :key="index"
-            @click="$toRouter('/pages/foodAnalysis/foodAnalysis', `type=${item.type}&time=${item.date_time}`)"
+            @click="$toRouter('/pages/foodRecord/foodRecord', `type=${item.type}&date_time=${item.date_time}`)"
           >
             <text>{{ item.name }}</text>
             <text>{{ item.weight }}克</text>

@@ -217,7 +217,8 @@ export default {
       }
 
       // TODO 需要判断是否已经定制AI食谱
-      this.$refs.markAIRecipesDialog.open();
+      // this.$refs.markAIRecipesDialog.open();
+      this.$toRouter('/pages/customizedRecipes/customizedRecipes');
     },
   },
 };

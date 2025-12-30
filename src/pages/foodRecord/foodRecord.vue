@@ -177,6 +177,25 @@ export default {
     // type 默认从0开始，0 => 早餐
     if (options.type) {
       this.type = Number(options.type) - 1;
+    } else {
+      // 根据当前时间推断餐饮类型
+      let time = new Date().format().slice(-8, -6);
+
+      if (time >= 7 && time <= 9) {
+        this.type = 0;
+      } else if (time >= 9 && time <= 11) {
+        this.type = 1;
+      } else if (time >= 11 && time <= 14) {
+        this.type = 2;
+      } else if (time >= 14 && time <= 17) {
+        this.type = 3;
+      } else if (time >= 17 && time <= 19) {
+        this.type = 4;
+      } else if (time >= 19 && time <= 21) {
+        this.type = 5;
+      } else {
+        this.type = 6;
+      }
     }
 
     if (options.date_time) {

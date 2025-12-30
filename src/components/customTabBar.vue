@@ -58,7 +58,7 @@ export default {
   },
 
   mounted() {
-    uni.hideTabBar();
+    // uni.hideTabBar();
 
     // eslint-disable-next-line no-undef
     const pages = getCurrentPages();

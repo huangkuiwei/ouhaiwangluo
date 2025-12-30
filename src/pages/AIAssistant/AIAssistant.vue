@@ -15,7 +15,7 @@
         <view class="ask-ai" @click="jumpAi(aiChartList[0])">问助理</view>
 
         <view class="ai-items1">
-          <view @click="jumpAi(aiChartList[5])">
+          <view @click="jumpAi(aiChartList[1])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg03.png"
@@ -23,8 +23,7 @@
             <text>配料表查询</text>
           </view>
 
-          <!-- TODO 快速消食运动 -->
-          <view>
+          <view @click="jumpAi(aiChartList[3])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg04.png"
@@ -34,7 +33,7 @@
         </view>
 
         <view class="ai-items2">
-          <view @click="jumpAi(aiChartList[6])">
+          <view @click="jumpAi(aiChartList[2])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg05.png"
@@ -42,7 +41,7 @@
             <text>BMI计算</text>
           </view>
 
-          <view @click="jumpAi(aiChartList[7])">
+          <view @click="jumpAi(aiChartList[4])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg06.png"
@@ -50,7 +49,7 @@
             <text>BMR计算</text>
           </view>
 
-          <view @click="jumpAi(aiChartList[8])">
+          <view @click="jumpAi(aiChartList[5])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg07.png"
@@ -58,7 +57,7 @@
             <text>热量计算</text>
           </view>
 
-          <view @click="jumpAi(aiChartList[9])">
+          <view @click="jumpAi(aiChartList[6])">
             <image
               mode="widthFix"
               src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg08.png"
@@ -68,7 +67,7 @@
         </view>
       </view>
 
-      <view class="ai-box2" @click="jumpAi(aiChartList[4])">
+      <view class="ai-box2" @click="jumpAi(aiChartList[7])">
         <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg09.png" />
         <view class="content">
           <text>AI健身教练</text>
@@ -78,7 +77,7 @@
     </view>
 
     <view class="part2">
-      <view class="ai-food" @click="jumpAi(aiChartList[1])">
+      <view class="ai-food" v-if="isVip" @click="markAIRecipes">
         <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/bg11.png" />
 
         <view class="content">
@@ -86,6 +85,18 @@
           <text>开启AI定制</text>
           <text>为你量身定制个性化的食品计划</text>
         </view>
+
+        <!-- TODO 定制食谱时间 -->
+        <view class="time">
+          <text>Day</text>
+          <text>7</text>
+          <text>/13</text>
+        </view>
+      </view>
+
+      <view class="lock" v-else @click="goVip">
+        <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/lock.png" />
+        <text>会员解锁AI定制食谱</text>
       </view>
 
       <!-- TODO 食谱列表 -->
@@ -118,27 +129,49 @@
       <view class="no-more">暂无更多</view>
     </view>
 
+    <markAIRecipesDialog ref="markAIRecipesDialog" />
+
     <custom-tab-bar />
   </view>
 </template>
 
 <script>
 import $http from '@/utils/http';
+import { mapGetters, mapState } from 'vuex';
+import { verifyIsLogin } from '@/utils';
+import MarkAIRecipesDialog from '@/pages/AIAssistant/markAIRecipesDialog.vue';
 
 export default {
   name: 'AIAssistant',
 
+  components: {
+    MarkAIRecipesDialog,
+  },
+
   data() {
     return {
       aiChartList: [],
+      homeWeightPlanData: null,
     };
+  },
+
+  computed: {
+    ...mapGetters('app', ['isVip']),
+    ...mapState('app', ['userDetailInfo']),
   },
 
   onLoad() {
     this.getAiChartList();
+    this.getHomeWeightPlan();
   },
 
   methods: {
+    getHomeWeightPlan() {
+      return $http.get('api/diet-info/weight-plan/home').then((res) => {
+        this.homeWeightPlanData = res.data;
+      });
+    },
+
     /**
      * 获取 ai 搭子列表
      */
@@ -153,18 +186,38 @@ export default {
         });
     },
 
+    goVip() {
+      verifyIsLogin();
+      this.$toRouter('/pages/vip/vip');
+    },
+
     /**
      * 跳转 AI 搭子聊天界面
      */
     jumpAi(item) {
-      // verifyIsLogin();
-
       if (item.id === 10000) {
         this.$toRouter('/pages/healthAssistant/healthAssistant', `agent_id=${item.id}&name=${item.name}`);
         return;
       }
 
       this.$toRouter('/pages/aiChat/aiChat', `agent_id=${item.id}&name=${item.name}`);
+    },
+
+    markAIRecipes() {
+      verifyIsLogin();
+
+      if (!this.userDetailInfo) {
+        this.$toRouter('/pages/evaluation/evaluation');
+        return;
+      }
+
+      if (!this.homeWeightPlanData || this.homeWeightPlanData.state !== 1) {
+        this.$toRouter('/pages/addPlan/addPlan');
+        return;
+      }
+
+      // TODO 需要判断是否已经定制AI食谱
+      this.$refs.markAIRecipesDialog.open();
     },
   },
 };
@@ -330,6 +383,48 @@ export default {
             margin-bottom: 44rpx;
           }
         }
+      }
+
+      .time {
+        position: absolute;
+        right: 48rpx;
+        bottom: 38rpx;
+        display: flex;
+        align-items: center;
+
+        text {
+          font-weight: 600;
+          font-size: 32rpx;
+          color: #323131;
+
+          &:nth-child(2) {
+            font-size: 80rpx;
+            position: relative;
+            top: -20rpx;
+          }
+        }
+      }
+    }
+
+    .lock {
+      position: relative;
+      margin-bottom: 20rpx;
+
+      image {
+        width: 100%;
+      }
+
+      text {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 24rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24rpx;
+        color: #000000;
+        font-weight: 600;
       }
     }
 

@@ -170,12 +170,14 @@
 
       <template v-else>
         <image
+          @click="$toRouter('/pages/vip/vip')"
           mode="widthFix"
           style="width: 100%; margin-bottom: 12rpx"
           src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock01.png"
         />
 
         <image
+          @click="$toRouter('/pages/vip/vip')"
           mode="widthFix"
           style="width: 100%"
           src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock02.png"

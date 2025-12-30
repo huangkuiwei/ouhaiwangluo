@@ -29,15 +29,13 @@
       </view>
 
       <view class="data-card">
-        <!-- TODO 记录饮食次数 -->
         <view class="data-item">
-          <text>0</text>
+          <text>{{ userDetailInfo.diet_count || 0 }}</text>
           <text>记录饮食/次</text>
         </view>
 
-        <!-- TODO 记录运动次数 -->
         <view class="data-item">
-          <text>0</text>
+          <text>{{ userDetailInfo.movement_count || 0 }}</text>
           <text>记录运动/天</text>
         </view>
       </view>
@@ -72,8 +70,7 @@
           <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg02.png" />
         </view>
 
-        <!-- TODO 我的食谱 -->
-        <view class="item">
+        <view class="item" @click="previewDataPage('/pages/myRecipe/myRecipe')">
           <view class="data-title">我的食谱</view>
           <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/my/bg03.png" />
         </view>
@@ -127,14 +124,11 @@
       </view>
     </view>
 
-    <redemption-dialog ref="redemptionDialog" @success="success" />
-
     <custom-tab-bar />
   </view>
 </template>
 
 <script>
-import RedemptionDialog from '@/pages/my/redemptionDialog.vue';
 import { verifyIsLogin } from '@/utils';
 import $http from '@/utils/http';
 import { mapActions, mapGetters, mapState } from 'vuex';
@@ -176,10 +170,6 @@ export default {
       imageUrl: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/food-diary-app/share-img.jpg',
       path: '/pages/index/index',
     };
-  },
-
-  components: {
-    RedemptionDialog,
   },
 
   methods: {
@@ -255,7 +245,7 @@ export default {
       this.$toRouter(url);
     },
 
-    // TODO 客服
+    // TODO 企微客服
     openContact() {
       uni.openCustomerServiceChat({
         corpId: 'wwa09afa94a53c191b',

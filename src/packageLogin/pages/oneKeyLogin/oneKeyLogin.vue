@@ -40,8 +40,7 @@
     <view class="kefu">
       <text @click="callPhone">联系客服</text>
       <text class="line">｜</text>
-      <!-- TODO 客服电话 -->
-      <text>客服电话：4000000000</text>
+      <text>客服电话：020-89631980</text>
     </view>
   </view>
 </template>
@@ -125,10 +124,9 @@ export default {
       });
     },
 
-    // TODO 客服电话
     callPhone() {
       uni.makePhoneCall({
-        phoneNumber: '4000000000',
+        phoneNumber: '020-89631980',
       });
     },
   },

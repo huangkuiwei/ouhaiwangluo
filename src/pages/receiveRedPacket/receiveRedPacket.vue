@@ -7,7 +7,7 @@
           src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/scantool/static/assets/receiveRedPacket/logo.png"
         />
 
-        <text>慧食搭子发出的红包</text>
+        <text>OUHI发出的红包</text>
       </view>
 
       <view class="bottom">恭喜发财，大吉大利！</view>

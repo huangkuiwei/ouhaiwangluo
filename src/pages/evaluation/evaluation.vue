@@ -115,7 +115,10 @@
             <view class="evaluation-item-values">
               <view class="items">
                 <text>当前体重</text>
-                <!-- TODO 缺少一张图片 -->
+                <image
+                  mode="widthFix"
+                  src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/evaluation/icon03.png"
+                />
                 <text>目标体重</text>
               </view>
 
@@ -908,13 +911,18 @@ page {
             .items {
               display: flex;
               align-items: center;
-              justify-content: space-around;
+              justify-content: center;
+              gap: 62rpx;
               margin-bottom: 60rpx;
 
               text {
                 font-weight: 600;
                 font-size: 28rpx;
                 color: #323131;
+              }
+
+              image {
+                width: 142rpx;
               }
             }
 
@@ -931,7 +939,7 @@ page {
                 input {
                   width: 160rpx;
                   height: 60rpx;
-                  background: #d9d9d9;
+                  background: #f3f3f3;
                   border-radius: 20rpx;
                   font-weight: 600;
                   font-size: 32rpx;

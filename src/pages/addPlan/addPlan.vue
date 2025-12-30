@@ -176,11 +176,9 @@ export default {
           target_weight: this.targetWeight,
           end_date: new Date(this.$refs.calendarRef.selectedDate).format(),
         })
-        .then((res) => {
+        .then(() => {
           uni.hideLoading();
-
-          uni.setStorageSync('planSuggestion', res.data);
-          this.$toRouter('/pages/planSuggestion/planSuggestion');
+          this.$toRouter('/pages/weightManagementPlan/weightManagementPlan');
         });
     },
 

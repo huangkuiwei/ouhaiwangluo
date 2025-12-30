@@ -489,8 +489,8 @@ export default {
   data() {
     return {
       configInfo: {
-        appName: '慧食搭子',
-        companyName: '广州泰湖科技有限公司',
+        appName: 'OUHI',
+        companyName: '广州欧海网络科技有限公司',
       },
     };
   },

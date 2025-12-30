@@ -43,7 +43,6 @@ export default {
         mask: true,
       });
 
-      // TODO 接口异常
       $http
         .post('api/health-tree/tree-record', {
           pageIndex: 1,

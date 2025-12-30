@@ -226,21 +226,6 @@
       }
     },
     {
-      "path": "pages/planSuggestion/planSuggestion",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "方案建议",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
       "path": "pages/foodRecord/foodRecord",
       "style": {
         "navigationStyle": "custom",

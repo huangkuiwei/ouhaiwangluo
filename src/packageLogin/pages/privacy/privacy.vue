@@ -318,7 +318,7 @@
     <view
       >如果你认为{{
         configInfo.companyName
-      }}违反法律法规规定或与你的约定收集、使用你的个人信息，你也可以通过发送电子邮件到taihukj@163.com的方式与{{
+      }}违反法律法规规定或与你的约定收集、使用你的个人信息，你也可以通过发送电子邮件到ohhiii@126.com的方式与{{
         configInfo.companyName
       }}取得联系，并要求删除你的相关个人信息。{{
         configInfo.companyName
@@ -455,7 +455,7 @@
       }}软件及相关服务为准。</view
     >
     <view
-      >如对本隐私政策内容有任何疑问、意见或建议，你可通过发送邮件至taihukj@163.com与{{
+      >如对本隐私政策内容有任何疑问、意见或建议，你可通过发送邮件至ohhiii@126.com与{{
         configInfo.companyName
       }}联系。</view
     >
@@ -535,8 +535,8 @@ export default {
   data() {
     return {
       configInfo: {
-        appName: '慧食搭子',
-        companyName: '广州泰湖科技有限公司',
+        appName: 'OUHI',
+        companyName: '广州欧海网络科技有限公司',
       },
     };
   },

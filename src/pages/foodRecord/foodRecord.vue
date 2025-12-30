@@ -106,6 +106,10 @@
       </view>
     </scroll-view>
 
+    <view class="icon" @click="selectImage">
+      <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/foodRecord/icon01.png" />
+    </view>
+
     <view class="message-box">
       <view class="ai-tip"> 本服务为AI生成内容，结果仅供参考 </view>
 
@@ -270,43 +274,7 @@ export default {
     }
 
     if (options.url) {
-      this.chatList.push({
-        id: Math.random().toString(),
-        role: 1,
-        content: '',
-        img: decodeURIComponent(options.url),
-      });
-
-      this.answering = true;
-
-      uni.showLoading({
-        title: '正在分析...',
-        mask: true,
-      });
-
-      $http
-        .upload('api/baseai/image-analysis', decodeURIComponent(options.url), 'image')
-        .then((res) => {
-          if (res.data && !res.data.length) {
-            this.chatList.push({
-              id: Math.random().toString(),
-              role: 2,
-              content: this.$towxml('未检出到食物，请重新输入', 'markdown'),
-              img: '',
-            });
-
-            this.answering = false;
-            uni.hideLoading();
-            return;
-          }
-
-          let analysisText = res.data.map((item) => `${item.name}(${item.weight})`).join(',');
-          this.analysisData(this.type, 2, analysisText, this.date_time);
-        })
-        .catch(() => {
-          this.answering = false;
-          uni.hideLoading();
-        });
+      this.uploadImgAndAna(decodeURIComponent(options.url));
     }
   },
 
@@ -371,6 +339,54 @@ export default {
   },
 
   methods: {
+    uploadImgAndAna(url) {
+      this.chatList.push({
+        id: Math.random().toString(),
+        role: 1,
+        content: '',
+        img: url,
+      });
+
+      this.answering = true;
+
+      uni.showLoading({
+        title: '正在分析...',
+        mask: true,
+      });
+
+      this.$nextTick(() => {
+        this.scrollTop += 1;
+      });
+
+      $http
+        .upload('api/baseai/image-analysis', url, 'image')
+        .then((res) => {
+          if (res.data && !res.data.length) {
+            this.chatList.push({
+              id: Math.random().toString(),
+              role: 2,
+              content: this.$towxml('未检出到食物，请重新输入', 'markdown'),
+              img: '',
+            });
+
+            this.$nextTick(() => {
+              this.scrollTop += 1;
+            });
+
+            this.answering = false;
+            uni.hideLoading();
+            return;
+          }
+
+          let analysisText = res.data.map((item) => `${item.name}(${item.weight})`).join(',');
+          this.analysisData(this.type, 2, analysisText, this.date_time);
+        })
+        .catch(() => {
+          this.answering = false;
+          uni.hideLoading();
+        });
+    },
+
     getDailyCalorie(date_time) {
       return $http
         .post('api/diet-info/daily-calorie', {
@@ -387,6 +403,18 @@ export default {
 
     onDateChange(event, item) {
       item.date_time = event.detail.value;
+    },
+
+    selectImage() {
+      uni.chooseMedia({
+        count: 1,
+        mediaType: ['image'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          let filePath = res.tempFiles[0].tempFilePath;
+          this.uploadImgAndAna(filePath);
+        },
+      });
     },
 
     analysisData(type, input_type, analysisText, date_time, addRecode = true) {
@@ -611,7 +639,7 @@ page {
   }
 
   .chat-box {
-    padding: 60rpx 48rpx 50rpx;
+    padding: 50rpx 48rpx 40rpx;
     flex-grow: 1;
     overflow: auto;
 
@@ -798,6 +826,17 @@ page {
           }
         }
       }
+    }
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20rpx 20rpx;
+
+    image {
+      width: 96rpx;
     }
   }
 

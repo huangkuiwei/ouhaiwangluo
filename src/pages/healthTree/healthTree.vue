@@ -11,7 +11,7 @@
       </view>
 
       <view class="history-height">
-        <text>当前高度：</text>
+        <text>历史高度：</text>
         <text>{{ accountInfo.tree_history_height || 0 }}厘米</text>
       </view>
 
@@ -240,44 +240,43 @@ export default {
       return false;
     },
 
-    // TODO 7个等级判定
     treeInfo() {
-      if (this.accountInfo.tree_level === 7) {
+      if (this.accountInfo.level >= 7) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree07.png',
           widthProportion: 1,
           bottom: 0,
           zIndex: 1,
         };
-      } else if (this.accountInfo.tree_level === 6) {
+      } else if (this.accountInfo.level === 6) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree06.png',
           widthProportion: 1,
           bottom: 40,
           zIndex: 1,
         };
-      } else if (this.accountInfo.tree_level === 5) {
+      } else if (this.accountInfo.level === 5) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree05.png',
           widthProportion: 682 / 750,
           bottom: 0,
           zIndex: 1,
         };
-      } else if (this.accountInfo.tree_level === 4) {
+      } else if (this.accountInfo.level === 4) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree04.png',
           widthProportion: 246 / 750,
           bottom: 40,
           zIndex: 1,
         };
-      } else if (this.accountInfo.tree_level === 3) {
+      } else if (this.accountInfo.level === 3) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree03.png',
           widthProportion: 184 / 750,
           bottom: 40,
           zIndex: 1,
         };
-      } else if (this.accountInfo.tree_level === 2) {
+      } else if (this.accountInfo.level === 2) {
         return {
           url: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/healthTree/tree02.png',
           widthProportion: 142 / 750,
@@ -395,8 +394,7 @@ export default {
         mask: true,
       });
 
-      // TODO 接口404
-      $http.get('api/health-tree/fertilize').then((res) => {
+      $http.post('api/health-tree/fertilize').then((res) => {
         uni.hideLoading();
 
         uni.showToast({

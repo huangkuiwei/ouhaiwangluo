@@ -478,7 +478,7 @@ page {
   }
 
   .chat-box {
-    padding: 60rpx 48rpx 50rpx;
+    padding: 50rpx 48rpx 40rpx;
     flex-grow: 1;
     overflow: auto;
 

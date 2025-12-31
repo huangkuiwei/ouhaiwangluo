@@ -124,12 +124,54 @@
 
               <view class="values">
                 <view class="values-item">
-                  <input type="number" v-model="initialWeight" />
+                  <view style="width: 160rpx">
+                    <picker-view
+                      indicator-style="height: 60rpx;"
+                      style="width: 100%; height: 180rpx"
+                      :value="initialWeightValue"
+                      @change="initialWeightValue = $event.detail.value"
+                    >
+                      <picker-view-column>
+                        <view
+                          class="item"
+                          :class="{
+                            active: initialWeightValue[0] === index,
+                          }"
+                          v-for="(item, index) in rulerLineList2"
+                          :key="index"
+                        >
+                          <text class="value">{{ item }}</text>
+                        </view>
+                      </picker-view-column>
+                    </picker-view>
+                  </view>
+
                   <text>公斤</text>
                 </view>
 
                 <view class="values-item">
-                  <input type="number" v-model="targetWeight" />
+                  <view style="width: 160rpx">
+                    <picker-view
+                      indicator-style="height: 60rpx;"
+                      style="width: 100%; height: 180rpx"
+                      :value="targetWeightValue"
+                      @change="targetWeightValue = $event.detail.value"
+                    >
+                      <picker-view-column>
+                        <view
+                          class="item"
+                          :class="{
+                            active: targetWeightValue[0] === index,
+                          }"
+                          v-for="(item, index) in rulerLineList3"
+                          :key="index"
+                        >
+                          <text class="value">{{ item }}</text>
+                        </view>
+                      </picker-view-column>
+                    </picker-view>
+                  </view>
+
                   <text>公斤</text>
                 </view>
               </view>
@@ -252,9 +294,9 @@ export default {
       rulerLineList1.push(i);
     }
 
-    for (let i = 0; i < 305; i++) {
-      rulerLineList2.push(i);
-      rulerLineList3.push(i);
+    for (let i = 0; i < 401; i++) {
+      rulerLineList2.push(Number((i * 0.5).toFixed(1)));
+      rulerLineList3.push(Number((i * 0.5).toFixed(1)));
     }
 
     return {
@@ -282,8 +324,8 @@ export default {
       age: [80],
       ageList: ageList,
       height: 170,
-      initialWeight: 70,
-      targetWeight: 60,
+      initialWeightValue: [140],
+      targetWeightValue: [120],
       initPosition1: 'ruler1-150',
       initPosition2: 'ruler2-50',
       initPosition3: 'ruler3-40',
@@ -343,6 +385,14 @@ export default {
 
     isWeightLoss() {
       return this.initialWeight - this.targetWeight > 0;
+    },
+
+    initialWeight() {
+      return this.rulerLineList2[this.initialWeightValue[0]];
+    },
+
+    targetWeight() {
+      return this.rulerLineList2[this.targetWeightValue[0]];
     },
   },
 
@@ -936,26 +986,24 @@ page {
                 align-items: center;
                 gap: 10rpx;
 
-                input {
-                  width: 160rpx;
-                  height: 60rpx;
-                  background: #f3f3f3;
-                  border-radius: 20rpx;
-                  font-weight: 600;
-                  font-size: 32rpx;
-                  color: #604fa6;
-                  text-align: center;
-                  position: relative;
+                picker-view {
+                  width: 100%;
+                  margin-right: 8rpx;
 
-                  &:after {
-                    content: '';
-                    position: absolute;
-                    bottom: 8rpx;
-                    left: 15rpx;
-                    right: 15rpx;
-                    height: 2rpx;
-                    border-radius: 4rpx;
-                    background: #323131;
+                  .item {
+                    width: 100%;
+                    height: 60rpx;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    &.active {
+                      background: #f3f3f3;
+                      border-radius: 20rpx;
+                      font-weight: 600;
+                      font-size: 32rpx;
+                      color: #604fa6;
+                    }
                   }
                 }
 

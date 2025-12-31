@@ -12,16 +12,9 @@
         <text>周</text>
       </view>
 
-      <!--<view class="status">-->
-      <!--  <text v-if="isLogin" @click="goWeightManage">-->
-      <!--    <template v-if="!userDetailInfo">完善个人资料</template>-->
-      <!--    <template v-else-if="homeWeightPlanData && homeWeightPlanData.state === 1">查看计划</template>-->
-      <!--    <template v-else-if="!homeWeightPlanData || (homeWeightPlanData && homeWeightPlanData.state === 2)"-->
-      <!--      >创建计划</template-->
-      <!--    >-->
-      <!--  </text>-->
-      <!--  <text v-else @click="$toRouter('/packageLogin/pages/login/login')">请登录</text>-->
-      <!--</view>-->
+      <view class="status">
+        <text v-if="isLogin && homeWeightPlanData && homeWeightPlanData.state === 2">目标已完成</text>
+      </view>
 
       <view class="chart">
         <view class="left">
@@ -274,16 +267,15 @@
 
           <view v-else class="empty-recode">未制定运动计划</view>
         </view>
-
-        <!-- TODO 今日训练是否可以自己添加 -->
-        <!--<view class="add">-->
-        <!--  <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/add-icon.png" />-->
-        <!--</view>-->
       </view>
     </view>
 
     <view class="lock" v-else @click="$toRouter('/pages/vip/vip')">
       <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/lock-box.png?t=123" />
+    </view>
+
+    <view class="add" @click="showAddFoodRecodeDialog">
+      <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/add-icon.png" />
     </view>
 
     <add-food-recode-dialog
@@ -676,10 +668,6 @@ export default {
 
     selectRecodeType(item) {
       this.selectRecodeItem = item;
-
-      setTimeout(() => {
-        this.showAddFoodRecodeDialog();
-      });
     },
 
     onCheckboxClick(item) {
@@ -887,7 +875,7 @@ export default {
 
 <style scoped lang="scss">
 .index-page {
-  padding: 0 24rpx 200rpx;
+  padding: 0 24rpx 240rpx;
 
   .page-title {
   }
@@ -924,15 +912,21 @@ export default {
     }
 
     .status {
-      padding: 8rpx 10rpx;
+      width: 120rpx;
       height: 40rpx;
-      background: #fcffea;
-      border-radius: 60rpx 60rpx 60rpx 60rpx;
-      font-size: 20rpx;
-      color: #000000;
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
+
+      text {
+        width: 100%;
+        height: 100%;
+        background: #fcffea;
+        border-radius: 60rpx 60rpx 60rpx 60rpx;
+        font-size: 20rpx;
+        color: #000000;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     .chart {
@@ -1430,15 +1424,6 @@ export default {
           padding-top: 86rpx;
         }
       }
-
-      .add {
-        flex-shrink: 0;
-        text-align: right;
-
-        image {
-          width: 80rpx;
-        }
-      }
     }
 
     .login,
@@ -1454,6 +1439,18 @@ export default {
   .lock {
     image {
       width: 100%;
+    }
+  }
+
+  .add {
+    position: fixed;
+    bottom: 140rpx;
+    right: 24rpx;
+    flex-shrink: 0;
+    text-align: right;
+
+    image {
+      width: 80rpx;
     }
   }
 }

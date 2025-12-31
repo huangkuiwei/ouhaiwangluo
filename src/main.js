@@ -2,7 +2,7 @@ import Vue from 'vue';
 import App from './App';
 import './uni.promisify.adaptor';
 import store from './store';
-import { toBack, toReLaunch, toRouter, toSwitch } from '@/utils';
+import { toBack, toRedirect, toReLaunch, toRouter, toSwitch } from '@/utils';
 const towxml = require('./wxcomponents/towxml/index');
 
 import uniIcons from '@dcloudio/uni-ui/lib/uni-icons/uni-icons.vue';
@@ -31,6 +31,7 @@ Vue.prototype.$toRouter = toRouter;
 Vue.prototype.$toSwitch = toSwitch;
 Vue.prototype.$toBack = toBack;
 Vue.prototype.$toReLaunch = toReLaunch;
+Vue.prototype.$toRedirect = toRedirect;
 
 Vue.prototype.$towxml = towxml;
 

@@ -102,40 +102,37 @@
       </view>
     </view>
 
-    <!-- TODO 修改体重弹窗 -->
     <uni-popup ref="updateWeightDataDialog">
-      <view class="update-weight-data-dialog">
-        <view class="title" v-if="updateType === 1">更新初始体重</view>
-        <view class="title" v-else-if="updateType === 2">更新目标体重</view>
-        <view class="title" v-else-if="updateType === 3">更新最新体重</view>
+      <view class="update-target-weight-data-dialog">
+        <view class="title">更新最新体重</view>
 
-        <view class="input-box">
-          <input
-            v-if="updateType === 1"
-            type="number"
-            :value="weightData.initial_weight"
-            @input="weightData.initial_weight = $event.detail.value"
-          />
-          <input
-            v-else-if="updateType === 2"
-            type="number"
-            :value="weightData.target_weight"
-            @input="weightData.target_weight = $event.detail.value"
-          />
-          <input
-            v-else-if="updateType === 3"
-            type="number"
-            :value="weightData.current_weight"
-            @input="weightData.current_weight = $event.detail.value"
-          />
-          <text>公斤</text>
+        <view class="weight-list">
+          <view class="list">
+            <picker-view
+              indicator-style="height: 60rpx;"
+              style="width: 100%; height: 180rpx"
+              :value="weightData.current_weight"
+              @change="weightData.current_weight = $event.detail.value"
+            >
+              <picker-view-column>
+                <view
+                  class="item"
+                  :class="{
+                    active: weightData.current_weight[0] === index,
+                  }"
+                  v-for="(item, index) in rulerLineList1"
+                  :key="index"
+                >
+                  <text class="value">{{ item }}</text>
+                </view>
+              </picker-view-column>
+            </picker-view>
+          </view>
+
+          <text class="unit">公斤</text>
         </view>
 
-        <view class="submit" @click="submit">确定</view>
-
-        <view class="close" @click="$refs.updateWeightDataDialog.close()">
-          <uni-icons class="back" color="#999999" type="closeempty" size="24"></uni-icons>
-        </view>
+        <view class="btn" @click="submit">确定</view>
       </view>
     </uni-popup>
   </view>
@@ -153,6 +150,12 @@ export default {
   name: 'weightData',
 
   data() {
+    let rulerLineList1 = [];
+
+    for (let i = 0; i < 401; i++) {
+      rulerLineList1.push(Number((i * 0.5).toFixed(1)));
+    }
+
     return {
       userDetailInfo: {},
       homeWeightPlanData: {},
@@ -160,6 +163,7 @@ export default {
       weightData: {},
       progress: 0,
       updateType: 1,
+      rulerLineList1,
       option1: {
         color: ['#DAD2FF', '#FEFFF7'],
         series: [
@@ -407,6 +411,13 @@ export default {
     updateWeightData(type) {
       this.updateType = type;
       this.weightData = { ...this.userDetailInfo };
+
+      let index = this.rulerLineList1.findIndex((item) => Number(item) === Number(this.userDetailInfo.current_weight));
+
+      if (index !== -1) {
+        this.weightData.current_weight = [index];
+      }
+
       this.$refs.updateWeightDataDialog.open();
     },
 
@@ -436,7 +447,7 @@ export default {
       } else {
         $http
           .post('api/diet-info/user-weight/update', {
-            weight: this.weightData.current_weight,
+            weight: this.rulerLineList1[this.weightData.current_weight[0]],
           })
           .then(() => {
             this.$refs.updateWeightDataDialog.close();
@@ -718,6 +729,71 @@ page {
       right: 20rpx;
       top: 30rpx;
     }
+  }
+}
+
+.update-target-weight-data-dialog {
+  width: 702rpx;
+  background: #ffffff;
+  border-radius: 60rpx;
+  padding: 32rpx 24rpx 48rpx;
+
+  .title {
+    font-weight: 600;
+    font-size: 28rpx;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 114rpx;
+  }
+
+  .weight-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 116rpx;
+
+    .list {
+      width: 160rpx;
+
+      picker-view {
+        width: 100%;
+        margin-right: 8rpx;
+
+        .item {
+          width: 100%;
+          height: 60rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &.active {
+            background: #f3f3f3;
+            border-radius: 20rpx;
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #604fa6;
+          }
+        }
+      }
+    }
+
+    .unit {
+      font-size: 28rpx;
+      color: #323131;
+      padding: 0 16rpx 12rpx;
+      position: relative;
+    }
+  }
+
+  .btn {
+    height: 80rpx;
+    background: #e8f480;
+    border-radius: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28rpx;
+    color: #323131;
   }
 }
 </style>

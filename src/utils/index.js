@@ -53,6 +53,14 @@ export const toBack = (delta = 1) => {
   uni.navigateBack(delta);
 };
 
+export const toRedirect = (url, params) => {
+  params ? (url = url + '?' + params) : '';
+
+  uni.redirectTo({
+    url,
+  });
+};
+
 /**
  * 验证是否登录，未登录弹窗提示
  */

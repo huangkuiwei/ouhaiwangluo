@@ -185,7 +185,6 @@ export default {
       rulerLineList1.push(i);
     }
 
-    // TODO 体重选择间隔设置
     for (let i = 0; i < 401; i++) {
       rulerLineList2.push(Number((i * 0.5).toFixed(1)));
       rulerLineList3.push(Number((i * 0.5).toFixed(1)));

@@ -16,7 +16,7 @@
           <text class="label">目标体重</text>
 
           <view class="value" @click="openUpdateTargetWeightDialog">
-            <text class="filed">{{ targetWeight }}公斤</text>
+            <text class="filed">{{ targetWeight || 0 }}公斤</text>
             <uni-icons class="back" color="#323131" type="right" size="18"></uni-icons>
           </view>
         </view>
@@ -35,13 +35,13 @@
             <view class="line1">
               <view class="left">
                 预计
-                <text>{{ planData1.week }}</text>
+                <text>{{ planData1.week || 0 }}</text>
                 周
               </view>
 
               <view class="right">
                 每周{{ isWeightLoss ? '减重' : '增重' }}约
-                <text>{{ planData1.weight }}</text>
+                <text>{{ planData1.weight || 0 }}</text>
                 公斤
               </view>
             </view>
@@ -57,8 +57,29 @@
         <view class="title">目标体重</view>
 
         <view class="weight-list">
-          <input type="number" v-model="changedTargetWeight" />
-          <text>公斤</text>
+          <view class="list">
+            <picker-view
+              indicator-style="height: 60rpx;"
+              style="width: 100%; height: 180rpx"
+              :value="changedTargetWeight"
+              @change="changedTargetWeight = $event.detail.value"
+            >
+              <picker-view-column>
+                <view
+                  class="item"
+                  :class="{
+                    active: changedTargetWeight[0] === index,
+                  }"
+                  v-for="(item, index) in rulerLineList1"
+                  :key="index"
+                >
+                  <text class="value">{{ item }}</text>
+                </view>
+              </picker-view-column>
+            </picker-view>
+          </view>
+
+          <text class="unit">公斤</text>
         </view>
 
         <view class="btn" @click="changedTargetWeightSubmit">确定</view>
@@ -81,18 +102,24 @@ export default {
 
   data() {
     let rulerLineList = [];
+    let rulerLineList1 = [];
 
     for (let i = 30; i < 301; i++) {
       rulerLineList.push(i);
+    }
+
+    for (let i = 0; i < 401; i++) {
+      rulerLineList1.push(Number((i * 0.5).toFixed(1)));
     }
 
     return {
       targetWeight: null,
       initialWeight: null,
       rulerLineList,
+      rulerLineList1,
       planData: {},
       planData1: {},
-      changedTargetWeight: null,
+      changedTargetWeight: [0],
     };
   },
 
@@ -113,7 +140,7 @@ export default {
     this._getUserDetailInfo().then(() => {
       uni.hideLoading();
 
-      this.initialWeight = this.userDetailInfo.initial_weight;
+      this.initialWeight = this.userDetailInfo.current_weight;
       this.targetWeight = this.userDetailInfo.target_weight;
 
       setTimeout(() => {
@@ -178,18 +205,22 @@ export default {
         })
         .then(() => {
           uni.hideLoading();
-          this.$toRouter('/pages/weightManagementPlan/weightManagementPlan');
+          this.$toRedirect('/pages/weightManagementPlan/weightManagementPlan');
         });
     },
 
     openUpdateTargetWeightDialog() {
-      this.changedTargetWeight = this.targetWeight;
+      let index = this.rulerLineList1.findIndex((item) => Number(item) === Number(this.targetWeight));
+
+      if (index !== -1) {
+        this.changedTargetWeight = [index];
+      }
+
       this.$refs.updateTargetWeightDialog.open();
     },
 
-    // TODO 修改目标体重
     changedTargetWeightSubmit() {
-      this.targetWeight = this.changedTargetWeight;
+      this.targetWeight = this.rulerLineList1[this.changedTargetWeight[0]];
       this.$refs.updateTargetWeightDialog.close();
       this.onSelectDayChange();
     },
@@ -334,33 +365,36 @@ page {
     justify-content: center;
     margin-bottom: 116rpx;
 
-    input {
+    .list {
       width: 160rpx;
-      height: 60rpx;
-      background: #f3f3f3;
-      border-radius: 20rpx;
-      text-align: center;
-      font-weight: 600;
-      font-size: 32rpx;
-      color: #604fa6;
-      margin-right: 8rpx;
+
+      picker-view {
+        width: 100%;
+        margin-right: 8rpx;
+
+        .item {
+          width: 100%;
+          height: 60rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &.active {
+            background: #f3f3f3;
+            border-radius: 20rpx;
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #604fa6;
+          }
+        }
+      }
     }
 
-    text {
+    .unit {
       font-size: 28rpx;
       color: #323131;
       padding: 0 16rpx 12rpx;
       position: relative;
-
-      &:after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 2rpx;
-        background: #323131;
-      }
     }
   }
 

@@ -28,7 +28,9 @@
           <text>每周</text>
           <text
             >{{
-              isWeightLoss ? `减重${lastPlanData.weekly_loss_weight}` : `增重${-lastPlanData.weekly_loss_weight}`
+              isWeightLoss
+                ? `减重${lastPlanData.weekly_loss_weight || 0}`
+                : `增重${-lastPlanData.weekly_loss_weight || 0}`
             }}kg</text
           >
         </view>
@@ -58,7 +60,9 @@
         <view class="loss-data">
           <text
             >每周{{
-              isWeightLoss ? `减重${lastPlanData.weekly_loss_weight}` : `增重${-lastPlanData.weekly_loss_weight}`
+              isWeightLoss
+                ? `减重${lastPlanData.weekly_loss_weight || 0}`
+                : `增重${-lastPlanData.weekly_loss_weight || 0}`
             }}kg</text
           >
         </view>
@@ -87,7 +91,7 @@
           </view>
         </view>
 
-        <view class="recode-btn" @click="$toRouter('/pages/weightData/weightData')">记录体重</view>
+        <view class="recode-btn" @click="showUpdateTargetWeightDialog">记录体重</view>
       </view>
 
       <view class="options">
@@ -185,6 +189,40 @@
       </template>
     </view>
 
+    <uni-popup ref="updateTargetWeightDialog">
+      <view class="update-target-weight-data-dialog">
+        <view class="title">目标体重</view>
+
+        <view class="weight-list">
+          <view class="list">
+            <picker-view
+              indicator-style="height: 60rpx;"
+              style="width: 100%; height: 180rpx"
+              :value="changedTargetWeight"
+              @change="changedTargetWeight = $event.detail.value"
+            >
+              <picker-view-column>
+                <view
+                  class="item"
+                  :class="{
+                    active: changedTargetWeight[0] === index,
+                  }"
+                  v-for="(item, index) in rulerLineList1"
+                  :key="index"
+                >
+                  <text class="value">{{ item }}</text>
+                </view>
+              </picker-view-column>
+            </picker-view>
+          </view>
+
+          <text class="unit">公斤</text>
+        </view>
+
+        <view class="btn" @click="changedTargetWeightSubmit">确定</view>
+      </view>
+    </uni-popup>
+
     <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
   </view>
 </template>
@@ -205,7 +243,14 @@ export default {
   },
 
   data() {
+    let rulerLineList1 = [];
+
+    for (let i = 0; i < 401; i++) {
+      rulerLineList1.push(Number((i * 0.5).toFixed(1)));
+    }
+
     return {
+      rulerLineList1,
       lastPlanData: {},
       weighData: {},
       dateList: [],
@@ -253,13 +298,13 @@ export default {
         ],
       },
       exercisesPlanData: [],
+      changedTargetWeight: [0],
     };
   },
 
   onShow() {
     this.getLastPlanData();
     this._getUserInfo();
-    this._getLifestyle();
   },
 
   computed: {
@@ -307,34 +352,6 @@ export default {
       return this.lastPlanData.plan_initial_weight - this.lastPlanData.plan_target_weight > 0;
     },
 
-    exercisesProgress() {
-      if (!this.lastPlanData.end_date) {
-        return {};
-      }
-
-      let total =
-        new Date(this.lastPlanData.end_date.replace(/-/g, '/')) -
-        new Date(this.lastPlanData.start_date.replace(/-/g, '/'));
-      let totalDay = Math.ceil(total / (24 * 60 * 60 * 1000));
-
-      let finish = new Date() - new Date(this.lastPlanData.start_date.replace(/-/g, '/'));
-      let finishDay = Math.ceil(finish / (24 * 60 * 60 * 1000));
-
-      let progress = (finishDay / totalDay) * 100;
-
-      if (progress < 0) {
-        progress = 0;
-      } else if (progress > 100) {
-        progress = 100;
-      }
-
-      return {
-        totalDay,
-        finishDay,
-        progress: progress,
-      };
-    },
-
     isNotStart() {
       if (!this.selectDateKey1) {
         return undefined;
@@ -372,7 +389,7 @@ export default {
 
   methods: {
     ...mapMutations('app', ['_setLifestyle']),
-    ...mapActions('app', ['_getUserInfo', '_getLifestyle']),
+    ...mapActions('app', ['_getUserInfo']),
 
     async init() {
       chart = await this.$refs.chartRef.init(echarts);
@@ -388,7 +405,11 @@ export default {
         mask: true,
       });
 
-      $http.get('api/diet-info/weight-plan/last').then((res) => {
+      $http.get('api/diet-info/weight-plan/last', {}, {
+        hiddenErrorMessage: true
+      }).then((res) => {
+        res.data.recipes_list = res.data.recipes_list || [];
+
         this.getRecodeWeightData(res.data.plan_id);
 
         let dateList = {};
@@ -427,6 +448,18 @@ export default {
 
         this.lastPlanData = res.data;
         this.dateList = dateList;
+      }).catch(error => {
+        if (error.Msg === '当前没有进行中的计划,请制定新的计划') {
+          uni.showToast({
+            title: '计划已完成，正在返回首页',
+            icon: 'none',
+            mask: true,
+          })
+
+          setTimeout(() => {
+            this.$toSwitch(`/pages/index/index`);
+          }, 1500);
+        }
       });
     },
 
@@ -542,23 +575,37 @@ export default {
       }
     },
 
-    refreshLife() {
+    showUpdateTargetWeightDialog() {
+      let index = this.rulerLineList1.findIndex((item) => Number(item) === Number(this.lastPlanData.current_weight));
+
+      if (index !== -1) {
+        this.changedTargetWeight = [index];
+      }
+
+      this.$refs.updateTargetWeightDialog.open();
+    },
+
+    changedTargetWeightSubmit() {
       uni.showLoading({
         title: '加载中...',
         mask: true,
       });
 
       $http
-        .post(
-          'api/diet-info/regenerate-lifestyle-advices',
-          {},
-          {
-            timeout: 90000,
-          },
-        )
-        .then((res) => {
+        .post('api/diet-info/user-weight/update', {
+          weight: this.rulerLineList1[this.changedTargetWeight[0]],
+        })
+        .then(() => {
+          this.$refs.updateTargetWeightDialog.close();
           uni.hideLoading();
-          this._setLifestyle(res.data);
+
+          uni.showToast({
+            title: '更新成功',
+            icon: 'none',
+          });
+
+          this.getLastPlanData();
+          this._getUserInfo();
         });
     },
 
@@ -946,4 +993,70 @@ page {
     }
   }
 }
+
+.update-target-weight-data-dialog {
+  width: 702rpx;
+  background: #ffffff;
+  border-radius: 60rpx;
+  padding: 32rpx 24rpx 48rpx;
+
+  .title {
+    font-weight: 600;
+    font-size: 28rpx;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 114rpx;
+  }
+
+  .weight-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 116rpx;
+
+    .list {
+      width: 160rpx;
+
+      picker-view {
+        width: 100%;
+        margin-right: 8rpx;
+
+        .item {
+          width: 100%;
+          height: 60rpx;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &.active {
+            background: #f3f3f3;
+            border-radius: 20rpx;
+            font-weight: 600;
+            font-size: 32rpx;
+            color: #604fa6;
+          }
+        }
+      }
+    }
+
+    .unit {
+      font-size: 28rpx;
+      color: #323131;
+      padding: 0 16rpx 12rpx;
+      position: relative;
+    }
+  }
+
+  .btn {
+    height: 80rpx;
+    background: #e8f480;
+    border-radius: 60rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28rpx;
+    color: #323131;
+  }
+}
+</style>
 </style>

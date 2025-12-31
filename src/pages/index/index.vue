@@ -98,12 +98,12 @@
           <text class="header-title">热量计算</text>
           <view class="options">
             <view class="option-item" @click="goAddFoodRecodePage">
-              <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon1.png" />
+              <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon01.png" />
               <text>对话记饮食</text>
             </view>
 
             <view class="option-item" @click="selectImage">
-              <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon2.png" />
+              <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon02.png" />
               <text>拍照记饮食</text>
             </view>
           </view>
@@ -283,7 +283,7 @@
     </view>
 
     <view class="lock" v-else @click="$toRouter('/pages/vip/vip')">
-      <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/lock-box.png" />
+      <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/lock-box.png?t=123" />
     </view>
 
     <add-food-recode-dialog
@@ -380,42 +380,42 @@ export default {
       foodRecodeList: [
         {
           type: 1,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type01.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type01.png?t=123',
           text: '早餐',
           foodList: [],
           total: 0,
         },
         {
           type: 3,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type02.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type02.png?t=123',
           text: '午餐',
           foodList: [],
           total: 0,
         },
         {
           type: 5,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type03.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type03.png?t=123',
           text: '晚餐',
           foodList: [],
           total: 0,
         },
         {
           type: 2,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '早加餐',
           foodList: [],
           total: 0,
         },
         {
           type: 4,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '午加餐',
           foodList: [],
           total: 0,
         },
         {
           type: 6,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '晚加餐',
           foodList: [],
           total: 0,

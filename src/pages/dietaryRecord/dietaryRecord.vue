@@ -50,37 +50,37 @@ export default {
       foodRecodeList: [
         {
           type: 1,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type01.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type01.png?t=123',
           text: '早餐',
           foodList: [],
         },
         {
           type: 3,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type02.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type02.png?t=123',
           text: '午餐',
           foodList: [],
         },
         {
           type: 5,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type03.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type03.png?t=123',
           text: '晚餐',
           foodList: [],
         },
         {
           type: 2,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '早加餐',
           foodList: [],
         },
         {
           type: 4,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '午加餐',
           foodList: [],
         },
         {
           type: 6,
-          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png',
+          icon: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/food-type04.png?t=123',
           text: '晚加餐',
           foodList: [],
         },

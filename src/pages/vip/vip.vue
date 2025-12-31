@@ -225,7 +225,7 @@ export default {
       onPay(price, openid, mobile);
     },
 
-    // TODO 企微客服
+    // 企微客服
     openContact() {
       uni.openCustomerServiceChat({
         corpId: 'wwa09afa94a53c191b',

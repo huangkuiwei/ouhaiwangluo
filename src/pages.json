@@ -437,6 +437,21 @@
           "softinputMode": "adjustResize"
         }
       }
+    },
+    {
+      "path": "pages/recipesDetail/recipesDetail",
+      "style": {
+        "navigationStyle": "custom",
+        // #ifndef H5
+        "navigationBarTitleText": "食谱详情",
+        // #endif
+        "h5": {
+          "titleNView": false
+        },
+        "app-plus": {
+          "softinputMode": "adjustResize"
+        }
+      }
     }
   ],
   "subPackages": [

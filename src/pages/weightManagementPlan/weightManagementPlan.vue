@@ -35,10 +35,9 @@
           >
         </view>
 
-        <!-- TODO 燃脂心率数据 -->
         <view class="info-item">
           <text>燃脂心率</text>
-          <text>119~158次/分</text>
+          <text>{{ lastPlanData.heart_rate_min || 0 }}~{{ lastPlanData.heart_rate_max || 0 }}次/分</text>
         </view>
 
         <view class="info-item">
@@ -405,62 +404,69 @@ export default {
         mask: true,
       });
 
-      $http.get('api/diet-info/weight-plan/last', {}, {
-        hiddenErrorMessage: true
-      }).then((res) => {
-        res.data.recipes_list = res.data.recipes_list || [];
+      $http
+        .get(
+          'api/diet-info/weight-plan/last',
+          {},
+          {
+            hiddenErrorMessage: true,
+          },
+        )
+        .then((res) => {
+          res.data.recipes_list = res.data.recipes_list || [];
 
-        this.getRecodeWeightData(res.data.plan_id);
+          this.getRecodeWeightData(res.data.plan_id);
 
-        let dateList = {};
+          let dateList = {};
 
-        res.data.recipes_list.forEach((item) => {
-          let date = item.date;
+          res.data.recipes_list.forEach((item) => {
+            let date = item.date;
 
-          if (dateList[date]) {
-            dateList[date].push(item);
-          } else {
-            dateList[date] = [item];
-          }
-        });
-
-        Object.keys(dateList).forEach((dateListKey, index) => {
-          let foodList = {};
-          let item = dateList[dateListKey];
-
-          item.forEach((item) => {
-            let type = item.type;
-
-            if (foodList[type]) {
-              foodList[type].push(item);
+            if (dateList[date]) {
+              dateList[date].push(item);
             } else {
-              foodList[type] = [item];
+              dateList[date] = [item];
             }
           });
 
-          if (index === 0) {
-            this.selectDateKey = dateListKey;
-            this.selectDateKey1 = dateListKey;
+          Object.keys(dateList).forEach((dateListKey, index) => {
+            let foodList = {};
+            let item = dateList[dateListKey];
+
+            item.forEach((item) => {
+              let type = item.type;
+
+              if (foodList[type]) {
+                foodList[type].push(item);
+              } else {
+                foodList[type] = [item];
+              }
+            });
+
+            if (index === 0) {
+              this.selectDateKey = dateListKey;
+              this.selectDateKey1 = dateListKey;
+            }
+
+            dateList[dateListKey] = foodList;
+          });
+
+          this.lastPlanData = res.data;
+          this.dateList = dateList;
+        })
+        .catch((error) => {
+          if (error.Msg === '当前没有进行中的计划,请制定新的计划') {
+            uni.showToast({
+              title: '计划已完成，正在返回首页',
+              icon: 'none',
+              mask: true,
+            });
+
+            setTimeout(() => {
+              this.$toSwitch(`/pages/index/index`);
+            }, 1500);
           }
-
-          dateList[dateListKey] = foodList;
         });
-
-        this.lastPlanData = res.data;
-        this.dateList = dateList;
-      }).catch(error => {
-        if (error.Msg === '当前没有进行中的计划,请制定新的计划') {
-          uni.showToast({
-            title: '计划已完成，正在返回首页',
-            icon: 'none',
-            mask: true,
-          })
-
-          setTimeout(() => {
-            this.$toSwitch(`/pages/index/index`);
-          }, 1500);
-        }
-      });
     },
 
     /**
@@ -1058,5 +1064,4 @@ page {
     color: #323131;
   }
 }
-</style>
 </style>

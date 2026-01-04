@@ -1,5 +1,5 @@
 <template>
-  <view class="customized-recipes"></view>
+  <view class="customized-recipes"> </view>
 </template>
 
 <script>

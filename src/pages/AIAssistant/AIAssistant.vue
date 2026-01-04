@@ -86,11 +86,10 @@
           <text>为你量身定制个性化的食品计划</text>
         </view>
 
-        <!-- TODO 定制食谱时间 -->
-        <view class="time">
+        <view class="time" v-if="recipesDetail.id">
           <text>Day</text>
-          <text>7</text>
-          <text>/13</text>
+          <text>{{ recipesDetail.useDay }}</text>
+          <text>/{{ recipesDetail.day }}</text>
         </view>
       </view>
 
@@ -99,30 +98,10 @@
         <text>会员解锁AI定制食谱</text>
       </view>
 
-      <!-- TODO 食谱列表 -->
       <view class="recipes-list">
-        <view class="recipes-item">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/recipes-pic.png"
-          />
-          <text>高钾排水-3日急救掉秤食谱</text>
-        </view>
-
-        <view class="recipes-item">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/recipes-pic.png"
-          />
-          <text>高钾排水-3日急救掉秤食谱</text>
-        </view>
-
-        <view class="recipes-item">
-          <image
-            mode="widthFix"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/recipes-pic.png"
-          />
-          <text>高钾排水-3日急救掉秤食谱</text>
+        <view class="recipes-item" v-for="item of recipesList" :key="item.id" @click="goRecipesDetailPage(item.id)">
+          <image mode="widthFix" :src="item.image" />
+          <text>{{ item.name_des }}</text>
         </view>
       </view>
 
@@ -137,7 +116,7 @@
 
 <script>
 import $http from '@/utils/http';
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import { verifyIsLogin } from '@/utils';
 import MarkAIRecipesDialog from '@/pages/AIAssistant/markAIRecipesDialog.vue';
 
@@ -151,6 +130,8 @@ export default {
   data() {
     return {
       aiChartList: [],
+      recipesList: [],
+      recipesDetail: {},
       homeWeightPlanData: null,
     };
   },
@@ -161,11 +142,19 @@ export default {
   },
 
   onLoad() {
+    this.getRecipesList();
     this.getAiChartList();
+  },
+
+  onShow() {
+    this._getUserDetailInfo();
     this.getHomeWeightPlan();
+    this.getRecipesDetail();
   },
 
   methods: {
+    ...mapActions('app', ['_getUserDetailInfo']),
+
     getHomeWeightPlan() {
       return $http.get('api/diet-info/weight-plan/home').then((res) => {
         this.homeWeightPlanData = res.data;
@@ -184,6 +173,37 @@ export default {
         .catch(() => {
           this.aiChartList = [];
         });
+    },
+
+    getRecipesList() {
+      $http.get('api/diet-info/template-summary').then((res) => {
+        this.recipesList = res.data;
+      });
+    },
+
+    getRecipesDetail() {
+      $http.post('api/diet-info/recipes-summarys-info').then((res) => {
+        res.data.useDay = Math.ceil(
+          (new Date() - new Date(res.data.begin_date.replace(/-/g, '/'))) / (24 * 60 * 60 * 1000),
+        );
+        this.recipesDetail = res.data;
+      });
+    },
+
+    goRecipesDetailPage(id) {
+      verifyIsLogin();
+
+      if (!this.userDetailInfo) {
+        this.$toRouter('/pages/evaluation/evaluation');
+        return;
+      }
+
+      if (!this.homeWeightPlanData || this.homeWeightPlanData.state !== 1) {
+        this.$toRouter('/pages/addPlan/addPlan');
+        return;
+      }
+
+      this.$toRouter('/pages/recipesDetail/recipesDetail', `id=${id}`);
     },
 
     goVip() {
@@ -216,9 +236,11 @@ export default {
         return;
       }
 
-      // TODO 需要判断是否已经定制AI食谱
-      // this.$refs.markAIRecipesDialog.open();
-      this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+      if (this.recipesDetail.id) {
+        this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+      } else {
+        this.$refs.markAIRecipesDialog.open();
+      }
     },
   },
 };

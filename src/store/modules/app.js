@@ -15,8 +15,8 @@ const appStore = {
     },
 
     isVip(state) {
-      // return state.userInfo.vip_info && state.userInfo.vip_info.vip_type;
-      return true;
+      return state.userInfo.vip_info && state.userInfo.vip_info.vip_type;
+      // return true;
     },
   },
 

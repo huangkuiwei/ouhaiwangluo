@@ -24,6 +24,57 @@
           <text class="date" :class="{ active: selectDateKey === key }">{{ key.slice(5, 10) }}</text>
         </view>
       </view>
+
+      <view class="title">
+        <text>{{ recipesDetail.name_des }}</text>
+        <text>食谱仅供参考</text>
+        <text>{{ currentsStatisticsData.calorie }}千卡</text>
+      </view>
+
+      <view class="ingredients" v-if="recipesDetail.recipes_statistics_list">
+        <view class="ingredients-item">
+          <text>碳水化合物</text>
+          <text
+            >{{ currentsStatisticsData.carbs }}g/{{ (currentsStatisticsData.carbs_proportion * 100).toFixed(1) }}%</text
+          >
+        </view>
+
+        <view class="ingredients-item">
+          <text>蛋白质</text>
+          <text
+            >{{ currentsStatisticsData.protein }}g/{{
+              (currentsStatisticsData.protein_proportion * 100).toFixed(1)
+            }}%</text
+          >
+        </view>
+
+        <view class="ingredients-item">
+          <text>脂肪</text>
+          <text>{{ currentsStatisticsData.fat }}g/{{ (currentsStatisticsData.fat_proportion * 100).toFixed(1) }}%</text>
+        </view>
+      </view>
+
+      <view class="cookbook-list-wrap">
+        <view class="cookbook-list">
+          <view class="cookbook-item" v-for="(item, key) of dateList[selectDateKey]" :key="key">
+            <view class="cookbook-title1">
+              <text>{{ currentFoodData(item, key).typeName }}</text>
+              <text>约{{ currentFoodData(item).currentCalorie }}千卡</text>
+            </view>
+
+            <view class="food-list">
+              <view class="food-item" v-for="(item1, key1) of item" :key="key1">
+                <text>{{ item1.name }}</text>
+                <text>{{ item1.weight }}克</text>
+                <text>{{ item1.calorie }}千卡</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="tip" v-if="recipesDetail.des">{{ recipesDetail.des }}</view>
+        <view class="use-btn" @click="useRecipes">使用食谱</view>
+      </view>
     </view>
   </view>
 </template>
@@ -46,6 +97,51 @@ export default {
   onLoad(options) {
     this.id = options.id;
     this.getRecipesDetail();
+  },
+
+  computed: {
+    currentFoodData() {
+      return (foodList, type) => {
+        let allCalorie = 0;
+
+        Object.keys(this.dateList[this.selectDateKey]).forEach((key) => {
+          this.dateList[this.selectDateKey][key].forEach((item) => {
+            allCalorie += item.calorie;
+          });
+        });
+
+        let typeName = '';
+        let currentCalorie = 0;
+
+        if (type === '1') {
+          typeName = '早餐';
+        } else if (type === '2') {
+          typeName = '早加餐';
+        } else if (type === '3') {
+          typeName = '午餐';
+        } else if (type === '4') {
+          typeName = '午加餐';
+        } else if (type === '5') {
+          typeName = '晚餐';
+        } else if (type === '6') {
+          typeName = '晚加餐';
+        }
+
+        foodList.forEach((item) => {
+          currentCalorie += item.calorie;
+        });
+
+        return {
+          typeName,
+          currentCalorie,
+          ratio: Number(((currentCalorie / allCalorie) * 100).toFixed(2)),
+        };
+      };
+    },
+
+    currentsStatisticsData() {
+      return this.recipesDetail.recipes_statistics_list.find((item) => item.date === this.selectDateKey);
+    },
   },
 
   methods: {
@@ -102,6 +198,8 @@ export default {
           this.recipesDetail = res.data;
         });
     },
+
+    useRecipes() {},
   },
 };
 </script>
@@ -117,13 +215,15 @@ export default {
   }
 
   .cookbook-box {
-    padding: 0 36rpx;
+    padding: 0 24rpx;
 
     .time-nav {
+      padding: 0 12rpx;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 20rpx;
+      margin-bottom: 40rpx;
 
       .time-item {
         width: 80rpx;
@@ -151,6 +251,139 @@ export default {
             color: #333333;
           }
         }
+      }
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20rpx;
+
+      text {
+        font-weight: 600;
+        color: #323131;
+
+        &:nth-child(1) {
+          font-size: 24rpx;
+          margin-right: 20rpx;
+        }
+
+        &:nth-child(2) {
+          flex-grow: 1;
+          font-size: 20rpx;
+          color: #323131cc;
+        }
+
+        &:nth-child(3) {
+          font-size: 24rpx;
+        }
+      }
+    }
+
+    .ingredients {
+      background: #ffffff;
+      border-radius: 20rpx;
+      border: 4rpx solid #323131;
+      padding: 20rpx;
+      display: flex;
+      flex-direction: column;
+      gap: 20rpx;
+      margin-bottom: 20rpx;
+      position: relative;
+      z-index: 9;
+
+      .ingredients-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        text {
+          font-size: 24rpx;
+          color: #323131;
+        }
+      }
+    }
+
+    .cookbook-list-wrap {
+      background: #f3f3f3;
+      padding-bottom: 80rpx;
+      position: relative;
+      top: -30rpx;
+
+      .cookbook-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10rpx;
+        margin-bottom: 100rpx;
+
+        .cookbook-title1 {
+          padding: 26rpx 24rpx 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20rpx;
+
+          text {
+            &:nth-child(1) {
+              font-weight: 600;
+              font-size: 24rpx;
+              color: #323131;
+            }
+
+            &:nth-child(2) {
+              font-size: 20rpx;
+              color: #323131cc;
+            }
+          }
+        }
+
+        .food-list {
+          background: #dad2ff;
+          padding: 20rpx 12rpx;
+          display: flex;
+          flex-direction: column;
+          gap: 16rpx;
+
+          .food-item {
+            display: flex;
+            align-items: center;
+
+            text {
+              font-size: 24rpx;
+              color: #323131;
+
+              &:nth-child(1) {
+                width: 40%;
+              }
+
+              &:nth-child(2) {
+                flex-grow: 1;
+              }
+            }
+          }
+        }
+      }
+
+      .tip {
+        margin-bottom: 20rpx;
+        font-weight: 600;
+        font-size: 20rpx;
+        color: #323131dd;
+        padding: 24rpx;
+        line-height: 28rpx;
+      }
+
+      .use-btn {
+        width: 600rpx;
+        height: 80rpx;
+        margin: 0 auto;
+        background: #dad2ff;
+        border-radius: 60rpx;
+        font-size: 28rpx;
+        color: #323131;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }

@@ -11,10 +11,11 @@
         <view class="filed-item">
           <text class="point"></text>
           <text class="label">性别、年龄、身高、体重</text>
-          <picker @change="value1 = $event.detail.value" :value="value1" range-key="name" :range="picker1">
+          <picker @change="onWeightChange" :value="value1" :range="picker1">
             <view>
               <text>计划目标：</text>
-              <text class="value">{{ picker1[value1].name }}</text>
+              <text class="value">{{ picker1[value1] }}</text>
+              <text style="margin-left: 6rpx">KG</text>
             </view>
           </picker>
 
@@ -61,30 +62,26 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import $http from '@/utils/http';
+
 export default {
   name: 'markAIRecipesDialog',
 
   props: {},
 
   data() {
+    let picker1 = [];
+
+    for (let i = 0; i < 401; i++) {
+      picker1.push(Number((i * 0.5).toFixed(1)));
+    }
+
     return {
       demand: '',
       value1: 0,
       value2: 0,
-      picker1: [
-        {
-          id: 0,
-          name: '减脂',
-        },
-        {
-          id: 1,
-          name: '减重',
-        },
-        {
-          id: 2,
-          name: '提高健康',
-        },
-      ],
+      picker1,
       picker2: [
         {
           id: 0,
@@ -99,20 +96,85 @@ export default {
           name: '3',
         },
       ],
+      lastPlanData: {},
     };
+  },
+
+  computed: {
+    ...mapState('app', ['userDetailInfo']),
   },
 
   methods: {
     open() {
+      let index = this.picker1.findIndex((item) => Number(item) === Number(this.userDetailInfo.target_weight));
+
+      if (index !== -1) {
+        this.value1 = index;
+      }
+
       this.$refs.markAIRecipesPopup.open();
+      this.getLastPlanData();
     },
 
     close() {
       this.$refs.markAIRecipesPopup.close();
     },
 
-    // TODO 提交AI定制食谱
-    submit() {},
+    onWeightChange($event) {
+      this.value1 = Number($event.detail.value);
+    },
+
+    getLastPlanData() {
+      uni.showLoading({
+        title: '加载中...',
+        mask: true,
+      });
+
+      $http
+        .get(
+          'api/diet-info/weight-plan/last',
+          {},
+          {
+            hiddenErrorMessage: true,
+          },
+        )
+        .then((res) => {
+          this.lastPlanData = res.data;
+        });
+    },
+
+    submit() {
+      if (!this.demand.trim()) {
+        uni.showToast({
+          title: '请填写食谱需求',
+          icon: 'none',
+        });
+
+        return;
+      }
+
+      uni.showLoading({
+        title: '加载中...',
+        mask: true,
+      });
+
+      $http
+        .post('api/diet-info/generate-recipes-vip', {
+          target_weight: this.picker1[this.value1],
+          day: this.picker2[this.value2].name,
+          des: this.demand,
+          plan_id: this.lastPlanData.plan_id,
+        })
+        .then(() => {
+          uni.hideLoading();
+
+          uni.showModal({
+            title: '温馨提示',
+            content: 'AI食谱正在生成中，可能需要几分钟时间，请稍后刷新页面查看',
+            showCancel: false,
+          });
+        });
+    },
   },
 };
 </script>
@@ -186,7 +248,7 @@ export default {
           color: #313030;
           display: flex;
           align-items: center;
-          width: 210rpx;
+          width: 220rpx;
 
           .value {
             height: 40rpx;

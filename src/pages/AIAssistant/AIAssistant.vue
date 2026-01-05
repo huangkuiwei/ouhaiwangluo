@@ -86,7 +86,7 @@
           <text>为你量身定制个性化的食品计划</text>
         </view>
 
-        <view class="time" v-if="recipesDetail.id">
+        <view class="time" v-if="recipesDetail.id && !recipesDetail.template_id">
           <text>Day</text>
           <text>{{ recipesDetail.useDay }}</text>
           <text>/{{ recipesDetail.day }}</text>
@@ -237,7 +237,19 @@ export default {
       }
 
       if (this.recipesDetail.id) {
-        this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+        if (this.recipesDetail.template_id) {
+          uni.showModal({
+            title: '温馨提示',
+            content: '您当前已经生成免费食谱，如需定制AI食谱，需要终止之前的食谱，是否前往食谱详情页？',
+            success: (res) => {
+              if (res.confirm) {
+                this.$toRouter('/pages/recipesDetail/recipesDetail', `id=${this.recipesDetail.template_id}`);
+              }
+            },
+          });
+        } else {
+          this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+        }
       } else {
         this.$refs.markAIRecipesDialog.open();
       }

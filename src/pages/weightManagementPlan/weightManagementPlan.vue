@@ -721,7 +721,6 @@ export default {
         mask: true,
       });
 
-      // TODO 接口报错
       $http
         .post('api/diet-info/recipes-bind-weight', {
           id: this.recipesDetail.id,

@@ -65,7 +65,7 @@
             <view class="food-list">
               <view class="food-item" v-for="(item1, key1) of item" :key="key1">
                 <text>{{ item1.name }}</text>
-                <text>{{ item1.weight }}克</text>
+                <text>{{ item1.number }}{{ item1.number_unit }}({{ item1.weight }}克)</text>
                 <text>{{ item1.calorie }}千卡</text>
               </view>
             </view>
@@ -216,6 +216,7 @@ export default {
     },
 
     useRecipes() {
+      // 终止当前食谱
       if (this.currentRecipesDetail.template_id === this.recipesDetail.id) {
         uni.showModal({
           title: '确认终止食谱计划吗？',
@@ -238,10 +239,12 @@ export default {
             }
           },
         });
-      } else if (this.currentRecipesDetail.template_id) {
+      }
+      // 已生成免费食谱
+      else if (this.currentRecipesDetail.template_id) {
         uni.showModal({
           title: '温馨提示',
-          content: '您当前已经存在正在使用的食谱，是否跳转到食谱详情页面',
+          content: '您当前已经存在正在使用的食谱，是否前往食谱详情页？',
           success: (res) => {
             if (res.confirm) {
               uni.redirectTo({
@@ -250,7 +253,21 @@ export default {
             }
           },
         });
-      } else {
+      }
+      // 已生成AI食谱
+      else if (this.currentRecipesDetail.id && !this.currentRecipesDetail.template_id) {
+        uni.showModal({
+          title: '温馨提示',
+          content: '您当前已经存在正在使用的食谱，是否前往食谱详情页？',
+          success: (res) => {
+            if (res.confirm) {
+              this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+            }
+          },
+        });
+      }
+      // 未生成食谱
+      else {
         uni.showModal({
           title: '温馨提示',
           content: '确认使用该食谱吗？',
@@ -261,27 +278,19 @@ export default {
                 mask: true,
               });
 
-              $http
-                .get(
-                  'api/diet-info/weight-plan/last',
-                  {},
-                  {
-                    hiddenErrorMessage: true,
-                  },
-                )
-                .then((res) => {
-                  let plan_id = res.data.plan_id;
+              $http.get('api/diet-info/weight-plan/last').then((res) => {
+                let plan_id = res.data.plan_id;
 
-                  $http
-                    .post('api/diet-info/generate-recipes-normal', {
-                      id: this.recipesDetail.id,
-                      plan_id: plan_id,
-                    })
-                    .then(() => {
-                      uni.hideLoading();
-                      this.getCurrentRecipesDetail();
-                    });
-                });
+                $http
+                  .post('api/diet-info/generate-recipes-normal', {
+                    id: this.recipesDetail.id,
+                    plan_id: plan_id,
+                  })
+                  .then(() => {
+                    uni.hideLoading();
+                    this.getCurrentRecipesDetail();
+                  });
+              });
             }
           },
         });

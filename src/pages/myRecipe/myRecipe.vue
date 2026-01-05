@@ -14,19 +14,18 @@
       <view class="title">进行中</view>
 
       <view class="recipe-list" v-if="successRecipeList.length">
-        <!-- TODO 点击查看食谱详情 -->
         <view class="recipe-item" v-for="item of successRecipeList" :key="item.id">
           <view class="time-box">
-            <text class="time">{{ item.startTime }}</text>
+            <text class="time">{{ item.begin_date.slice(0, 10) }}</text>
             <text class="line"></text>
             <text class="days">第{{ days(item) }}天</text>
             <text class="line"></text>
-            <text class="time">{{ item.endTime }}</text>
+            <text class="time">{{ item.end_date.slice(0, 10) }}</text>
           </view>
 
           <view class="icon">
-            <image mode="widthFix" :src="item.img" />
-            <view class="content">减脂入门7日食谱-1000Kcal轻量档</view>
+            <image mode="widthFix" :src="item.image" />
+            <view class="content">{{ item.name }}</view>
           </view>
         </view>
       </view>
@@ -38,22 +37,20 @@
       <view class="title">已结束</view>
 
       <view class="recipe-list" v-if="unSuccessRecipeList.length">
-        <!-- TODO 点击查看食谱详情 -->
         <view class="recipe-item" v-for="item of unSuccessRecipeList" :key="item.id">
           <view class="time-box">
-            <text class="time">{{ item.startTime }}</text>
+            <text class="time">{{ item.begin_date.slice(0, 10) }}</text>
             <text class="line"></text>
-            <!-- TODO 食谱状态：达成、未达成 -->
-            <text class="days" :class="{ noSuccess: !item.success }">{{
-              item.success ? '计划达成' : '计划未达成'
+            <text class="days" :class="{ noSuccess: item.summary_state === 3 }">{{
+              item.summary_state === 3 ? '计划未达成' : '计划达成'
             }}</text>
             <text class="line"></text>
-            <text class="time">{{ item.endTime }}</text>
+            <text class="time">{{ item.end_date.slice(0, 10) }}</text>
           </view>
 
           <view class="icon">
-            <image mode="widthFix" :src="item.img" />
-            <view class="content">减脂入门7日食谱-1000Kcal轻量档</view>
+            <image mode="widthFix" :src="item.image" />
+            <view class="content">{{ item.name }}</view>
           </view>
         </view>
       </view>
@@ -64,38 +61,60 @@
 </template>
 
 <script>
+import $http from '@/utils/http';
+
 export default {
   name: 'myRecipe',
 
   data() {
     return {
-      recipeList: [
-        {
-          id: 0,
-          startTime: '2025-12-29',
-          endTime: '2026-01-09',
-          img: 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/AIAssistant/recipes-pic.png',
-          status: 1,
-          success: false,
-        },
-      ],
+      recipeList: [],
     };
+  },
+
+  onLoad() {
+    this.getRecipesList();
   },
 
   computed: {
     successRecipeList() {
-      return this.recipeList.filter((x) => x.status === 1);
+      return this.recipeList.filter((x) => x.summary_state === 1);
     },
 
     unSuccessRecipeList() {
-      return this.recipeList.filter((x) => x.status !== 1);
+      return this.recipeList.filter((x) => x.summary_state !== 1);
     },
 
     days() {
       return (item) => {
-        let days = (new Date() - new Date(item.startTime.replace(/-/g, '/'))) / (24 * 60 * 60 * 1000);
+        let days = (new Date() - new Date(item.begin_date.replace(/-/g, '/'))) / (24 * 60 * 60 * 1000);
         return Math.ceil(days);
       };
+    },
+  },
+
+  methods: {
+    getRecipesList() {
+      uni.showLoading({
+        title: '加载中...',
+        mask: true,
+      });
+
+      $http
+        .post('api/diet-info/recipes-summarys', {
+          pageIndex: 1,
+          pageSize: 999,
+        })
+        .then((res) => {
+          uni.hideLoading();
+
+          res.data.Items.forEach((item) => {
+            item.image =
+              item.image || 'https://hnenjoy.oss-cn-shanghai.aliyuncs.com/shiji/file/shiji/202512/8e599f8638af45a.png';
+          });
+
+          this.recipeList = res.data.Items;
+        });
     },
   },
 };

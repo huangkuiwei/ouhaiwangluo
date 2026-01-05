@@ -360,6 +360,8 @@ export default {
           typeName = '午加餐';
         } else if (type === '5') {
           typeName = '晚餐';
+        } else if (type === '6') {
+          typeName = '晚加餐';
         }
 
         foodList.forEach((item) => {

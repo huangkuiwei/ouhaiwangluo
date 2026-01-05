@@ -1,7 +1,7 @@
 <template>
   <uni-popup ref="markAIRecipesPopup" type="bottom" :safe-area="false">
     <view class="mark-AI-recipes-dialog">
-      <view class="title">AI定制食谱</view>
+      <view class="title">{{ reGen ? '重新生成食谱' : 'AI定制食谱' }}</view>
 
       <view class="tip"
         >AI会根据您的个人信息和历史饮食记录，为您定制专属的个性化食谱。为了让AI更好的进行分析，建议您完善以下信息后开始创建。</view
@@ -68,7 +68,12 @@ import $http from '@/utils/http';
 export default {
   name: 'markAIRecipesDialog',
 
-  props: {},
+  props: {
+    reGen: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
   data() {
     let picker1 = [];
@@ -139,6 +144,7 @@ export default {
           },
         )
         .then((res) => {
+          uni.hideLoading();
           this.lastPlanData = res.data;
         });
     },
@@ -159,7 +165,7 @@ export default {
       });
 
       $http
-        .post('api/diet-info/generate-recipes-vip', {
+        .post(this.reGen ? 'api/diet-info/regenerate-recipes-vip' : 'api/diet-info/generate-recipes-vip', {
           target_weight: this.picker1[this.value1],
           day: this.picker2[this.value2].name,
           des: this.demand,
@@ -167,11 +173,17 @@ export default {
         })
         .then(() => {
           uni.hideLoading();
+          this.close();
 
           uni.showModal({
             title: '温馨提示',
-            content: 'AI食谱正在生成中，可能需要几分钟时间，请稍后刷新页面查看',
+            content: 'AI食谱正在生成中，需要几分钟时间，请稍后刷新页面查看',
             showCancel: false,
+            success: (res) => {
+              if (res.confirm) {
+                this.$emit('success');
+              }
+            },
           });
         });
     },

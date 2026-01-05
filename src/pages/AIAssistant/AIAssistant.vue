@@ -86,10 +86,10 @@
           <text>为你量身定制个性化的食品计划</text>
         </view>
 
-        <view class="time" v-if="recipesDetail.id && !recipesDetail.template_id">
+        <view class="time" v-if="currentRecipesDetail.id && !currentRecipesDetail.template_id">
           <text>Day</text>
-          <text>{{ recipesDetail.useDay }}</text>
-          <text>/{{ recipesDetail.day }}</text>
+          <text>{{ currentRecipesDetail.useDay }}</text>
+          <text>/{{ currentRecipesDetail.day }}</text>
         </view>
       </view>
 
@@ -131,7 +131,7 @@ export default {
     return {
       aiChartList: [],
       recipesList: [],
-      recipesDetail: {},
+      currentRecipesDetail: {},
       homeWeightPlanData: null,
     };
   },
@@ -182,11 +182,11 @@ export default {
     },
 
     getCurrentRecipesDetail() {
-      $http.post('api/diet-info/recipes-summarys-info').then((res) => {
+      return $http.post('api/diet-info/recipes-summarys-info').then((res) => {
         res.data.useDay = Math.ceil(
           (new Date() - new Date(res.data.begin_date.replace(/-/g, '/'))) / (24 * 60 * 60 * 1000),
         );
-        this.recipesDetail = res.data;
+        this.currentRecipesDetail = res.data;
       });
     },
 
@@ -236,19 +236,38 @@ export default {
         return;
       }
 
-      if (this.recipesDetail.id) {
-        if (this.recipesDetail.template_id) {
+      if (this.currentRecipesDetail.id) {
+        if (this.currentRecipesDetail.template_id) {
           uni.showModal({
             title: '温馨提示',
             content: '您当前已经生成免费食谱，如需定制AI食谱，需要终止之前的食谱，是否前往食谱详情页？',
             success: (res) => {
               if (res.confirm) {
-                this.$toRouter('/pages/recipesDetail/recipesDetail', `id=${this.recipesDetail.template_id}`);
+                this.$toRouter('/pages/recipesDetail/recipesDetail', `id=${this.currentRecipesDetail.template_id}`);
               }
             },
           });
         } else {
-          this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+          uni.showLoading({
+            title: '加载中...',
+            mask: true,
+          });
+
+          this.getCurrentRecipesDetail().then(() => {
+            uni.hideLoading();
+
+            if (!this.currentRecipesDetail.recipes_list || !this.currentRecipesDetail.recipes_list.length) {
+              uni.showModal({
+                title: '温馨提示',
+                content: 'AI食谱正在生成中，需要几分钟时间，请稍后刷新页面查看',
+                showCancel: false,
+              });
+
+              return;
+            }
+
+            this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+          });
         }
       } else {
         this.$refs.markAIRecipesDialog.open();

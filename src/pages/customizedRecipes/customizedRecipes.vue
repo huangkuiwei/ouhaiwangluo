@@ -14,14 +14,15 @@
       <view class="time-nav">
         <view
           class="time-item"
-          :class="{ active: selectDateKey === key }"
-          v-for="(item, key) of dateList"
-          :key="key"
-          @click="selectDateKey = key"
+          :class="{ active: selectDateKey === item.key }"
+          v-for="(item, index) in dateListArray"
+          :key="item.key"
+          @click="selectDateKey = item.key"
         >
-          <!-- TODO 序号 -->
-          <text>{{ 1 }}</text>
-          <text class="date" :class="{ active: selectDateKey === key }">{{ key.slice(5, 10) }}</text>
+          <text>{{ index + 1 }}</text>
+          <text class="date" :class="{ active: selectDateKey === item.key }">
+            {{ item.key.slice(5, 10) }}
+          </text>
         </view>
       </view>
 
@@ -62,7 +63,10 @@
               <text>约{{ currentFoodData(item).currentCalorie }}千卡</text>
             </view>
 
-            <view class="food-list">
+            <view
+              class="food-list"
+              :style="{ background: key === '1' || key === '3' || key === '5' ? '#e8f48090' : '#FCFFEA90' }"
+            >
               <view class="food-item" v-for="(item1, key1) of item" :key="key1">
                 <text>{{ item1.name }}</text>
                 <text>{{ item1.number }}{{ item1.number_unit }}({{ item1.weight }}克)</text>
@@ -80,14 +84,21 @@
         </view>
       </view>
     </view>
+
+    <markAIRecipesDialog ref="markAIRecipesDialog" :reGen="true" @success="reGenSuccess" />
   </view>
 </template>
 
 <script>
 import $http from '@/utils/http';
+import MarkAIRecipesDialog from '@/pages/AIAssistant/markAIRecipesDialog.vue';
 
 export default {
   name: 'customizedRecipes',
+
+  components: {
+    MarkAIRecipesDialog,
+  },
 
   data() {
     return {
@@ -103,6 +114,13 @@ export default {
   },
 
   computed: {
+    dateListArray() {
+      return Object.keys(this.dateList).map((key) => ({
+        key,
+        value: this.dateList[key],
+      }));
+    },
+
     currentFoodData() {
       return (foodList, type) => {
         let allCalorie = 0;
@@ -227,38 +245,11 @@ export default {
     },
 
     reGen() {
-      uni.showModal({
-        title: '温馨提示',
-        content: '确认重新生成食谱？',
-        success: (res) => {
-          if (res.confirm) {
-            uni.showLoading({
-              title: '加载中...',
-              mask: true,
-            });
+      this.$refs.markAIRecipesDialog.open();
+    },
 
-            $http
-              .get('api/diet-info/regenerate-recipes-vip', {
-                target_weight: this.currentRecipesDetail.target_weight,
-                day: this.currentRecipesDetail.day,
-                des: this.currentRecipesDetail.day,
-                plan_id: this.currentRecipesDetail.plan_id,
-              })
-              .then(() => {
-                uni.showModal({
-                  title: '温馨提示',
-                  content: 'AI食谱正在重新生成中，可能需要几分钟时间，请稍后刷新页面查看',
-                  showCancel: false,
-                  success: (res) => {
-                    if (res.confirm) {
-                      this.$toBack();
-                    }
-                  },
-                });
-              });
-          }
-        },
-      });
+    reGenSuccess() {
+      this.$toBack();
     },
   },
 };
@@ -282,7 +273,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 20rpx;
+      gap: 18rpx;
       margin-bottom: 40rpx;
 
       .time-item {
@@ -398,7 +389,6 @@ export default {
         }
 
         .food-list {
-          background: #e8f480;
           padding: 20rpx 12rpx;
           display: flex;
           flex-direction: column;

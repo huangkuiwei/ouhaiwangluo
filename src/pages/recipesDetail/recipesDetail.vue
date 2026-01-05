@@ -14,14 +14,15 @@
       <view class="time-nav">
         <view
           class="time-item"
-          :class="{ active: selectDateKey === key }"
-          v-for="(item, key) of dateList"
-          :key="key"
-          @click="selectDateKey = key"
+          :class="{ active: selectDateKey === item.key }"
+          v-for="(item, index) in dateListArray"
+          :key="item.key"
+          @click="selectDateKey = item.key"
         >
-          <!-- TODO 序号 -->
-          <text>{{ 1 }}</text>
-          <text class="date" :class="{ active: selectDateKey === key }">{{ key.slice(5, 10) }}</text>
+          <text>{{ index + 1 }}</text>
+          <text class="date" :class="{ active: selectDateKey === item.key }">
+            {{ item.key.slice(5, 10) }}
+          </text>
         </view>
       </view>
 
@@ -62,7 +63,10 @@
               <text>约{{ currentFoodData(item).currentCalorie }}千卡</text>
             </view>
 
-            <view class="food-list">
+            <view
+              class="food-list"
+              :style="{ background: key === '1' || key === '3' || key === '5' ? '#dad2ff90' : '#FCFFEA90' }"
+            >
               <view class="food-item" v-for="(item1, key1) of item" :key="key1">
                 <text>{{ item1.name }}</text>
                 <text>{{ item1.number }}{{ item1.number_unit }}({{ item1.weight }}克)</text>
@@ -109,6 +113,13 @@ export default {
   },
 
   computed: {
+    dateListArray() {
+      return Object.keys(this.dateList).map((key) => ({
+        key,
+        value: this.dateList[key],
+      }));
+    },
+
     currentFoodData() {
       return (foodList, type) => {
         let allCalorie = 0;
@@ -318,7 +329,7 @@ export default {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 20rpx;
+      gap: 18rpx;
       margin-bottom: 40rpx;
 
       .time-item {
@@ -434,7 +445,6 @@ export default {
         }
 
         .food-list {
-          background: #dad2ff;
           padding: 20rpx 12rpx;
           display: flex;
           flex-direction: column;

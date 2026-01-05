@@ -32,12 +32,18 @@ export const toRouter = (url, params) => {
 
   uni.navigateTo({
     url,
+    fail: () => {
+      toSwitch('/pages/index/index');
+    },
   });
 };
 
 export const toSwitch = (url) => {
   uni.switchTab({
     url,
+    fail: () => {
+      toSwitch('/pages/index/index');
+    },
   });
 };
 
@@ -46,11 +52,16 @@ export const toReLaunch = (url, params) => {
 
   uni.reLaunch({
     url,
+    fail: () => {
+      toSwitch('/pages/index/index');
+    },
   });
 };
 
 export const toBack = (delta = 1) => {
-  uni.navigateBack(delta);
+  uni.navigateBack(delta).catch(() => {
+    toSwitch('/pages/index/index');
+  });
 };
 
 export const toRedirect = (url, params) => {

@@ -112,10 +112,10 @@
       </view>
 
       <template v-if="isVip">
-        <view class="plan-item motion-plan">
+        <view class="plan-item motion-plan" v-if="exercisesPlanData.length">
           <view class="plan-detail">
             <view class="time-nav">
-              <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey1 = key">
+              <view class="time-item" v-for="(item, key) of dateList1" :key="key" @click="selectDateKey1 = key">
                 <text class="date" :class="{ active: selectDateKey1 === key }">{{
                   isToday(key) ? '今日训练' : key.slice(5, 10)
                 }}</text>
@@ -143,10 +143,21 @@
             </view>
           </view>
         </view>
+      </template>
 
-        <view class="cookbook-box">
-          <view class="cookbook-title">每日食谱</view>
+      <template v-else>
+        <image
+          @click="$toRouter('/pages/vip/vip')"
+          mode="widthFix"
+          style="width: 100%; margin-bottom: 12rpx"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock01.png"
+        />
+      </template>
 
+      <view class="cookbook-box">
+        <view class="cookbook-title">每日食谱</view>
+
+        <template v-if="Object.keys(dateList).length">
           <view class="time-nav">
             <view class="time-item" v-for="(item, key) of dateList" :key="key" @click="selectDateKey = key">
               <text class="date" :class="{ active: selectDateKey === key }">{{ key.slice(5, 10) }}</text>
@@ -168,24 +179,15 @@
               </view>
             </view>
           </view>
-        </view>
-      </template>
+        </template>
 
-      <template v-else>
-        <image
-          @click="$toRouter('/pages/vip/vip')"
-          mode="widthFix"
-          style="width: 100%; margin-bottom: 12rpx"
-          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock01.png"
-        />
-
-        <image
-          @click="$toRouter('/pages/vip/vip')"
-          mode="widthFix"
-          style="width: 100%"
-          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/weightManagementPlan/lock02.png"
-        />
-      </template>
+        <template v-else>
+          <view class="empty-food">
+            <text>当前未生成食谱，是否前往生成？</text>
+            <text @click="$toSwitch('/pages/AIAssistant/AIAssistant')">点击前往</text>
+          </view>
+        </template>
+      </view>
     </view>
 
     <uni-popup ref="updateTargetWeightDialog">
@@ -222,6 +224,17 @@
       </view>
     </uni-popup>
 
+    <uni-popup ref="recipesTipDialog">
+      <view class="recipes-tip-dialog">
+        <view class="title">专属计划发生改变</view>
+        <view class="sub-title">是否跟随专属方案<text>更改</text>食谱计划？</view>
+        <view class="options">
+          <text @click="keep">保留食谱原计划</text>
+          <text @click="change">确定更改</text>
+        </view>
+      </view>
+    </uni-popup>
+
     <add-motion-recode-dialog ref="addMotionRecodeDialog" @addRecode="addMotionRecode" />
   </view>
 </template>
@@ -253,6 +266,7 @@ export default {
       lastPlanData: {},
       weighData: {},
       dateList: [],
+      dateList1: {},
       selectDateKey: null,
       selectDateKey1: null,
       option: {
@@ -298,12 +312,25 @@ export default {
       },
       exercisesPlanData: [],
       changedTargetWeight: [0],
+      recipesDetail: {},
     };
   },
 
   onShow() {
     this.getLastPlanData();
     this._getUserInfo();
+  },
+
+  onLoad() {
+    for (let i = 0; i < 7; i++) {
+      let key = new Date(Date.now() + 24 * 60 * 60 * 1000 * i).format().replace(/\//g, '-');
+
+      this.dateList1[key] = [];
+
+      if (i === 0) {
+        this.selectDateKey1 = key;
+      }
+    }
   },
 
   computed: {
@@ -395,6 +422,51 @@ export default {
       chart.setOption(this.option);
     },
 
+    getCurrentRecipesDetail() {
+      $http.post('api/diet-info/recipes-summarys-info').then((res) => {
+        res.data.recipes_list = res.data.recipes_list || [];
+        let dateList = {};
+
+        res.data.recipes_list.forEach((item) => {
+          let date = item.date;
+
+          if (dateList[date]) {
+            dateList[date].push(item);
+          } else {
+            dateList[date] = [item];
+          }
+        });
+
+        Object.keys(dateList).forEach((dateListKey, index) => {
+          let foodList = {};
+          let item = dateList[dateListKey];
+
+          item.forEach((item) => {
+            let type = item.type;
+
+            if (foodList[type]) {
+              foodList[type].push(item);
+            } else {
+              foodList[type] = [item];
+            }
+          });
+
+          if (index === 0) {
+            this.selectDateKey = dateListKey;
+          }
+
+          dateList[dateListKey] = foodList;
+        });
+
+        this.dateList = dateList;
+        this.recipesDetail = res.data;
+
+        if (this.recipesDetail.id && this.recipesDetail.plan_id !== this.lastPlanData.plan_id) {
+          this.$refs.recipesTipDialog.open();
+        }
+      });
+    },
+
     /**
      * 获取最新一次计划数据
      */
@@ -413,46 +485,10 @@ export default {
           },
         )
         .then((res) => {
-          res.data.recipes_list = res.data.recipes_list || [];
-
           this.getRecodeWeightData(res.data.plan_id);
-
-          let dateList = {};
-
-          res.data.recipes_list.forEach((item) => {
-            let date = item.date;
-
-            if (dateList[date]) {
-              dateList[date].push(item);
-            } else {
-              dateList[date] = [item];
-            }
-          });
-
-          Object.keys(dateList).forEach((dateListKey, index) => {
-            let foodList = {};
-            let item = dateList[dateListKey];
-
-            item.forEach((item) => {
-              let type = item.type;
-
-              if (foodList[type]) {
-                foodList[type].push(item);
-              } else {
-                foodList[type] = [item];
-              }
-            });
-
-            if (index === 0) {
-              this.selectDateKey = dateListKey;
-              this.selectDateKey1 = dateListKey;
-            }
-
-            dateList[dateListKey] = foodList;
-          });
-
           this.lastPlanData = res.data;
-          this.dateList = dateList;
+
+          this.getCurrentRecipesDetail();
         })
         .catch((error) => {
           if (error.Msg === '当前没有进行中的计划,请制定新的计划') {
@@ -677,6 +713,37 @@ export default {
               });
             });
         });
+    },
+
+    keep() {
+      uni.showLoading({
+        title: '加载中...',
+        mask: true,
+      });
+
+      // TODO 接口报错
+      $http
+        .post('api/diet-info/recipes-bind-weight', {
+          id: this.recipesDetail.id,
+          weight_plan_id: this.lastPlanData.plan_id,
+        })
+        .then(() => {
+          this.$refs.recipesTipDialog.close();
+          uni.hideLoading();
+
+          this.getLastPlanData();
+          this._getUserInfo();
+        });
+    },
+
+    change() {
+      this.$refs.recipesTipDialog.close();
+
+      if (this.recipesDetail.template_id) {
+        this.$toRouter('/pages/recipesDetail/recipesDetail', `id=${this.recipesDetail.template_id}`);
+      } else {
+        this.$toRouter('/pages/customizedRecipes/customizedRecipes');
+      }
     },
   },
 };
@@ -933,10 +1000,11 @@ page {
       .time-nav {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        overflow: auto;
         margin-bottom: 18rpx;
 
         .time-item {
+          flex-shrink: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -993,6 +1061,23 @@ page {
                 color: #323131;
               }
             }
+          }
+        }
+      }
+
+      .empty-food {
+        padding: 60rpx 0;
+        font-size: 24rpx;
+        color: #323131cc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20rpx;
+
+        text {
+          &:nth-child(2) {
+            color: #323131;
           }
         }
       }
@@ -1062,6 +1147,57 @@ page {
     justify-content: center;
     font-size: 28rpx;
     color: #323131;
+  }
+}
+
+.recipes-tip-dialog {
+  width: 702rpx;
+  background: #ffffff;
+  border-radius: 40rpx;
+  padding: 60rpx 52rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .title {
+    font-size: 32rpx;
+    color: #000000;
+    margin-bottom: 110rpx;
+  }
+
+  .sub-title {
+    font-weight: 500;
+    font-size: 28rpx;
+    color: #000000;
+    margin-bottom: 114rpx;
+
+    text {
+      color: #604fa6;
+    }
+  }
+
+  .options {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    text {
+      width: 280rpx;
+      height: 80rpx;
+      background: #e8f480;
+      border-radius: 60rpx;
+      font-size: 28rpx;
+      color: #323131;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:nth-child(2) {
+        background: #fcffea;
+      }
+    }
   }
 }
 </style>

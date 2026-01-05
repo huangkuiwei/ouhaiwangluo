@@ -233,7 +233,7 @@
           <view v-else class="empty-recode">今日未运动记录</view>
         </view>
 
-        <view class="add" v-if="isLogin">
+        <view class="add1" v-if="isLogin">
           <view class="total">总消耗{{ motionTotalCalorie }}千卡</view>
           <view class="add-icon" @click="showAddMotionRecodeDialog">
             <text>+</text>
@@ -1324,7 +1324,7 @@ export default {
         }
       }
 
-      .add {
+      .add1 {
         display: flex;
         align-items: center;
         justify-content: center;

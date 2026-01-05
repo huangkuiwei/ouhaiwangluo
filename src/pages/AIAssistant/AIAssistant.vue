@@ -149,7 +149,7 @@ export default {
   onShow() {
     this._getUserDetailInfo();
     this.getHomeWeightPlan();
-    this.getRecipesDetail();
+    this.getCurrentRecipesDetail();
   },
 
   methods: {
@@ -181,7 +181,7 @@ export default {
       });
     },
 
-    getRecipesDetail() {
+    getCurrentRecipesDetail() {
       $http.post('api/diet-info/recipes-summarys-info').then((res) => {
         res.data.useDay = Math.ceil(
           (new Date() - new Date(res.data.begin_date.replace(/-/g, '/'))) / (24 * 60 * 60 * 1000),

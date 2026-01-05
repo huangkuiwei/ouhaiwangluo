@@ -73,7 +73,14 @@
         </view>
 
         <view class="tip" v-if="recipesDetail.des">{{ recipesDetail.des }}</view>
-        <view class="use-btn" @click="useRecipes">使用食谱</view>
+
+        <view
+          class="options-btn"
+          :class="{ closeRecipes: currentRecipesDetail.template_id === recipesDetail.id }"
+          @click="useRecipes"
+        >
+          {{ currentRecipesDetail.template_id === recipesDetail.id ? '终止计划' : '使用食谱' }}
+        </view>
       </view>
     </view>
   </view>
@@ -89,6 +96,7 @@ export default {
     return {
       id: undefined,
       recipesDetail: {},
+      currentRecipesDetail: {},
       dateList: [],
       selectDateKey: undefined,
     };
@@ -97,6 +105,7 @@ export default {
   onLoad(options) {
     this.id = options.id;
     this.getRecipesDetail();
+    this.getCurrentRecipesDetail();
   },
 
   computed: {
@@ -140,11 +149,20 @@ export default {
     },
 
     currentsStatisticsData() {
-      return this.recipesDetail.recipes_statistics_list.find((item) => item.date === this.selectDateKey);
+      return (
+        this.recipesDetail.recipes_statistics_list &&
+        this.recipesDetail.recipes_statistics_list.find((item) => item.date === this.selectDateKey)
+      );
     },
   },
 
   methods: {
+    getCurrentRecipesDetail() {
+      $http.post('api/diet-info/recipes-summarys-info').then((res) => {
+        this.currentRecipesDetail = res.data;
+      });
+    },
+
     getRecipesDetail() {
       uni.showLoading({
         title: '加载中...',
@@ -192,14 +210,83 @@ export default {
             dateList[dateListKey] = foodList;
           });
 
-          console.log(JSON.parse(JSON.stringify(dateList)));
-
           this.dateList = dateList;
           this.recipesDetail = res.data;
         });
     },
 
-    useRecipes() {},
+    useRecipes() {
+      if (this.currentRecipesDetail.template_id === this.recipesDetail.id) {
+        uni.showModal({
+          title: '确认终止食谱计划吗？',
+          content: '终止后再次使用食谱需重新开始。',
+          success: (res) => {
+            if (res.confirm) {
+              uni.showLoading({
+                title: '加载中...',
+                mask: true,
+              });
+
+              $http
+                .post('api/diet-info/recipes-stop', {
+                  id: this.currentRecipesDetail.id,
+                })
+                .then(() => {
+                  uni.hideLoading();
+                  this.getCurrentRecipesDetail();
+                });
+            }
+          },
+        });
+      } else if (this.currentRecipesDetail.template_id) {
+        uni.showModal({
+          title: '温馨提示',
+          content: '您当前已经存在正在使用的食谱，是否跳转到食谱详情页面',
+          success: (res) => {
+            if (res.confirm) {
+              uni.redirectTo({
+                url: `/pages/recipesDetail/recipesDetail?id=${this.currentRecipesDetail.template_id}`,
+              });
+            }
+          },
+        });
+      } else {
+        uni.showModal({
+          title: '温馨提示',
+          content: '确认使用该食谱吗？',
+          success: (res) => {
+            if (res.confirm) {
+              uni.showLoading({
+                title: '加载中...',
+                mask: true,
+              });
+
+              $http
+                .get(
+                  'api/diet-info/weight-plan/last',
+                  {},
+                  {
+                    hiddenErrorMessage: true,
+                  },
+                )
+                .then((res) => {
+                  let plan_id = res.data.plan_id;
+
+                  $http
+                    .post('api/diet-info/generate-recipes-normal', {
+                      id: this.recipesDetail.id,
+                      plan_id: plan_id,
+                    })
+                    .then(() => {
+                      uni.hideLoading();
+                      this.getCurrentRecipesDetail();
+                    });
+                });
+            }
+          },
+        });
+      }
+    },
   },
 };
 </script>
@@ -373,7 +460,7 @@ export default {
         line-height: 28rpx;
       }
 
-      .use-btn {
+      .options-btn {
         width: 600rpx;
         height: 80rpx;
         margin: 0 auto;
@@ -384,6 +471,10 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+
+        &.closeRecipes {
+          background: #fcffea;
+        }
       }
     }
   }

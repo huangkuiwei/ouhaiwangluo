@@ -36,6 +36,7 @@
 
 <script>
 import $http from '@/utils/http';
+import { mapActions, mapState } from 'vuex';
 
 export default {
   name: 'updateWeightDataDialog',
@@ -55,27 +56,29 @@ export default {
     };
   },
 
+  computed: {
+    ...mapState('app', ['userDetailInfo']),
+  },
+
   methods: {
+    ...mapActions('app', ['_getUserDetailInfo']),
+
     open() {
-      this.getHomeWeightPlan();
-      this.$refs.updateWeightDataDialog.open();
-    },
-
-    close() {
-      this.$refs.updateWeightDataDialog.close();
-    },
-
-    /**
-     * 获取首页体重相关数据
-     */
-    getHomeWeightPlan() {
-      return $http.get('api/diet-info/weight-plan/home').then((res) => {
-        let index = this.rulerLineList1.findIndex((item) => Number(item) === Number(res.data.current_weight));
+      this._getUserDetailInfo().then(() => {
+        let index = this.rulerLineList1.findIndex(
+          (item) => Number(item) === Number(this.userDetailInfo.current_weight),
+        );
 
         if (index !== -1) {
           this.currentWeight = [index];
         }
       });
+
+      this.$refs.updateWeightDataDialog.open();
+    },
+
+    close() {
+      this.$refs.updateWeightDataDialog.close();
     },
 
     recodeWeight() {

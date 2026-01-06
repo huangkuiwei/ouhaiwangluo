@@ -94,6 +94,7 @@ export default {
   border-radius: 60rpx 60rpx 0 0;
 
   .custom-tab-bar-wrap {
+    padding: 0 20rpx;
     display: flex;
     align-items: center;
     justify-content: space-between;

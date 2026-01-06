@@ -231,7 +231,7 @@ page {
 
 <style scoped lang="scss">
 .profile-page {
-  background: linear-gradient(180deg, #e8f480cc 0%, #ffffff 100%);
+  background: linear-gradient(181deg, #e8f480 0%, #ffffff 41.56%);
   padding: 0 26rpx 200rpx;
   height: 100%;
   overflow: auto;

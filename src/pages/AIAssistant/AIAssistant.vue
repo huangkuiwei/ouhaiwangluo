@@ -1,6 +1,6 @@
 <template>
   <view class="AI-assistant">
-    <view class="page-title">体重管理</view>
+    <view class="page-title" v-if="scrollTop < 20">体重管理</view>
 
     <view class="banner"></view>
 
@@ -133,6 +133,7 @@ export default {
       recipesList: [],
       currentRecipesDetail: {},
       homeWeightPlanData: null,
+      scrollTop: 0,
     };
   },
 
@@ -150,6 +151,10 @@ export default {
     this._getUserDetailInfo();
     this.getHomeWeightPlan();
     this.getCurrentRecipesDetail();
+  },
+
+  onPageScroll(options) {
+    this.scrollTop = options.scrollTop;
   },
 
   methods: {

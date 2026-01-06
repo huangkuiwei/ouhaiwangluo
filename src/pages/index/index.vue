@@ -1,6 +1,6 @@
 <template>
   <view class="index-page">
-    <view class="page-title">首页</view>
+    <view class="page-title" v-if="scrollTop < 20">首页</view>
 
     <view class="banner"></view>
 
@@ -425,6 +425,7 @@ export default {
       selectRecodeItem: {},
       motionRecodeList: [],
       exercisesPlanData: [],
+      scrollTop: 0,
     };
   },
 
@@ -434,6 +435,10 @@ export default {
 
   onLoad() {
     this.selectRecodeItem = this.foodRecodeList[0];
+  },
+
+  onPageScroll(options) {
+    this.scrollTop = options.scrollTop;
   },
 
   computed: {

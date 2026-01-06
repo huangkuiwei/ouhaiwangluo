@@ -223,10 +223,25 @@ export default {
     display: flex;
     align-items: center;
 
+    &::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+      color: transparent;
+    }
+
+    &::-webkit-scrollbar-track {
+      display: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      display: none;
+    }
+
     .calendar-day {
       flex-shrink: 0;
-      width: 60rpx;
-      height: 60rpx;
+      width: 56rpx;
+      height: 56rpx;
       border-radius: 50%;
       font-size: 28rpx;
       color: #323131;

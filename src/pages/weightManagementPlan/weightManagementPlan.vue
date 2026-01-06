@@ -183,8 +183,14 @@
 
         <template v-else>
           <view class="empty-food">
-            <text>当前未生成食谱，是否前往生成？</text>
-            <text @click="$toSwitch('/pages/AIAssistant/AIAssistant')">点击前往</text>
+            <template v-if="recipesDetail.id">
+              <text>AI食谱正在生成中，需要几分钟时间，请稍后刷新页面查看</text>
+            </template>
+
+            <template v-else>
+              <text>当前未生成食谱，是否前往生成？</text>
+              <text @click="$toSwitch('/pages/AIAssistant/AIAssistant')">点击前往</text>
+            </template>
           </view>
         </template>
       </view>

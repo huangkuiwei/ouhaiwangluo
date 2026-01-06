@@ -108,7 +108,7 @@
       <view class="no-more">暂无更多</view>
     </view>
 
-    <markAIRecipesDialog ref="markAIRecipesDialog" />
+    <markAIRecipesDialog ref="markAIRecipesDialog" @success="getCurrentRecipesDetail" />
 
     <custom-tab-bar />
   </view>
@@ -248,26 +248,7 @@ export default {
             },
           });
         } else {
-          uni.showLoading({
-            title: '加载中...',
-            mask: true,
-          });
-
-          this.getCurrentRecipesDetail().then(() => {
-            uni.hideLoading();
-
-            if (!this.currentRecipesDetail.recipes_list || !this.currentRecipesDetail.recipes_list.length) {
-              uni.showModal({
-                title: '温馨提示',
-                content: 'AI食谱正在生成中，需要几分钟时间，请稍后刷新页面查看',
-                showCancel: false,
-              });
-
-              return;
-            }
-
-            this.$toRouter('/pages/customizedRecipes/customizedRecipes');
-          });
+          this.$toRouter('/pages/customizedRecipes/customizedRecipes');
         }
       } else {
         this.$refs.markAIRecipesDialog.open();

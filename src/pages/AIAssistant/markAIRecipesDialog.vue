@@ -73,6 +73,16 @@ export default {
       type: Boolean,
       default: false,
     },
+
+    des: {
+      type: String,
+      default: '',
+    },
+
+    targetWeight: {
+      type: Number,
+      default: 0,
+    },
   },
 
   data() {
@@ -111,7 +121,17 @@ export default {
 
   methods: {
     open() {
-      let index = this.picker1.findIndex((item) => Number(item) === Number(this.userDetailInfo.target_weight));
+      if (this.des) {
+        this.demand = this.des;
+      }
+
+      let index;
+
+      if (this.targetWeight) {
+        index = this.picker1.findIndex((item) => Number(item) === Number(this.targetWeight));
+      } else {
+        index = this.picker1.findIndex((item) => Number(item) === Number(this.userDetailInfo.target_weight));
+      }
 
       if (index !== -1) {
         this.value1 = index;

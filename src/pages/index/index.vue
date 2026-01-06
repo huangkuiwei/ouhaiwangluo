@@ -187,29 +187,37 @@
     </view>
 
     <view class="weight-cards">
-      <view class="card-item" @click="showRecodeWeight">
-        <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/bg3.png" />
+      <view class="card-item">
+        <image
+          class="bg"
+          mode="widthFix"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/bg3_1.png"
+        />
         <view class="details details1">
+          <view class="title">体重记录</view>
+
           <template v-if="isLogin && userDetailInfo">
-            <text>{{ userDetailInfo.current_weight }}公斤</text>
-            <text v-if="updateTime === 1">今天更新</text>
-            <text v-else>{{ updateTime - 1 }}天前更新</text>
+            <view class="content">
+              <text>{{ userDetailInfo.current_weight }}公斤</text>
+              <text v-if="updateTime === 1">今天更新</text>
+              <text v-else>{{ updateTime - 1 }}天前更新</text>
+            </view>
           </template>
 
           <template v-else>
-            <text>待记录</text>
-            <text>无记录</text>
+            <view class="content">
+              <text>待记录</text>
+              <text>无记录</text>
+            </view>
           </template>
         </view>
-      </view>
 
-      <!-- TODO 轻断食 -->
-      <view class="card-item">
-        <image mode="widthFix" src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/bg4.png" />
-        <view class="details details2">
-          <text>用餐时间剩余：</text>
-          <text>01:00:48</text>
-        </view>
+        <image
+          @click="showRecodeWeight"
+          class="add-icon1"
+          mode="widthFix"
+          src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/index/icon6.png"
+        />
       </view>
     </view>
 
@@ -1223,22 +1231,33 @@ export default {
     margin-bottom: 22rpx;
 
     .card-item {
-      width: 340rpx;
+      width: 100%;
       position: relative;
 
-      image {
+      .bg {
         width: 100%;
       }
 
       .details {
         position: absolute;
-        left: 104rpx;
-        bottom: 22rpx;
-        display: flex;
-        flex-direction: column;
+        left: 0;
+        right: 0;
+        top: 16rpx;
+        bottom: 0;
         color: #323131;
 
-        &.details1 {
+        .title {
+          text-align: center;
+          font-weight: 600;
+          font-size: 24rpx;
+          margin-bottom: 20rpx;
+        }
+
+        .content {
+          padding-left: 122rpx;
+          display: flex;
+          flex-direction: column;
+
           text {
             &:nth-child(1) {
               font-size: 32rpx;
@@ -1250,19 +1269,13 @@ export default {
             }
           }
         }
+      }
 
-        &.details2 {
-          text {
-            &:nth-child(1) {
-              font-size: 16rpx;
-              margin-bottom: 6rpx;
-            }
-
-            &:nth-child(2) {
-              font-size: 32rpx;
-            }
-          }
-        }
+      .add-icon1 {
+        position: absolute;
+        top: 38rpx;
+        right: 24rpx;
+        width: 80rpx;
       }
     }
   }

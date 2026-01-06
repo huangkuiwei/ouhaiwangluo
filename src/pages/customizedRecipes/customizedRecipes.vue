@@ -1,7 +1,7 @@
 <template>
   <view class="customized-recipes">
     <view class="page-title">
-      <text>{{ currentRecipesDetail.name }}</text>
+      <text>AI定制食谱</text>
 
       <view class="back" @click="$toBack">
         <uni-icons class="back" color="#1A1A1A" type="left" size="22"></uni-icons>
@@ -32,26 +32,32 @@
         <!-- <text>{{ currentsStatisticsData.calorie }}千卡</text> -->
       </view>
 
-      <view class="ingredients" v-if="currentRecipesDetail.recipes_statistics_list">
+      <view class="ingredients">
         <view class="ingredients-item">
           <text>碳水化合物</text>
           <text
-            >{{ currentsStatisticsData.carbs }}g/{{ (currentsStatisticsData.carbs_proportion * 100).toFixed(1) }}%</text
+            >{{ currentsStatisticsData.carbs || 0 }}g/{{
+              ((currentsStatisticsData.carbs_proportion || 0) * 100).toFixed(1)
+            }}%</text
           >
         </view>
 
         <view class="ingredients-item">
           <text>蛋白质</text>
           <text
-            >{{ currentsStatisticsData.protein }}g/{{
-              (currentsStatisticsData.protein_proportion * 100).toFixed(1)
+            >{{ currentsStatisticsData.protein || 0 }}g/{{
+              ((currentsStatisticsData.protein_proportion || 0) * 100).toFixed(1)
             }}%</text
           >
         </view>
 
         <view class="ingredients-item">
           <text>脂肪</text>
-          <text>{{ currentsStatisticsData.fat }}g/{{ (currentsStatisticsData.fat_proportion * 100).toFixed(1) }}%</text>
+          <text
+            >{{ currentsStatisticsData.fat || 0 }}g/{{
+              ((currentsStatisticsData.fat_proportion || 0) * 100).toFixed(1)
+            }}%</text
+          >
         </view>
       </view>
 
@@ -85,7 +91,13 @@
       </view>
     </view>
 
-    <markAIRecipesDialog ref="markAIRecipesDialog" :reGen="true" @success="reGenSuccess" />
+    <markAIRecipesDialog
+      ref="markAIRecipesDialog"
+      :reGen="true"
+      :des="currentRecipesDetail.des"
+      :targetWeight="currentRecipesDetail.target_weight"
+      @success="reGenSuccess"
+    />
   </view>
 </template>
 
@@ -162,8 +174,9 @@ export default {
 
     currentsStatisticsData() {
       return (
-        this.currentRecipesDetail.recipes_statistics_list &&
-        this.currentRecipesDetail.recipes_statistics_list.find((item) => item.date === this.selectDateKey)
+        (this.currentRecipesDetail.recipes_statistics_list &&
+          this.currentRecipesDetail.recipes_statistics_list.find((item) => item.date === this.selectDateKey)) ||
+        {}
       );
     },
   },
@@ -214,6 +227,14 @@ export default {
 
         this.dateList = dateList;
         this.currentRecipesDetail = res.data;
+
+        if (!res.data.recipes_list.length) {
+          uni.showModal({
+            title: '温馨提示',
+            content: 'AI食谱正在生成中，需要几分钟时间，请稍后刷新页面查看',
+            showCancel: false,
+          });
+        }
       });
     },
 

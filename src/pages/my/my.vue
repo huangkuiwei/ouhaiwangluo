@@ -94,15 +94,6 @@
           <uni-icons color="#323131" type="right" size="14"></uni-icons>
         </view>
 
-        <!-- TODO 断食提醒 -->
-        <view class="nav-item">
-          <text class="nav-title">断食提醒</text>
-          <view>
-            <text>09:00</text>
-            <switch :checked="remind" @change="remind = !remind" />
-          </view>
-        </view>
-
         <view class="nav-item" @click="previewDataPage('/pages/dataReport/dataReport')">
           <text class="nav-title">数据报告</text>
           <uni-icons color="#323131" type="right" size="14"></uni-icons>

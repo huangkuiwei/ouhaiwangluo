@@ -25,6 +25,7 @@
           selected: day.selected,
           today: day.isToday,
         }"
+        :style="{ top: platform === 'ios' || platform === 'devtools' ? '18rpx' : '' }"
         @click="selectDay(day)"
       >
         {{ day.value }}
@@ -57,7 +58,10 @@ export default {
   },
 
   data() {
+    const platform = uni.getDeviceInfo().platform;
+
     return {
+      platform,
       currentDate: new Date().getTime(), // 当前显示月份的时间戳
       selectedDate: null, // 选中日期的时间戳
       minSelectableDate: null, // 最小可选日期（明天）

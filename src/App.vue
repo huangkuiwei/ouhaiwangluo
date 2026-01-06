@@ -16,8 +16,6 @@ export default {
   },
 
   onLaunch() {
-    uni.removeStorageSync('sign_order_no');
-
     // 获取用户信息
     this._getUserInfo();
     this._getUserDetailInfo();
@@ -63,12 +61,11 @@ export default {
       if (appId === 'wxbd687630cd02ce1d') {
         if (extraData.return_code === 'SUCCESS') {
           let sign_order_no = uni.getStorageSync('sign_order_no');
-          uni.setStorageSync('drawCount', 1);
 
           if (sign_order_no) {
             // 跳转到红包领取页面
             wx.navigateTo({
-              url: '/pages/lottery/lottery',
+              url: '/packagePart1/pages/receiveRedPacket/receiveRedPacket',
             });
           } else {
             // 跳转到订购成功页面
@@ -77,20 +74,10 @@ export default {
             });
           }
         } else {
-          let sign_order_no = uni.getStorageSync('sign_order_no');
           wx.showToast({
             title: '签约失败',
             icon: 'none',
           });
-
-          if (sign_order_no) {
-            setTimeout(() => {
-              // 跳转到红包领取页面
-              wx.navigateTo({
-                url: '/pages/lottery2/lottery2',
-              });
-            }, 500);
-          }
         }
       }
     }

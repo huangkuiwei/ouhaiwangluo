@@ -261,21 +261,6 @@
       }
     },
     {
-      "path": "pages/webview/webview",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
       "path": "pages/aiChat/aiChat",
       "style": {
         // #ifdef MP-WEIXIN
@@ -328,12 +313,6 @@
       }
     },
     {
-      "path": "pages/receiveRedPacket/receiveRedPacket",
-      "style": {
-        "navigationBarTitleText": "领取红包"
-      }
-    },
-    {
       "path": "pages/profile/profile",
       "style": {
         "navigationStyle": "custom",
@@ -354,36 +333,6 @@
         "navigationStyle": "custom",
         // #ifndef H5
         "navigationBarTitleText": "更改手机号",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
-      "path": "pages/lottery/lottery",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "抽奖",
-        // #endif
-        "h5": {
-          "titleNView": false
-        },
-        "app-plus": {
-          "softinputMode": "adjustResize"
-        }
-      }
-    },
-    {
-      "path": "pages/lottery2/lottery2",
-      "style": {
-        "navigationStyle": "custom",
-        // #ifndef H5
-        "navigationBarTitleText": "抽奖",
         // #endif
         "h5": {
           "titleNView": false
@@ -530,6 +479,33 @@
             "app-plus": {
               "softinputMode": "adjustResize"
             }
+          }
+        }
+      ]
+    },
+    {
+      "root": "packagePart1",
+      "name": "packagePart1",
+      "pages": [
+        {
+          "path": "pages/webview/webview",
+          "style": {
+            "navigationStyle": "custom",
+            // #ifndef H5
+            "navigationBarTitleText": "",
+            // #endif
+            "h5": {
+              "titleNView": false
+            },
+            "app-plus": {
+              "softinputMode": "adjustResize"
+            }
+          }
+        },
+        {
+          "path": "pages/receiveRedPacket/receiveRedPacket",
+          "style": {
+            "navigationBarTitleText": "领取红包"
           }
         }
       ]

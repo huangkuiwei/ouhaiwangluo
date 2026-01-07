@@ -22,7 +22,7 @@ export const onPay = (price, openid, mobile) => {
   // TODO 连续包月
   if (price.id === 10003) {
     $http
-      .post('https://hsdzapi.laketay.com/api/business/ali_sign/create_sign', {
+      .post('https://ohtfapi.ohiisp.com/api/business/ali_sign/create_sign', {
         mobile: mobile,
         pt: 15,
         url: 'https://hsdz.laketay.com/#/pages/tech/hsdzvipts/5072531?id=38808',
@@ -38,7 +38,7 @@ export const onPay = (price, openid, mobile) => {
 
         uni.request({
           method: 'GET',
-          url: `https://hsdzapi.laketay.com/api/business/ali_sign/au_order/${orderNo}`,
+          url: `https://ohtfapi.ohiisp.com/api/business/ali_sign/au_order/${orderNo}`,
           success: (res) => {
             if (res.data.code === 0 || res.data.Code === 0) {
               if (res.data.data.startsWith('http')) {

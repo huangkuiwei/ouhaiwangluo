@@ -40,12 +40,7 @@
           v-for="item of vipList"
           :key="item.id"
         >
-          <image
-            v-if="item.is_recommend"
-            class="is_recommend"
-            mode="aspectFit"
-            src="https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/buy/bg01.png"
-          />
+          <view class="recommend" v-if="item.is_recommend">推荐</view>
 
           <view class="top-part"></view>
           <view class="item-detail">
@@ -347,17 +342,26 @@ export default {
         display: flex;
         flex-direction: column;
 
-        .is_recommend {
+        .recommend {
           position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
+          left: 60rpx;
+          top: 6rpx;
+          width: 100rpx;
+          height: 34rpx;
+          background: #b3a1ff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          font-size: 22rpx;
+          color: #323131;
+          border-radius: 16rpx;
         }
 
         &.active {
           .item-detail {
             background: #ffffff;
+            border: 4rpx solid #b3a1ff;
           }
         }
 
@@ -374,6 +378,7 @@ export default {
           display: flex;
           flex-direction: column;
           justify-content: center;
+          border: 4rpx solid transparent;
 
           .name {
             font-size: 28rpx;
@@ -462,7 +467,8 @@ export default {
         .btn {
           width: 532rpx;
           height: 100rpx;
-          background: linear-gradient(86deg, #e8f480 0%, #fcffea 100%);
+          background: url('https://hnenjoy.oss-cn-shanghai.aliyuncs.com/ouhaiwangluo/buy/bg1.png') left top/100% 100%
+            no-repeat;
           border-radius: 60rpx 60rpx 60rpx 60rpx;
           font-weight: 600;
           font-size: 32rpx;

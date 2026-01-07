@@ -137,7 +137,7 @@ export default {
 
       uni.request({
         method: 'POST',
-        url: 'https://hsdzapi.laketay.com/api/microapp/order/we_h5/createordernew',
+        url: 'https://ohtfapi.ohiisp.com/api/microapp/order/we_h5/createordernew',
         data: {
           mobile: this.mobile,
           url: decodeURIComponent(this.shurl),
@@ -207,7 +207,7 @@ export default {
 
       uni.request({
         method: 'GET',
-        url: `https://hsdzapi.laketay.com/api/business/ali_sign/au_order/${this.queryO}`,
+        url: `https://ohtfapi.ohiisp.com/api/business/ali_sign/au_order/${this.queryO}`,
         success: (res) => {
           if (res.data.code === 0 || res.data.Code === 0) {
             let sign_order_no = res.header.sign_order_no;

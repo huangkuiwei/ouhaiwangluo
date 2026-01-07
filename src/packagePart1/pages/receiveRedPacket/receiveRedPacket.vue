@@ -78,7 +78,7 @@ export default {
 
       uni.request({
         method: 'POST',
-        url: `https://hsdzapi.laketay.com/api/open/order/cashgift/v3`,
+        url: `https://ohtfapi.ohiisp.com/api/open/order/cashgift/v3`,
         data: {
           external_agreement_no: this.sign_order_no,
         },
